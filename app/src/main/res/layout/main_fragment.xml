@@ -15,70 +15,125 @@
         android:textSize="48dp"
         android:gravity="center_horizontal"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:id="@+id/section_text"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header_title"
-        android:orientation="horizontal"
-        android:gravity="center_horizontal"
-        android:layout_marginTop="16dp"
-       >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ROUNDS"
-            android:textSize="16dp"
-            android:layout_margin="8dp"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TIME"
-            android:textSize="16dp"
-            android:layout_margin="8dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="REST"
-            android:textSize="16dp"
-            android:layout_margin="8dp"/>
 
-    </LinearLayout>
+
+
+
+
+
+
     <LinearLayout
         android:id="@+id/counter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/section_text"
+        app:layout_constraintTop_toBottomOf="@+id/header_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:orientation="horizontal"
         android:gravity="center_horizontal"
-
+        android:layout_marginTop="32dp"
         >
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="00"
-            android:textSize="16dp"
-            android:layout_margin="32dp"
-            />
-        <TextView
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ROUNDS"
+                android:textSize="16dp"
+                android:layout_gravity="start"
+                android:layout_marginStart="12dp"
+
+                />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:background="@drawable/ic_baseline_keyboard_arrow_up_24"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00"
+                android:textSize="16dp"
+                android:layout_gravity="center_horizontal"
+                />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_baseline_keyboard_arrow_down_24"
+                android:layout_gravity="start"
+                />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="00"
-            android:textSize="16dp"
-            android:layout_margin="32dp"
-            />
-        <TextView
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="REST"
+                android:textSize="16dp"
+                android:layout_gravity="center_horizontal"
+                />
+
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_baseline_keyboard_arrow_up_24"
+                android:layout_gravity="start"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00"
+                android:textSize="16dp"
+                android:layout_gravity="center_horizontal"
+                />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_baseline_keyboard_arrow_down_24"
+                android:layout_gravity="start"
+                />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="00"
-            android:textSize="16dp"
-            android:layout_margin="32dp"
-           />
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TIME"
+                android:textSize="16dp"
+                android:layout_gravity="center_horizontal"
+                />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_baseline_keyboard_arrow_up_24"
+                android:layout_gravity="start"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00"
+                android:textSize="16dp"
+                android:layout_gravity="center_horizontal"
+                />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_baseline_keyboard_arrow_down_24"
+                android:layout_gravity="start"
+                />
+        </LinearLayout>
     </LinearLayout>
     <Button
         android:layout_width="match_parent"
