@@ -53,9 +53,10 @@
                 android:background="@drawable/ic_baseline_keyboard_arrow_up_24"
                 />
             <EditText
+                android:id="@+id/edtxt_round"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="00"
+                android:hint="0"
                 android:textSize="16dp"
                 android:layout_gravity="center_horizontal"
                 android:inputType="number"
@@ -75,7 +76,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="REST"
+                android:text="REST(sec)"
                 android:textSize="16dp"
                 android:layout_gravity="center_horizontal"
                 />
@@ -88,9 +89,10 @@
                 android:layout_gravity="start"
                 />
             <EditText
+                android:id="@+id/edtxt_rest"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="00:00"
+                android:hint="0"
                 android:textSize="16dp"
                 android:layout_gravity="center_horizontal"
                 android:inputType="number"
@@ -111,7 +113,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TIME"
+                android:text="TIME(min)"
                 android:textSize="16dp"
                 android:layout_gravity="center_horizontal"
                 />
@@ -123,9 +125,10 @@
                 android:layout_gravity="start"
                 />
             <EditText
+                android:id="@+id/edtxt_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="00:00"
+                android:hint="0"
                 android:textSize="16dp"
                 android:layout_gravity="center_horizontal"
                 android:inputType="number"
