@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import com.example.spartime.databinding.FragmentRoundCounterBinding
 import com.example.spartime.databinding.MainFragmentBinding
 
 class MainActivity : AppCompatActivity() {
@@ -17,11 +18,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = MainFragmentBinding.inflate(layoutInflater)
+        val bindingRoundFragment = FragmentRoundCounterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setupListeners(binding)
+        setupListeners(binding, bindingRoundFragment)
     }
 
-    private fun setupListeners(binding: MainFragmentBinding){
+    private fun setupListeners(binding: MainFragmentBinding, bindingRoundFragment: FragmentRoundCounterBinding){
         binding.edtxtRound.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 round = Integer.parseInt(s.toString())
@@ -61,5 +63,8 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        binding.startBtn.setOnClickListener {
+            setContentView(bindingRoundFragment.root)
+        }
     }
 }
