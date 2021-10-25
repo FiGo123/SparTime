@@ -11,16 +11,18 @@ import com.example.spartime.databinding.MainFragmentBinding
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding :MainFragmentBinding
     var round = 0
     var rest = 0
     var time = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = MainFragmentBinding.inflate(layoutInflater)
+        binding = MainFragmentBinding.inflate(layoutInflater)
         val bindingRoundFragment = FragmentRoundCounterBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupListeners(binding, bindingRoundFragment)
+
     }
 
     private fun setupListeners(binding: MainFragmentBinding, bindingRoundFragment: FragmentRoundCounterBinding){
@@ -65,6 +67,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.startBtn.setOnClickListener {
             setContentView(bindingRoundFragment.root)
+
         }
+
     }
 }
