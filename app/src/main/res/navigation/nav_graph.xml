@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/first">
 
+    <fragment android:id="@+id/placeholder" />
+    <fragment
+        android:id="@+id/first"
+        android:name="com.example.spartime.First"
+        android:label="fragment_first"
+        tools:layout="@layout/fragment_first" >
+        <action
+            android:id="@+id/action_first_to_second"
+            app:destination="@id/second" />
+    </fragment>
+    <fragment
+        android:id="@+id/second"
+        android:name="com.example.spartime.Second"
+        android:label="fragment_second"
+        tools:layout="@layout/fragment_second" >
+        <action
+            android:id="@+id/action_second_to_first"
+            app:destination="@id/first" />
+    </fragment>
 </navigation>

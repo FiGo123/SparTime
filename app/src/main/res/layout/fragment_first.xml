@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView
+        android:id="@+id/header_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp"
+        android:layout_marginTop="32dp"
+        android:text="SparTime"
+        android:textSize="48dp"
+        android:gravity="center_horizontal"/>
+
+
+    <LinearLayout
+        android:id="@+id/counter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/header_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="40dp"
+        >
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ROUNDS"
+                android:textSize="24dp"
+                android:layout_gravity="start"
+                android:layout_margin="8dp"
+
+                />
+
+            <EditText
+                android:id="@+id/edtxt_round"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="0"
+                android:textSize="40dp"
+                android:layout_gravity="center_horizontal"
+                android:inputType="number"
+                android:layout_marginTop="24dp"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="REST(sec)"
+                android:textSize="24dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="8dp"
+                />
+
+
+            <EditText
+                android:id="@+id/edtxt_rest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="0"
+                android:textSize="40dp"
+                android:layout_gravity="center_horizontal"
+                android:inputType="number"
+                android:layout_marginTop="24dp"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TIME(min)"
+                android:textSize="24dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="8dp"
+                />
+
+            <EditText
+                android:id="@+id/edtxt_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="0"
+                android:textSize="40dp"
+                android:layout_gravity="center_horizontal"
+                android:inputType="number"
+                android:layout_marginTop="24dp"
+                />
+
+        </LinearLayout>
+    </LinearLayout>
+    <Button
+        android:id="@+id/start_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/counter"
+        android:layout_marginTop="64dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginEnd="80dp"
+        android:text="START"
+        android:textSize="32dp"
+        android:background="@color/black"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
