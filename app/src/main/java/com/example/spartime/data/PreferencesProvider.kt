@@ -13,6 +13,8 @@ class PreferencesProvider(context: Context) {
 
     fun putInt(key: String, value: Int) =  sharedPreferences.edit().putInt(key,value).apply()
 
+    fun putBoolean(key: String, value: Boolean) =  sharedPreferences.edit().putBoolean(key,value).apply()
+
     fun getInt(key: String): Int = sharedPreferences.getInt(key,0)
 
     fun remove(key: String) = sharedPreferences.edit().remove(key).apply()
