@@ -59,8 +59,7 @@ class First : Fragment() {
         binding.edtxtRound.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 round = Integer.parseInt(s.toString())
-                println("amazon $s")
-                println("pablo $round")
+
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -72,7 +71,6 @@ class First : Fragment() {
         })
         binding.edtxtRest.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                println("namjera $round")
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -84,7 +82,6 @@ class First : Fragment() {
         })
         binding.edtxtTime.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                println("trenutak $round")
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
