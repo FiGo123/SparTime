@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import com.example.spartime.databinding.FragmentFirstBinding
 import com.example.spartime.databinding.FragmentRoundCounterBinding
 import com.example.spartime.databinding.FragmentSecondBinding
@@ -24,32 +25,25 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class First : Fragment() {
-    private lateinit var binding : FragmentFirstBinding
     private lateinit var bindingRoundFragment : FragmentSecondBinding
     var round = 0
     var rest = 0
     var time = 0
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
-        val bindingRoundFragment = FragmentSecondBinding.inflate(layoutInflater)
-        //setContentView(binding.root)
-        setupListeners(binding, bindingRoundFragment)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = layoutInflater.inflate(R.layout.fragment_first, container, false)
-        binding = FragmentFirstBinding.inflate(layoutInflater)
-        bindingRoundFragment = FragmentSecondBinding.inflate(layoutInflater)
-        binding.startBtn.setOnClickListener{
-            Navigation.findNavController(view).navigate(R.id.action_first_to_second)
-        }
+        println("zabizuretea")
+        val view = inflater.inflate(R.layout.fragment_first, container, false)
+        //val binding : FragmentFirstBinding = FragmentFirstBinding.inflate(layoutInflater)
+        //bindingRoundFragment = FragmentSecondBinding.inflate(layoutInflater)
+
+
+
 
         return view
     }
@@ -92,10 +86,7 @@ class First : Fragment() {
             }
         })
 
-        binding.startBtn.setOnClickListener {
-       //     setContentView(bindingRoundFragment.root)
 
-        }
 
     }
 }

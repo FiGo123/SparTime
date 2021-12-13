@@ -110,7 +110,7 @@
         </LinearLayout>
     </LinearLayout>
     <Button
-        android:id="@+id/start_btn"
+        android:id="@+id/first_fragment_start_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"

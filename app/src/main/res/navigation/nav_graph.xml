@@ -5,7 +5,6 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/first">
 
-    <fragment android:id="@+id/placeholder" />
     <fragment
         android:id="@+id/first"
         android:name="com.example.spartime.First"
