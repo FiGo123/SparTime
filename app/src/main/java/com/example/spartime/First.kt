@@ -7,12 +7,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.Navigation
+import android.widget.Button
 import androidx.navigation.findNavController
 import com.example.spartime.databinding.FragmentFirstBinding
-import com.example.spartime.databinding.FragmentRoundCounterBinding
 import com.example.spartime.databinding.FragmentSecondBinding
-import com.example.spartime.databinding.MainFragmentBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -39,17 +37,20 @@ class First : Fragment() {
     ): View? {
         println("zabizuretea")
         val view = inflater.inflate(R.layout.fragment_first, container, false)
-        //val binding : FragmentFirstBinding = FragmentFirstBinding.inflate(layoutInflater)
-        //bindingRoundFragment = FragmentSecondBinding.inflate(layoutInflater)
+        val binding= FragmentFirstBinding.inflate(layoutInflater)
+        val myBtn: Button = view.findViewById(R.id.first_fragment_start_btn)
+        myBtn.setOnClickListener {
+            println("zabizuresddstea")
+            it.findNavController().navigate(R.id.action_first_to_second)
+        }
 
-
-
+        setupListeners(binding)
 
         return view
     }
 
 
-    private fun setupListeners(binding: FragmentFirstBinding, bindingRoundFragment: FragmentSecondBinding){
+    private fun setupListeners(binding: FragmentFirstBinding){
         binding.edtxtRound.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 round = Integer.parseInt(s.toString())
@@ -85,6 +86,7 @@ class First : Fragment() {
 
             }
         })
+
 
 
 
