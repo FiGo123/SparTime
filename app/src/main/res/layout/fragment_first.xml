@@ -43,7 +43,7 @@
                 />
 
             <EditText
-                android:id="@+id/edtxt_round"
+                android:id="@+id/fragment_first_edtxt_round"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="0"
