@@ -6,9 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.findNavController
+import com.example.spartime.databinding.FragmentFirstBinding
 import com.example.spartime.databinding.FragmentSecondBinding
 import com.example.spartime.viewmodel.MainViewModel
 
@@ -28,6 +31,7 @@ class Second : Fragment() {
     private var param2: String? = null
     var numRounds = 0
     var roundLength = 0
+    var pauseLength = 0
 
     private val mainViewModel: MainViewModel by activityViewModels()
 
@@ -50,21 +54,34 @@ class Second : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
+       val view = inflater.inflate(R.layout.fragment_second, container, false)
        val binding= FragmentSecondBinding.inflate(layoutInflater)
+       val startBtn: Button = view.findViewById(R.id.roundFragmentBtn)
+       binding.roundFragmentBtn.setOnClickListener {
+           println("Back")
+           it.findNavController().navigate(R.id.action_second_to_first)
+       }
+       startBtn.setOnClickListener {
+           println("Stop")
+           it.findNavController().navigate(R.id.action_second_to_first)
+       }
        val roundTime: TextView? = view?.findViewById(R.id.timeCounter)
-       mainViewModel.numOfRounds.observe(viewLifecycleOwner,
-           { num -> println("toltava $num")
-           })
-       mainViewModel.roundLengthInMin.observe(viewLifecycleOwner,
-           { length -> roundLength = length
-               roundTime?.text = length.toString()
-           })
-       mainViewModel.pauseLengthInSecs.observe(viewLifecycleOwner,
-           { length -> println("rajna $length")
-           })
+       mainViewModel.numOfRounds.observe(viewLifecycleOwner
+       ) { num ->
+           numRounds = num
+       }
+       mainViewModel.roundLengthInMin.observe(viewLifecycleOwner
+       ) { length ->
+           roundTime?.text = length.toString()
+           roundLength = length
+           roundTime?.text = length.toString()
+       }
+       mainViewModel.pauseLengthInSecs.observe(viewLifecycleOwner
+       ) { pauseLengthInObserver ->
+           println("PauseObserver")
+           pauseLength = pauseLengthInObserver
+       }
 
-       println("regres $roundLength")
 
         // Inflate the layout for this fragment
        return inflater.inflate(R.layout.fragment_second, container, false)

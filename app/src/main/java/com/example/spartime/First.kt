@@ -43,10 +43,13 @@ class First : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_first, container, false)
         val binding= FragmentFirstBinding.inflate(layoutInflater)
-        val myBtn: Button = view.findViewById(R.id.first_fragment_start_btn)
+        val startBtn: Button = view.findViewById(R.id.first_fragment_start_btn)
 
-        myBtn.setOnClickListener {
-            println("zabizuresddstea")
+        startBtn.setOnClickListener {
+            println("Values of Round/Rest/Time")
+            println(round)
+            println(rest)
+            println(time)
             it.findNavController().navigate(R.id.action_first_to_second)
         }
 
@@ -60,10 +63,8 @@ class First : Fragment() {
         val edtxtRound: EditText = view.findViewById(R.id.fragment_first_edtxt_round)
         edtxtRound.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                println("coroonaa")
 
                 round = Integer.parseInt(s.toString())
-                println("zabizuretea $round")
                 mainViewModel.setNumOfRounds(round)
             }
 
@@ -93,7 +94,6 @@ class First : Fragment() {
         val edtxtTime: EditText = view.findViewById(R.id.edtxt_time)
         edtxtTime.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                println("jezuiti ${Integer.parseInt(s.toString())}")
                 mainViewModel.setRoundLengthInMin(Integer.parseInt(s.toString()))
             }
 
