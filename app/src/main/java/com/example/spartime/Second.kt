@@ -6,14 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
-import com.example.spartime.databinding.FragmentFirstBinding
 import com.example.spartime.databinding.FragmentSecondBinding
 import com.example.spartime.viewmodel.MainViewModel
+import android.os.CountDownTimer
+import android.widget.TextView
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -27,6 +25,12 @@ private const val ARG_PARAM2 = "param2"
  */
 class Second : Fragment() {
     // TODO: Rename and change types of parameters
+    private lateinit var countDownTimer: CountDownTimer
+    private var timeRemainingInMillis = 0L
+    private var initialTimeInMinutes = 0
+    private lateinit var timeTextView: TextView
+
+
     private var param1: String? = null
     private var param2: String? = null
     private var numRounds = 0
@@ -56,8 +60,10 @@ class Second : Fragment() {
     ): View {
        val binding = FragmentSecondBinding.inflate(inflater, container, false)
        binding.roundFragmentBtn.setOnClickListener {
+           countDownTimer.cancel()
            it.findNavController().navigate(R.id.action_second_to_first)
        }
+
 
        val roundTimePlaceholder = binding.roundNum
        val roundTime = binding.timeCounter
@@ -70,7 +76,9 @@ class Second : Fragment() {
        ) {
            length -> roundTime.text = length.toString()
            roundLength = length
-           roundTime.text = length.toString()
+           initialTimeInMinutes = roundLength // Example value
+           timeRemainingInMillis = (initialTimeInMinutes * 60 * 1000).toLong()
+           startTimer(roundTime)
        }
        mainViewModel.pauseLengthInSecs.observe(viewLifecycleOwner
        ) {
@@ -101,4 +109,29 @@ class Second : Fragment() {
                 }
             }
     }
+
+
+    private fun startTimer(roundTime: TextView) {
+        println("startTimer")
+        countDownTimer = object : CountDownTimer(timeRemainingInMillis, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                println(millisUntilFinished)
+                timeRemainingInMillis = millisUntilFinished
+                updateTimeText(roundTime)
+            }
+
+            override fun onFinish() {
+                // Handle timer completion, e.g., display a message or reset the timer
+            }
+        }.start()
+    }
+
+    private fun updateTimeText(roundTime: TextView) {
+        val minutes = timeRemainingInMillis / 60000
+        val seconds = (timeRemainingInMillis % 60000) / 1000
+
+        val formattedTime = String.format("%02d:%02d", minutes, seconds)
+        roundTime.text = formattedTime
+    }
+
 }
