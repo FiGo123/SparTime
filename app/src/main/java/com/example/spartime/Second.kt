@@ -29,9 +29,9 @@ class Second : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    var numRounds = 0
-    var roundLength = 0
-    var pauseLength = 0
+    private var numRounds = 0
+    private var roundLength = 0
+    private var pauseLength = 0
 
     private val mainViewModel: MainViewModel by activityViewModels()
 
@@ -53,38 +53,33 @@ class Second : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-       val view = inflater.inflate(R.layout.fragment_second, container, false)
-       val binding= FragmentSecondBinding.inflate(layoutInflater)
-       val startBtn: Button = view.findViewById(R.id.roundFragmentBtn)
+    ): View {
+       val binding = FragmentSecondBinding.inflate(inflater, container, false)
        binding.roundFragmentBtn.setOnClickListener {
-           println("Back")
            it.findNavController().navigate(R.id.action_second_to_first)
        }
-       startBtn.setOnClickListener {
-           println("Stop")
-           it.findNavController().navigate(R.id.action_second_to_first)
-       }
-       val roundTime: TextView? = view?.findViewById(R.id.timeCounter)
+
+       val roundTimePlaceholder = binding.roundNum
+       val roundTime = binding.timeCounter
        mainViewModel.numOfRounds.observe(viewLifecycleOwner
-       ) { num ->
-           numRounds = num
+       ) {
+           num -> numRounds = num
+           //roundTimePlaceholder.text = "Round $num"
        }
        mainViewModel.roundLengthInMin.observe(viewLifecycleOwner
-       ) { length ->
-           roundTime?.text = length.toString()
+       ) {
+           length -> roundTime.text = length.toString()
            roundLength = length
-           roundTime?.text = length.toString()
+           roundTime.text = length.toString()
        }
        mainViewModel.pauseLengthInSecs.observe(viewLifecycleOwner
-       ) { pauseLengthInObserver ->
-           println("PauseObserver")
-           pauseLength = pauseLengthInObserver
+       ) {
+           pauseLengthInObserver -> pauseLength = pauseLengthInObserver
        }
 
 
         // Inflate the layout for this fragment
-       return inflater.inflate(R.layout.fragment_second, container, false)
+       return binding.root
     }
 
     companion object {

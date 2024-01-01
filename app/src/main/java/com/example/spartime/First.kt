@@ -46,10 +46,6 @@ class First : Fragment() {
         val startBtn: Button = view.findViewById(R.id.first_fragment_start_btn)
 
         startBtn.setOnClickListener {
-            println("Values of Round/Rest/Time")
-            println(round)
-            println(rest)
-            println(time)
             it.findNavController().navigate(R.id.action_first_to_second)
         }
 
@@ -63,46 +59,38 @@ class First : Fragment() {
         val edtxtRound: EditText = view.findViewById(R.id.fragment_first_edtxt_round)
         edtxtRound.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-
                 round = Integer.parseInt(s.toString())
                 mainViewModel.setNumOfRounds(round)
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                println("coroonaa")
-            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                println("coroonaa")
-            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
         val edtxtRest: EditText = view.findViewById(R.id.edtxt_rest)
         edtxtRest.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-
+                rest = Integer.parseInt(s.toString())
+                mainViewModel.setPauseLengthInSecs(rest)
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                println("coroonaa")
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                println("coroonaa")
-
             }
         })
         val edtxtTime: EditText = view.findViewById(R.id.edtxt_time)
         edtxtTime.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                mainViewModel.setRoundLengthInMin(Integer.parseInt(s.toString()))
+                time = Integer.parseInt(s.toString())
+                mainViewModel.setRoundLengthInMin(time)
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                println("coroonaa")
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                println("coroonaa")
             }
         })
 
