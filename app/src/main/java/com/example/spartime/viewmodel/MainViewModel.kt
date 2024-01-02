@@ -7,7 +7,7 @@ class MainViewModel : ViewModel(){
 
     val numOfRounds = MutableLiveData<Int>()
     val roundLengthInMin = MutableLiveData<Int>()
-    val pauseLengthInSecs = MutableLiveData<Int>()
+    val pauseLengthInMin = MutableLiveData<Int>()
 
     fun setNumOfRounds(numberOfRounds:Int){
         numOfRounds.value = numberOfRounds
@@ -16,7 +16,7 @@ class MainViewModel : ViewModel(){
         roundLengthInMin.value = seconds
     }
     fun setPauseLengthInSecs(seconds:Int){
-        pauseLengthInSecs.value = seconds
+        pauseLengthInMin.value = seconds
     }
 
 }

@@ -1,4 +1,4 @@
-package com.example.spartime.UI
+package com.example.spartime
 
 import android.os.Bundle
 import android.text.Editable
@@ -11,7 +11,6 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
-import com.example.spartime.R
 import com.example.spartime.databinding.FragmentFirstBinding
 import com.example.spartime.databinding.FragmentSecondBinding
 import com.example.spartime.viewmodel.MainViewModel
