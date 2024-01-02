@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/first"
-        android:name="com.example.spartime.First"
+        android:name="com.example.spartime.UI.First"
         android:label="fragment_first"
         tools:layout="@layout/fragment_first" >
         <action
@@ -16,11 +16,23 @@
     </fragment>
     <fragment
         android:id="@+id/second"
-        android:name="com.example.spartime.Second"
+        android:name="com.example.spartime.UI.Second"
         android:label="fragment_second"
         tools:layout="@layout/fragment_second" >
         <action
             android:id="@+id/action_second_to_first"
             app:destination="@id/first" />
+        <action
+            android:id="@+id/action_second_to_rest"
+            app:destination="@id/rest" />
+    </fragment>
+    <fragment
+        android:id="@+id/rest"
+        android:name="com.example.spartime.UI.Rest"
+        android:label="Rest"
+        tools:layout="@layout/fragment_rest">
+        <action
+            android:id="@+id/action_rest_to_second"
+            app:destination="@id/second" />
     </fragment>
 </navigation>

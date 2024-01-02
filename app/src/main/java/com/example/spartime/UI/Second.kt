@@ -1,22 +1,18 @@
-package com.example.spartime
+package com.example.spartime.UI
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
+import com.example.spartime.R
 import com.example.spartime.databinding.FragmentSecondBinding
 import com.example.spartime.viewmodel.MainViewModel
-import android.os.CountDownTimer
-import android.widget.TextView
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
@@ -39,15 +35,7 @@ class Second : Fragment() {
 
     private val mainViewModel: MainViewModel by activityViewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-
-    }
 
    // override fun onBackPressed() {
     //    println("catch on back pressed")
@@ -55,8 +43,8 @@ class Second : Fragment() {
    // }
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+       inflater: LayoutInflater, container: ViewGroup?,
+       savedInstanceState: Bundle?
     ): View {
        val binding = FragmentSecondBinding.inflate(inflater, container, false)
        binding.roundFragmentBtn.setOnClickListener {
@@ -78,7 +66,7 @@ class Second : Fragment() {
            roundLength = length
            initialTimeInMinutes = roundLength // Example value
            timeRemainingInMillis = (initialTimeInMinutes * 60 * 1000).toLong()
-           startTimer(roundTime)
+           startTimer(binding)
        }
        mainViewModel.pauseLengthInSecs.observe(viewLifecycleOwner
        ) {
@@ -104,18 +92,15 @@ class Second : Fragment() {
         fun newInstance(param1: String, param2: String) =
             Second().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
                 }
             }
     }
 
 
-    private fun startTimer(roundTime: TextView) {
+    private fun startTimer(roundTime: FragmentSecondBinding) {
         println("startTimer")
         countDownTimer = object : CountDownTimer(timeRemainingInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                println(millisUntilFinished)
                 timeRemainingInMillis = millisUntilFinished
                 updateTimeText(roundTime)
             }
@@ -126,12 +111,16 @@ class Second : Fragment() {
         }.start()
     }
 
-    private fun updateTimeText(roundTime: TextView) {
+    private fun updateTimeText(binding: FragmentSecondBinding) {
         val minutes = timeRemainingInMillis / 60000
         val seconds = (timeRemainingInMillis % 60000) / 1000
 
         val formattedTime = String.format("%02d:%02d", minutes, seconds)
-        roundTime.text = formattedTime
+        binding.timeCounter.text = formattedTime
+        if (seconds.toInt() == 1){
+            binding.root.findNavController().navigate(R.id.action_second_to_rest)
+        }
+
     }
 
 }

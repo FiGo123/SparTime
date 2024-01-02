@@ -1,24 +1,20 @@
-package com.example.spartime
+package com.example.spartime.UI
 
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
+import com.example.spartime.R
 import com.example.spartime.databinding.FragmentFirstBinding
 import com.example.spartime.databinding.FragmentSecondBinding
 import com.example.spartime.viewmodel.MainViewModel
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
@@ -55,7 +51,7 @@ class First : Fragment() {
     }
 
 
-    private fun setupListeners(binding: FragmentFirstBinding,view: View){
+    private fun setupListeners(binding: FragmentFirstBinding, view: View){
         val edtxtRound: EditText = view.findViewById(R.id.fragment_first_edtxt_round)
         edtxtRound.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
