@@ -43,6 +43,10 @@ class First : Fragment() {
         startBtn.setOnClickListener {
             it.findNavController().navigate(R.id.action_first_to_second)
         }
+        mainViewModel.numOfRounds.value = 0
+        mainViewModel.currentRound.value = 0
+        mainViewModel.roundLengthInMin.value = 0
+        mainViewModel.pauseLengthInMin.value = 0
 
         setupListeners(binding,view)
 
@@ -56,6 +60,7 @@ class First : Fragment() {
             override fun afterTextChanged(s: Editable?) {
                 round = Integer.parseInt(s.toString())
                 mainViewModel.setNumOfRounds(round)
+                mainViewModel.setCurrentRound(1)
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -79,6 +84,7 @@ class First : Fragment() {
         edtxtTime.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 time = Integer.parseInt(s.toString())
+                println("hajnbc")
                 mainViewModel.setRoundLengthInMin(time)
             }
 

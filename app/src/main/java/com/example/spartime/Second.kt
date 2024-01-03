@@ -12,6 +12,9 @@ import com.example.spartime.databinding.FragmentSecondBinding
 import com.example.spartime.viewmodel.MainViewModel
 import android.os.CountDownTimer
 import android.widget.TextView
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -33,7 +36,8 @@ class Second : Fragment() {
 
     private var param1: String? = null
     private var param2: String? = null
-    private var numRounds = 0
+    private var currentRound = 0
+    private var roundNum = 0
     private var roundLength = 0
     private var pauseLength = 0
 
@@ -59,18 +63,26 @@ class Second : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentSecondBinding.inflate(inflater, container, false)
+
+        val navController = findNavController()
         binding.roundFragmentBtn.setOnClickListener {
             countDownTimer.cancel()
             it.findNavController().navigate(R.id.action_second_to_first)
         }
 
+        if (mainViewModel.currentRound.value!! > mainViewModel.numOfRounds.value!! && mainViewModel.currentRound.value!! > 0){
+           navController.navigate(R.id.action_second_to_first)
+        }
 
-        val roundTimePlaceholder = binding.roundNum
         val roundTime = binding.timeCounter
+        mainViewModel.currentRound.observe(viewLifecycleOwner
+        ) {
+            currentRoundValue -> currentRound = currentRoundValue
+            binding.roundNum.text = "Round $currentRound"
+        }
         mainViewModel.numOfRounds.observe(viewLifecycleOwner
         ) {
-                num -> numRounds = num
-            //roundTimePlaceholder.text = "Round $num"
+                numOfRoundsValue -> roundNum = numOfRoundsValue
         }
         mainViewModel.roundLengthInMin.observe(viewLifecycleOwner
         ) {
@@ -78,10 +90,16 @@ class Second : Fragment() {
             roundLength = length
             initialTimeInMinutes = roundLength // Example value
             timeRemainingInMillis = (initialTimeInMinutes * 60 * 1000).toLong()
-            startTimer(binding)
+            println("startcina")
+            if (mainViewModel.currentRound.value!! > mainViewModel.numOfRounds.value!! && mainViewModel.currentRound.value!! > 0){
+                println()
+               // navController.navigate(R.id.action_second_to_first)
+            }else{
+                startTimer(binding,findNavController())
+            }
+
+
         }
-
-
 
         // Inflate the layout for this fragment
         return binding.root
@@ -108,28 +126,32 @@ class Second : Fragment() {
     }
 
 
-    private fun startTimer(roundTime: FragmentSecondBinding) {
-        println("startTimer")
+    private fun startTimer(roundTime: FragmentSecondBinding, findNavController: NavController) {
+        val currentDestinationId = findNavController().currentDestination?.id
         countDownTimer = object : CountDownTimer(timeRemainingInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 println(millisUntilFinished)
                 timeRemainingInMillis = millisUntilFinished
-                updateTimeText(roundTime)
+                updateTimeText(roundTime, findNavController)
             }
 
             override fun onFinish() {
-                roundTime.root.findNavController().navigate(R.id.action_second_to_rest)
+                println("problemvina")
+
+                findNavController.navigate(R.id.action_second_to_rest)
+
                 // Handle timer completion, e.g., display a message or reset the timer
             }
         }.start()
     }
 
-    private fun updateTimeText(binding: FragmentSecondBinding) {
+    private fun updateTimeText(binding: FragmentSecondBinding, findNavController: NavController) {
         val minutes = timeRemainingInMillis / 60000
         val seconds = (timeRemainingInMillis % 60000) / 1000
-
+        println("euroleague $seconds")
         val formattedTime = String.format("%02d:%02d", minutes, seconds)
         binding.timeCounter.text = formattedTime
+
 
     }
 

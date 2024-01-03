@@ -9,7 +9,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.example.spartime.databinding.FragmentRestBinding
 import com.example.spartime.viewmodel.MainViewModel
 
@@ -38,37 +40,42 @@ class Rest : Fragment() {
                 pauseLengthInObserver -> initialTimeInMinutes = pauseLengthInObserver
                 println("Rest duration")
                 timeRemainingInMillis = (initialTimeInMinutes * 60 * 1000).toLong()
-                startTimer(binding)
+                startTimer(binding, findNavController())
         }
 
-
-
+        val valueFromPreviousRound = mainViewModel.currentRound.value
+        val currentRoundValue = valueFromPreviousRound?.plus(1)
+        if (currentRoundValue != null) {
+            mainViewModel.setCurrentRound(currentRoundValue)
+        }
         return binding.root
     }
 
 
 
 
-    private fun startTimer(binding: FragmentRestBinding) {
+    private fun startTimer(binding: FragmentRestBinding, findNavController: NavController) {
         countDownTimer = object : CountDownTimer(timeRemainingInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 timeRemainingInMillis = millisUntilFinished
-                updateTimeText(binding)
+                updateTimeText(binding, findNavController)
             }
 
             override fun onFinish() {
-                // Handle timer completion (e.g., dismiss dialog, play sound)
-                binding.root.findNavController().navigate(R.id.action_rest_to_second)
+                findNavController.navigate(R.id.action_rest_to_second)
+
+                // Handle timer completion (e.g., dismiss dialog, play sound) countDownTimer.cancel()
             }
         }.start()
     }
 
-    private fun updateTimeText(binding: FragmentRestBinding) {
+    private fun updateTimeText(binding: FragmentRestBinding, findNavController: NavController) {
         val minutes = timeRemainingInMillis / 60000
         val seconds = (timeRemainingInMillis % 60000) / 1000
 
         val formattedTime = String.format("%02d:%02d", minutes, seconds)
         binding.restTimeCounter.text = formattedTime
+
 
     }
 

@@ -8,6 +8,7 @@ class MainViewModel : ViewModel(){
     val numOfRounds = MutableLiveData<Int>()
     val roundLengthInMin = MutableLiveData<Int>()
     val pauseLengthInMin = MutableLiveData<Int>()
+    val currentRound = MutableLiveData<Int>()
 
     fun setNumOfRounds(numberOfRounds:Int){
         numOfRounds.value = numberOfRounds
@@ -18,5 +19,9 @@ class MainViewModel : ViewModel(){
     fun setPauseLengthInSecs(seconds:Int){
         pauseLengthInMin.value = seconds
     }
+    fun setCurrentRound(currentRoundFromFragment:Int){
+        currentRound.value = currentRoundFromFragment
+    }
+
 
 }
