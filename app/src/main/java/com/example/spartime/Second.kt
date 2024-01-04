@@ -90,12 +90,12 @@ class Second : Fragment() {
             roundLength = length
             initialTimeInMinutes = roundLength // Example value
             timeRemainingInMillis = (initialTimeInMinutes * 60 * 1000).toLong()
-            println("startcina")
-            if (mainViewModel.currentRound.value!! > mainViewModel.numOfRounds.value!! && mainViewModel.currentRound.value!! > 0){
+            val currRound = mainViewModel.currentRound.value!!
+            val numOfRounds = mainViewModel.numOfRounds.value!!
+            if (currRound > numOfRounds && currRound > 0){
                 println()
-               // navController.navigate(R.id.action_second_to_first)
             }else{
-                startTimer(binding,findNavController())
+                startTimer(binding,findNavController(), currRound, numOfRounds)
             }
 
 
@@ -126,21 +126,21 @@ class Second : Fragment() {
     }
 
 
-    private fun startTimer(roundTime: FragmentSecondBinding, findNavController: NavController) {
-        val currentDestinationId = findNavController().currentDestination?.id
+    private fun startTimer(roundTime: FragmentSecondBinding, findNavController: NavController, currRound: Int, numOfRounds: Int) {
         countDownTimer = object : CountDownTimer(timeRemainingInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                println(millisUntilFinished)
                 timeRemainingInMillis = millisUntilFinished
                 updateTimeText(roundTime, findNavController)
             }
 
             override fun onFinish() {
-                println("problemvina")
+                if (currRound == numOfRounds){
+                    findNavController.navigate(R.id.action_second_to_first)
+                }else{
+                    findNavController.navigate(R.id.action_second_to_rest)
+                }
 
-                findNavController.navigate(R.id.action_second_to_rest)
 
-                // Handle timer completion, e.g., display a message or reset the timer
             }
         }.start()
     }
@@ -148,10 +148,8 @@ class Second : Fragment() {
     private fun updateTimeText(binding: FragmentSecondBinding, findNavController: NavController) {
         val minutes = timeRemainingInMillis / 60000
         val seconds = (timeRemainingInMillis % 60000) / 1000
-        println("euroleague $seconds")
         val formattedTime = String.format("%02d:%02d", minutes, seconds)
         binding.timeCounter.text = formattedTime
-
 
     }
 
