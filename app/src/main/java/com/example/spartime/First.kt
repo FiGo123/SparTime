@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.example.spartime.databinding.FragmentFirstBinding
-import com.example.spartime.databinding.FragmentSecondBinding
 import com.example.spartime.viewmodel.MainViewModel
 
 /**
@@ -21,7 +20,7 @@ import com.example.spartime.viewmodel.MainViewModel
  * create an instance of this fragment.
  */
 class First : Fragment() {
-    private lateinit var bindingRoundFragment : FragmentSecondBinding
+    private lateinit var bindingRoundFragment : FragmentFirstBinding
     var round = 0
     var rest = 0
     var time = 0
@@ -39,9 +38,15 @@ class First : Fragment() {
         val view = inflater.inflate(R.layout.fragment_first, container, false)
         val binding= FragmentFirstBinding.inflate(layoutInflater)
         val startBtn: Button = view.findViewById(R.id.first_fragment_start_btn)
+        val settingsBtn: Button = view.findViewById(R.id.btn_settings)
 
         startBtn.setOnClickListener {
             it.findNavController().navigate(R.id.action_first_to_second)
+        }
+        settingsBtn.setOnClickListener {
+            println("kabib")
+
+            it.findNavController().navigate(R.id.action_first_to_settings)
         }
         mainViewModel.numOfRounds.value = 0
         mainViewModel.currentRound.value = 0
@@ -55,6 +60,7 @@ class First : Fragment() {
 
 
     private fun setupListeners(binding: FragmentFirstBinding, view: View){
+
         val edtxtRound: EditText = view.findViewById(R.id.fragment_first_edtxt_round)
         edtxtRound.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {

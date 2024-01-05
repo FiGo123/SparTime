@@ -1,0 +1,100 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#782E2E">
+
+    <!-- First section with dropdown -->
+    <TextView
+        android:id="@+id/textTrainingType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Default training type"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:padding="16dp"
+        android:clickable="true"
+        android:background="?android:attr/selectableItemBackground"
+        android:layout_marginTop="16dp"/>
+
+    <LinearLayout
+        android:id="@+id/dropdownChoices"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:layout_below="@id/textTrainingType">
+
+        <!-- Dropdown choices -->
+        <TextView
+            android:id="@+id/mmaTrainingTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="MMA Training"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:padding="12dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Boxing Training"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:padding="12dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Custom Training"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:padding="12dp"/>
+    </LinearLayout>
+
+    <!-- Second section with checkbox -->
+    <TextView
+        android:id="@+id/textSound"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sound"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:padding="16dp"
+        android:layout_below="@id/dropdownChoices"
+        android:layout_marginTop="32dp"/>
+
+    <CheckBox
+        android:id="@+id/checkboxSound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enable sound"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:padding="12dp"
+        android:layout_below="@id/textSound"
+        android:layout_marginStart="16dp"/>
+
+    <Button
+        app:backgroundTint="@null"
+        android:id="@+id/btn_back"
+        android:layout_width="150dp"
+        android:background="#808080"
+        android:layout_height="100dp"
+        android:layout_below="@id/checkboxSound"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="40dp"
+        android:text="Back" />
+    <Button
+        app:backgroundTint="@null"
+        android:id="@+id/btn_save"
+        android:layout_width="150dp"
+        android:background="#808080"
+        android:layout_height="100dp"
+        android:layout_toEndOf="@id/btn_back"
+        android:text="Save Changes"
+        android:layout_marginTop="40dp"
+        android:layout_below="@id/checkboxSound"/>
+</RelativeLayout>

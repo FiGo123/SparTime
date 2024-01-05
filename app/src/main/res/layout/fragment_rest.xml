@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#4285F4">
+    android:background="#782E2E">
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
@@ -36,6 +36,7 @@
 
 
     <Button
+        app:backgroundTint="@null"
         android:id="@+id/btnRestStop"
         android:layout_width="match_parent"
         android:layout_height="80dp"
@@ -45,7 +46,8 @@
         android:layout_marginTop="96dp"
         android:layout_marginStart="64dp"
         android:layout_marginEnd="64dp"
+        android:background="#808080"
         android:text="STOP"
-        android:textSize="40dp"
+        android:textSize="40sp"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>
