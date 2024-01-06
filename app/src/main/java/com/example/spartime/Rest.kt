@@ -22,7 +22,6 @@ class Rest : Fragment() {
     private lateinit var binding: FragmentRestBinding
     private var timeRemainingInMillis = 0L
     private var initialTimeInMinutes = 0
-    private var pauseLength = 0
     private val mainViewModel: MainViewModel by activityViewModels()
 
     @SuppressLint("SetTextI18n")
@@ -33,12 +32,12 @@ class Rest : Fragment() {
         binding = FragmentRestBinding.inflate(inflater, container, false)
         timeTextView = binding.restTimeCounter
         binding.btnRestStop.setOnClickListener {
-            it.findNavController().navigate(R.id.action_rest_to_second)
+            countDownTimer.cancel()
+            it.findNavController().navigate(R.id.action_rest_to_first)
         }
         mainViewModel.pauseLengthInMin.observe(viewLifecycleOwner
         ) {
                 pauseLengthInObserver -> initialTimeInMinutes = pauseLengthInObserver
-                println("Rest duration")
                 timeRemainingInMillis = (initialTimeInMinutes * 60 * 1000).toLong()
                 startTimer(binding, findNavController())
         }

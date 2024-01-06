@@ -37,6 +37,9 @@
         <action
             android:id="@+id/action_rest_to_second"
             app:destination="@id/second" />
+        <action
+            android:id="@+id/action_rest_to_first"
+            app:destination="@id/first" />
     </fragment>
     <fragment
         android:id="@+id/settings"
