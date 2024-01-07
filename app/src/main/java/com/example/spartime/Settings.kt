@@ -7,18 +7,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.example.spartime.databinding.FragmentSettingsBinding
+import com.example.spartime.viewmodel.MainViewModel
 
 class Settings : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        binding.mmaTrainingTextView.setOnClickListener {
+              mainViewModel.saveDataToPreferences("MMA")
+        }
+        binding.boxingTrainingTextView.setOnClickListener {
+              mainViewModel.saveDataToPreferences("BOXING")
+        }
         return binding.root
     }
 
