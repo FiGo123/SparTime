@@ -11,6 +11,7 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
+import com.example.spartime.data.Dao
 import com.example.spartime.databinding.FragmentFirstBinding
 import com.example.spartime.viewmodel.MainViewModel
 
@@ -19,7 +20,7 @@ import com.example.spartime.viewmodel.MainViewModel
  * Use the [First.newInstance] factory method to
  * create an instance of this fragment.
  */
-class First : Fragment() {
+class First() : Fragment() {
     private lateinit var bindingRoundFragment : FragmentFirstBinding
     var round = 0
     var rest = 0
@@ -44,14 +45,36 @@ class First : Fragment() {
             it.findNavController().navigate(R.id.action_first_to_second)
         }
         settingsBtn.setOnClickListener {
-            println("kabib")
-
             it.findNavController().navigate(R.id.action_first_to_settings)
         }
-        mainViewModel.numOfRounds.value = 0
-        mainViewModel.currentRound.value = 0
-        mainViewModel.roundLengthInMin.value = 0
-        mainViewModel.pauseLengthInMin.value = 0
+        mainViewModel.getDefaultTrainingType()
+        val trainingType = mainViewModel.trainingType.value
+        println("ANDIO $trainingType")
+        if (trainingType != null){
+            if (trainingType == "MMA"){
+                binding.fragmentFirstEdtxtRound.setText("5")
+                binding.edtxtRest.setText("1")
+                binding.edtxtTime.setText("5")
+                mainViewModel.numOfRounds.value = 5
+                mainViewModel.currentRound.value = 1
+                mainViewModel.roundLengthInMin.value = 5
+                mainViewModel.pauseLengthInMin.value = 1
+            }else if (trainingType == "BOXING"){
+                binding.fragmentFirstEdtxtRound.setText("12")
+                binding.edtxtRest.setText("1")
+                binding.edtxtTime.setText("3")
+                mainViewModel.numOfRounds.value = 12
+                mainViewModel.currentRound.value = 1
+                mainViewModel.roundLengthInMin.value = 3
+                mainViewModel.pauseLengthInMin.value = 1
+            }
+        }else{
+            mainViewModel.numOfRounds.value = 0
+            mainViewModel.currentRound.value = 0
+            mainViewModel.roundLengthInMin.value = 0
+            mainViewModel.pauseLengthInMin.value = 0
+        }
+
 
         setupListeners(binding,view)
 

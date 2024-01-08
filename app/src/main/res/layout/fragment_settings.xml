@@ -44,13 +44,7 @@
             android:textSize="16sp"
             android:padding="12dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Custom Training"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:padding="12dp"/>
+
     </LinearLayout>
 
     <!-- Second section with checkbox -->

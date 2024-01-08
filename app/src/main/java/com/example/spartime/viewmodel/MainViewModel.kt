@@ -1,15 +1,21 @@
 package com.example.spartime.viewmodel
 
+import android.app.Application
+import android.content.Context
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.spartime.data.Dao
+import com.example.spartime.data.PreferencesProvider
 
-class MainViewModel(private val repository: Dao) : ViewModel(){
+class MainViewModel(application: Application) : AndroidViewModel(application){
 
+    private val repository = Dao(PreferencesProvider(getApplication()))
     val numOfRounds = MutableLiveData<Int>()
     val roundLengthInMin = MutableLiveData<Int>()
     val pauseLengthInMin = MutableLiveData<Int>()
     val currentRound = MutableLiveData<Int>()
+    var trainingType = MutableLiveData<String>()
 
     fun setNumOfRounds(numberOfRounds:Int){
         numOfRounds.value = numberOfRounds
@@ -24,14 +30,21 @@ class MainViewModel(private val repository: Dao) : ViewModel(){
         currentRound.value = currentRoundFromFragment
     }
 
-    fun saveDataToPreferences(type: String) {
+    fun setDefaultTrainingType(type: String) {
         repository.saveDefault(type)
 
     }
 
-    fun getDataFromPreferences(): String? {
-        return repository.getDefault()
+    fun getDefaultTrainingType() {
+        trainingType.value = repository.getDefault()
     }
+
+
+    fun setSoundSettings(status: Boolean){
+        repository.saveSoundStatus(status)
+    }
+
+
 
 
 }
