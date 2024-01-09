@@ -1,6 +1,7 @@
 package com.example.spartime
 
 import android.annotation.SuppressLint
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -134,6 +135,8 @@ class Second : Fragment() {
             }
 
             override fun onFinish() {
+                val mediaPlayer = MediaPlayer.create(context, R.raw.boxingbell)
+                mediaPlayer.start()
                 if (currRound == numOfRounds){
                     findNavController.navigate(R.id.action_second_to_first)
                 }else{

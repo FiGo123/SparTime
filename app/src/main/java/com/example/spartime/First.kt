@@ -40,7 +40,9 @@ class First() : Fragment() {
         val binding= FragmentFirstBinding.inflate(layoutInflater)
         val startBtn: Button = view.findViewById(R.id.first_fragment_start_btn)
         val settingsBtn: Button = view.findViewById(R.id.btn_settings)
-
+        val roundBtn: EditText = view.findViewById(R.id.fragment_first_edtxt_round)
+        val restBtn: EditText = view.findViewById(R.id.edtxt_rest)
+        val roundTime: EditText = view.findViewById(R.id.edtxt_time)
         startBtn.setOnClickListener {
             it.findNavController().navigate(R.id.action_first_to_second)
         }
@@ -49,9 +51,11 @@ class First() : Fragment() {
         }
         mainViewModel.getDefaultTrainingType()
         val trainingType = mainViewModel.trainingType.value
-        println("ANDIO $trainingType")
         if (trainingType != null){
             if (trainingType == "MMA"){
+                roundBtn.setText("5")
+                restBtn.setText("1")
+                roundTime.setText("5")
                 binding.fragmentFirstEdtxtRound.setText("5")
                 binding.edtxtRest.setText("1")
                 binding.edtxtTime.setText("5")
@@ -60,9 +64,9 @@ class First() : Fragment() {
                 mainViewModel.roundLengthInMin.value = 5
                 mainViewModel.pauseLengthInMin.value = 1
             }else if (trainingType == "BOXING"){
-                binding.fragmentFirstEdtxtRound.setText("12")
-                binding.edtxtRest.setText("1")
-                binding.edtxtTime.setText("3")
+                roundBtn.setText("12")
+                restBtn.setText("1")
+                roundTime.setText("3")
                 mainViewModel.numOfRounds.value = 12
                 mainViewModel.currentRound.value = 1
                 mainViewModel.roundLengthInMin.value = 3

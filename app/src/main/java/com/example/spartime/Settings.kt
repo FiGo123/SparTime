@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
@@ -21,14 +22,12 @@ class Settings : Fragment() {
     ): View {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         binding.mmaTrainingTextView.setOnClickListener {
-            println("pozivi")
             val isVisible = binding.dropdownChoices.visibility == View.VISIBLE
             binding.dropdownChoices.visibility = if (isVisible) View.GONE else View.VISIBLE
             trainingType = "MMA"
 
         }
         binding.boxingTrainingTextView.setOnClickListener {
-            println("pozi2222vi")
             val isVisible = binding.dropdownChoices.visibility == View.VISIBLE
             binding.dropdownChoices.visibility = if (isVisible) View.GONE else View.VISIBLE
             trainingType = "BOXING"
@@ -42,6 +41,7 @@ class Settings : Fragment() {
             }
         }
         binding.btnSave.setOnClickListener{
+            Toast.makeText(context, "Default training saved!", Toast.LENGTH_LONG).show()
             mainViewModel.setDefaultTrainingType(trainingType)
         }
 
