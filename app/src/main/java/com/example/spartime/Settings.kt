@@ -41,8 +41,14 @@ class Settings : Fragment() {
             }
         }
         binding.btnSave.setOnClickListener{
-            Toast.makeText(context, "Default training saved!", Toast.LENGTH_LONG).show()
-            mainViewModel.setDefaultTrainingType(trainingType)
+
+            if (this::trainingType.isInitialized){
+                Toast.makeText(context, "Default training saved!", Toast.LENGTH_LONG).show()
+                mainViewModel.setDefaultTrainingType(trainingType)
+            }else{
+                Toast.makeText(context, "Choose training type first.", Toast.LENGTH_LONG).show()
+            }
+
         }
 
 
