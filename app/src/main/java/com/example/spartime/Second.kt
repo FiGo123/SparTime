@@ -2,6 +2,7 @@ package com.example.spartime
 
 import android.annotation.SuppressLint
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,9 +14,14 @@ import com.example.spartime.databinding.FragmentSecondBinding
 import com.example.spartime.viewmodel.MainViewModel
 import android.os.CountDownTimer
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import com.example.spartime.data.DBHandler
+import com.example.spartime.data.models.Training
+import java.sql.Time
+import java.time.LocalTime
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -54,10 +60,8 @@ class Second : Fragment() {
 
     }
 
-    // override fun onBackPressed() {
-    //    println("catch on back pressed")
-    //     view?.let { Navigation.findNavController(it).navigate(R.id.action_second_to_first) }
-    // }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,7 +76,18 @@ class Second : Fragment() {
         }
 
         if (mainViewModel.currentRound.value!! > mainViewModel.numOfRounds.value!! && mainViewModel.currentRound.value!! > 0){
-           navController.navigate(R.id.action_second_to_first)
+            var db = DBHandler(requireContext())
+
+            if(mainViewModel.trainingType.value == "BOXING"){
+                val training = Training("Boxing Training", LocalTime.now().toString(), 12, 3, "Odradjen boks trening")
+                db.insertData(training)
+
+            }else if (mainViewModel.trainingType.value == "MMA"){
+                val training = Training("MMA Training", LocalTime.now().toString(), 5, 3, "Odradjen mma trening")
+                db.insertData(training)
+            }
+
+            navController.navigate(R.id.action_second_to_first)
         }
 
         val roundTime = binding.timeCounter
@@ -138,6 +153,7 @@ class Second : Fragment() {
                 val mediaPlayer = MediaPlayer.create(context, R.raw.boxingbell)
                 mediaPlayer.start()
                 if (currRound == numOfRounds){
+                    println("Zavrsio onFinis")
                     findNavController.navigate(R.id.action_second_to_first)
                 }else{
                     findNavController.navigate(R.id.action_second_to_rest)
