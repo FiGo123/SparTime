@@ -79,11 +79,11 @@ class Second : Fragment() {
             var db = DBHandler(requireContext())
 
             if(mainViewModel.trainingType.value == "BOXING"){
-                val training = Training("Boxing Training", LocalTime.now().toString(), 12, 3, "Odradjen boks trening")
+                val training = Training("Boxing Training", LocalTime.now().toString(), 12, 3,3, "Odradjen boks trening")
                 db.insertData(training)
 
             }else if (mainViewModel.trainingType.value == "MMA"){
-                val training = Training("MMA Training", LocalTime.now().toString(), 5, 3, "Odradjen mma trening")
+                val training = Training("MMA Training", LocalTime.now().toString(), 5, 5,3, "Odradjen mma trening")
                 db.insertData(training)
             }
 

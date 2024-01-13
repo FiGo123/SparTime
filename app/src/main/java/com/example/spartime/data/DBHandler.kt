@@ -11,7 +11,8 @@ val DATABASE_NAME = "spartime"
 val TABLE_NAME = "training"
 val COL_TITLE = "title"
 val COL_DATE = "date"
-val COL_DURATION = "duration"
+val COL_NUMBER_OF_ROUNDS = "numberOfRounds"
+val COL_ROUND_DURATION = "roundDuration"
 val COL_DIFICULTY_SCALE = "difficultyScale"
 val COL_DESCRIPTION = "description"
 val COL_ID = "id"
@@ -22,7 +23,8 @@ class DBHandler (var context: Context) :SQLiteOpenHelper(context, DATABASE_NAME,
                 COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 COL_TITLE + " VARCHAR(256)," +
                 COL_DATE + " VARCHAR(256)," +
-                COL_DURATION + " VARCHAR(256)," +
+                COL_NUMBER_OF_ROUNDS + " INTEGER," +
+                COL_ROUND_DURATION + " INTEGER," +
                 COL_DIFICULTY_SCALE + " INTEGER," +
                 COL_DESCRIPTION + " VARCHAR(256))";
 
@@ -40,7 +42,7 @@ class DBHandler (var context: Context) :SQLiteOpenHelper(context, DATABASE_NAME,
         val cv = ContentValues()
         cv.put(COL_TITLE, training.title)
         cv.put(COL_DATE, training.date)
-        cv.put(COL_DURATION, training.duration)
+        cv.put(COL_NUMBER_OF_ROUNDS, training.numberOfRounds)
         cv.put(COL_DIFICULTY_SCALE, training.difficultyScale)
         cv.put(COL_DESCRIPTION, training.description)
         val result = db.insert(TABLE_NAME, null,cv)
