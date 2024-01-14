@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import android.widget.Toast
 import com.example.spartime.data.models.Training
 
@@ -51,5 +52,53 @@ class DBHandler (var context: Context) :SQLiteOpenHelper(context, DATABASE_NAME,
         else
             Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
 
+    }
+
+    fun getAllTraining(): List<Training> {
+        val trainingList = mutableListOf<Training>()
+        val db = this.readableDatabase
+        val query = "SELECT * FROM $TABLE_NAME"
+        val cursor = db.rawQuery(query, null)
+
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    // Log column indices to identify the issue
+                    val idIndex = cursor.getColumnIndex(COL_ID)
+                    val titleIndex = cursor.getColumnIndex(COL_TITLE)
+                    val dateIndex = cursor.getColumnIndex(COL_DATE)
+                    val numberOfRoundsIndex = cursor.getColumnIndex(COL_NUMBER_OF_ROUNDS)
+                    val roundDurationIndex = cursor.getColumnIndex(COL_ROUND_DURATION)
+                    val difficultyScaleIndex = cursor.getColumnIndex(COL_DIFICULTY_SCALE)
+                    val descriptionIndex = cursor.getColumnIndex(COL_DESCRIPTION)
+
+                    if (idIndex == -1 || titleIndex == -1 || dateIndex == -1 ||
+                        numberOfRoundsIndex == -1 || roundDurationIndex == -1 ||
+                        difficultyScaleIndex == -1 || descriptionIndex == -1) {
+                        // Log the cursor's column names if any index is -1
+                        val columnNames = cursor.columnNames.joinToString(", ")
+                        Log.e("DBHandler", "Column names in cursor: $columnNames")
+                        throw IllegalArgumentException("Column index was -1")
+                    }
+
+                    val id = cursor.getInt(idIndex)
+                    val title = cursor.getString(titleIndex)
+                    val date = cursor.getString(dateIndex)
+                    val numberOfRounds = cursor.getInt(numberOfRoundsIndex)
+                    val roundDuration = cursor.getInt(roundDurationIndex)
+                    val difficultyScale = cursor.getInt(difficultyScaleIndex)
+                    val description = cursor.getString(descriptionIndex)
+
+                    val training = Training(title, date, numberOfRounds, roundDuration, difficultyScale, description)
+                    trainingList.add(training)
+                } while (cursor.moveToNext())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cursor.close()
+        }
+
+        return trainingList
     }
 }
