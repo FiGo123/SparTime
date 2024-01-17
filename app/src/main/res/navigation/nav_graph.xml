@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_first_to_settings"
             app:destination="@id/settings" />
+        <action
+            android:id="@+id/action_first_to_historyTraining"
+            app:destination="@id/historyTraining" />
     </fragment>
     <fragment
         android:id="@+id/second"
@@ -48,6 +51,14 @@
         tools:layout="@layout/fragment_settings">>
         <action
             android:id="@+id/action_settings_to_first"
+            app:destination="@id/first" />
+    </fragment>
+    <fragment
+        android:id="@+id/historyTraining"
+        android:name="com.example.spartime.HistoryTraining"
+        android:label="HistoryTraining" >
+        <action
+            android:id="@+id/action_historyTraining_to_first"
             app:destination="@id/first" />
     </fragment>/>
 </navigation>

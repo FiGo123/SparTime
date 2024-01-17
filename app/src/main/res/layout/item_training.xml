@@ -8,14 +8,14 @@
         android:id="@+id/textViewTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
+        android:textSize="36sp"
         android:textStyle="bold"/>
 
     <TextView
         android:id="@+id/textViewDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
+        android:textSize="24sp"
         android:textColor="@android:color/darker_gray"/>
 
     <!-- Add more TextViews for other fields if needed -->
