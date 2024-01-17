@@ -40,6 +40,7 @@ class First() : Fragment() {
         val binding= FragmentFirstBinding.inflate(layoutInflater)
         val startBtn: Button = view.findViewById(R.id.first_fragment_start_btn)
         val settingsBtn: Button = view.findViewById(R.id.btn_settings)
+        val historyBtn: Button = view.findViewById(R.id.btn_history)
         val roundBtn: EditText = view.findViewById(R.id.fragment_first_edtxt_round)
         val restBtn: EditText = view.findViewById(R.id.edtxt_rest)
         val roundTime: EditText = view.findViewById(R.id.edtxt_time)
@@ -48,6 +49,9 @@ class First() : Fragment() {
         }
         settingsBtn.setOnClickListener {
             it.findNavController().navigate(R.id.action_first_to_settings)
+        }
+        historyBtn.setOnClickListener{
+            it.findNavController().navigate(R.id.action_first_to_historyTraining)
         }
         mainViewModel.getDefaultTrainingType()
         val trainingType = mainViewModel.trainingType.value

@@ -77,13 +77,19 @@ class Second : Fragment() {
 
         if (mainViewModel.currentRound.value!! > mainViewModel.numOfRounds.value!! && mainViewModel.currentRound.value!! > 0){
             var db = DBHandler(requireContext())
-
+            println("klasicna")
             if(mainViewModel.trainingType.value == "BOXING"){
+                println("BOXX")
                 val training = Training("Boxing Training", LocalTime.now().toString(), 12, 3,3, "Odradjen boks trening")
                 db.insertData(training)
 
             }else if (mainViewModel.trainingType.value == "MMA"){
+                println("MMA")
                 val training = Training("MMA Training", LocalTime.now().toString(), 5, 5,3, "Odradjen mma trening")
+                db.insertData(training)
+            }else{
+                println("citanje")
+                val training = Training("Custom Test", LocalTime.now().toString(), 5, 5,3, "Odradjen mma trening")
                 db.insertData(training)
             }
 
@@ -149,12 +155,29 @@ class Second : Fragment() {
                 updateTimeText(roundTime, findNavController)
             }
 
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun onFinish() {
                 val mediaPlayer = MediaPlayer.create(context, R.raw.boxingbell)
                 mediaPlayer.start()
+                var db = DBHandler(requireContext())
                 if (currRound == numOfRounds){
                     println("Zavrsio onFinis")
+                    if(mainViewModel.trainingType.value == "BOXING"){
+                        println("BOXX")
+                        val training = Training("Boxing Training", LocalTime.now().toString(), 12, 3,3, "Odradjen boks trening")
+                        db.insertData(training)
+
+                    }else if (mainViewModel.trainingType.value == "MMA"){
+                        println("MMA")
+                        val training = Training("MMA Training", LocalTime.now().toString(), 5, 5,3, "Odradjen mma trening")
+                        db.insertData(training)
+                    }else{
+                        println("citanje")
+                        val training = Training("Custom Test", LocalTime.now().toString(), 5, 5,3, "Odradjen mma trening")
+                        db.insertData(training)
+                    }
                     findNavController.navigate(R.id.action_second_to_first)
+
                 }else{
                     findNavController.navigate(R.id.action_second_to_rest)
                 }

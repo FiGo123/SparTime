@@ -20,13 +20,13 @@ val COL_ID = "id"
 
 class DBHandler (var context: Context) :SQLiteOpenHelper(context, DATABASE_NAME, null, 1){
     override fun onCreate(p0: SQLiteDatabase?) {
-        val createTable = "CREATE TABLE" + TABLE_NAME + " (" +
-                COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                COL_TITLE + " VARCHAR(256)," +
-                COL_DATE + " VARCHAR(256)," +
-                COL_NUMBER_OF_ROUNDS + " INTEGER," +
-                COL_ROUND_DURATION + " INTEGER," +
-                COL_DIFICULTY_SCALE + " INTEGER," +
+        val createTable = "CREATE TABLE " + TABLE_NAME + " (" +
+                COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_TITLE + " VARCHAR(256), " +
+                COL_DATE + " VARCHAR(256), " +
+                COL_NUMBER_OF_ROUNDS + " INTEGER, " +
+                COL_ROUND_DURATION + " INTEGER, " +
+                COL_DIFICULTY_SCALE + " INTEGER, " +
                 COL_DESCRIPTION + " VARCHAR(256))";
 
 
@@ -99,6 +99,8 @@ class DBHandler (var context: Context) :SQLiteOpenHelper(context, DATABASE_NAME,
             cursor.close()
         }
 
+        println("Cista Lista")
+        println(trainingList)
         return trainingList
     }
 }
