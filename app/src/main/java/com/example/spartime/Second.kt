@@ -77,18 +77,14 @@ class Second : Fragment() {
 
         if (mainViewModel.currentRound.value!! > mainViewModel.numOfRounds.value!! && mainViewModel.currentRound.value!! > 0){
             var db = DBHandler(requireContext())
-            println("klasicna")
             if(mainViewModel.trainingType.value == "BOXING"){
-                println("BOXX")
                 val training = Training("Boxing Training", LocalTime.now().toString(), 12, 3,3, "Odradjen boks trening")
                 db.insertData(training)
 
             }else if (mainViewModel.trainingType.value == "MMA"){
-                println("MMA")
                 val training = Training("MMA Training", LocalTime.now().toString(), 5, 5,3, "Odradjen mma trening")
                 db.insertData(training)
             }else{
-                println("citanje")
                 val training = Training("Custom Test", LocalTime.now().toString(), 5, 5,3, "Odradjen mma trening")
                 db.insertData(training)
             }
@@ -122,6 +118,24 @@ class Second : Fragment() {
 
 
         }
+        var nameOfmp3 = ""
+        when (currentRound) {
+            1 -> nameOfmp3 = "sound_round_one"
+            2 -> nameOfmp3 = "sound_round_two"
+            3 -> nameOfmp3 = "sound_round_three"
+            4 -> nameOfmp3 = "sound_round_four"
+            5 -> nameOfmp3 = "sound_round_five"
+            6 -> nameOfmp3 = "sound_round_six"
+            7 -> nameOfmp3 = "sound_round_seven"
+            8 -> nameOfmp3 = "sound_round_eight"
+            9 -> nameOfmp3 = "sound_round_nine"
+            10 -> nameOfmp3 = "sound_round_ten"
+            11 -> nameOfmp3 = "sound_round_eleven"
+            12 -> nameOfmp3 = "sound_round_twelve"
+            else -> ""
+        }
+        val mediaPlayer = MediaPlayer.create(context, R.raw.boxingbell)
+        mediaPlayer.start()
 
         // Inflate the layout for this fragment
         return binding.root
@@ -160,19 +174,16 @@ class Second : Fragment() {
                 val mediaPlayer = MediaPlayer.create(context, R.raw.boxingbell)
                 mediaPlayer.start()
                 var db = DBHandler(requireContext())
+
                 if (currRound == numOfRounds){
-                    println("Zavrsio onFinis")
                     if(mainViewModel.trainingType.value == "BOXING"){
-                        println("BOXX")
                         val training = Training("Boxing Training", LocalTime.now().toString(), 12, 3,3, "Odradjen boks trening")
                         db.insertData(training)
 
                     }else if (mainViewModel.trainingType.value == "MMA"){
-                        println("MMA")
                         val training = Training("MMA Training", LocalTime.now().toString(), 5, 5,3, "Odradjen mma trening")
                         db.insertData(training)
                     }else{
-                        println("citanje")
                         val training = Training("Custom Test", LocalTime.now().toString(), 5, 5,3, "Odradjen mma trening")
                         db.insertData(training)
                     }
