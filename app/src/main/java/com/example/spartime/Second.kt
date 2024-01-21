@@ -1,6 +1,7 @@
 package com.example.spartime
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
@@ -120,8 +121,8 @@ class Second : Fragment() {
         }
         var nameOfmp3 = ""
         when (currentRound) {
-            1 -> nameOfmp3 = "sound_round_one"
-            2 -> nameOfmp3 = "sound_round_two"
+            1 -> playSound(requireContext(),"sound_round_one")
+            2 -> playSound(requireContext(),"sound_round_two")
             3 -> nameOfmp3 = "sound_round_three"
             4 -> nameOfmp3 = "sound_round_four"
             5 -> nameOfmp3 = "sound_round_five"
@@ -161,6 +162,16 @@ class Second : Fragment() {
             }
     }
 
+    fun playSound(context: Context, resourceName: String) {
+        val resId = context.resources.getIdentifier(resourceName, "raw", context.packageName)
+
+        if (resId != 0) {
+            val mediaPlayer = MediaPlayer.create(context, resId)
+            mediaPlayer.start()
+        } else {
+            println("Resource not found for $resourceName")
+        }
+    }
 
     private fun startTimer(roundTime: FragmentSecondBinding, findNavController: NavController, currRound: Int, numOfRounds: Int) {
         countDownTimer = object : CountDownTimer(timeRemainingInMillis, 1000) {
