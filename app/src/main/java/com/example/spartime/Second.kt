@@ -117,26 +117,25 @@ class Second : Fragment() {
                 startTimer(binding,findNavController(), currRound, numOfRounds)
             }
 
+            when (currentRound) {
+                1 -> playSound(requireContext(),"sound_round_one")
+                2 -> playSound(requireContext(),"sound_round_two")
+                3 -> playSound(requireContext(),"sound_round_three")
+                4 -> playSound(requireContext(),"sound_round_four")
+                5 -> playSound(requireContext(),"sound_round_five")
+                6 -> playSound(requireContext(),"sound_round_six")
+                7 -> playSound(requireContext(),"sound_round_seven")
+                8 -> playSound(requireContext(),"sound_round_eight")
+                9 -> playSound(requireContext(),"sound_round_nine")
+                10 -> playSound(requireContext(),"sound_round_ten")
+                11 -> playSound(requireContext(),"sound_round_eleven")
+                12 -> playSound(requireContext(),"sound_round_twelve")
+                else -> ""
+            }
+
 
         }
-        var nameOfmp3 = ""
-        when (currentRound) {
-            1 -> playSound(requireContext(),"sound_round_one")
-            2 -> playSound(requireContext(),"sound_round_two")
-            3 -> nameOfmp3 = "sound_round_three"
-            4 -> nameOfmp3 = "sound_round_four"
-            5 -> nameOfmp3 = "sound_round_five"
-            6 -> nameOfmp3 = "sound_round_six"
-            7 -> nameOfmp3 = "sound_round_seven"
-            8 -> nameOfmp3 = "sound_round_eight"
-            9 -> nameOfmp3 = "sound_round_nine"
-            10 -> nameOfmp3 = "sound_round_ten"
-            11 -> nameOfmp3 = "sound_round_eleven"
-            12 -> nameOfmp3 = "sound_round_twelve"
-            else -> ""
-        }
-        val mediaPlayer = MediaPlayer.create(context, R.raw.boxingbell)
-        mediaPlayer.start()
+
 
         // Inflate the layout for this fragment
         return binding.root
