@@ -22,7 +22,9 @@ import androidx.navigation.fragment.findNavController
 import com.example.spartime.data.DBHandler
 import com.example.spartime.data.models.Training
 import java.sql.Time
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -78,15 +80,16 @@ class Second : Fragment() {
 
         if (mainViewModel.currentRound.value!! > mainViewModel.numOfRounds.value!! && mainViewModel.currentRound.value!! > 0){
             var db = DBHandler(requireContext())
+            val time = getCurrentDateTime()
             if(mainViewModel.trainingType.value == "BOXING"){
-                val training = Training("Boxing Training", LocalTime.now().toString(), 12, 3,3, "Odradjen boks trening")
+                val training = Training("Boxing Training", time, 12, 3,3, "Odradjen boks trening")
                 db.insertData(training)
 
             }else if (mainViewModel.trainingType.value == "MMA"){
-                val training = Training("MMA Training", LocalTime.now().toString(), 5, 5,3, "Odradjen mma trening")
+                val training = Training("MMA Training", time, 5, 5,3, "Odradjen mma trening")
                 db.insertData(training)
             }else{
-                val training = Training("Custom Test", LocalTime.now().toString(), 5, 5,3, "Odradjen mma trening")
+                val training = Training("Custom Test", time, 5, 5,3, "Odradjen mma trening")
                 db.insertData(training)
             }
 
@@ -159,6 +162,13 @@ class Second : Fragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getCurrentDateTime(): String {
+        val currentDateTime = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        return currentDateTime.format(formatter)
     }
 
     fun playSound(context: Context, resourceName: String) {

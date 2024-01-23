@@ -14,6 +14,7 @@ class TrainingAdapter(private val trainingList: List<Training>) :
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleTextView: TextView = itemView.findViewById(R.id.textViewTitle)
         val dateTextView: TextView = itemView.findViewById(R.id.textViewDate)
+        val numOfRoundsTextView: TextView = itemView.findViewById(R.id.numOfRounds)
         // Add more TextViews for other fields if needed
     }
 
@@ -26,6 +27,7 @@ class TrainingAdapter(private val trainingList: List<Training>) :
         val training = trainingList[position]
         holder.titleTextView.text = training.title
         holder.dateTextView.text = training.date
+        holder.numOfRoundsTextView.text = training.numberOfRounds.toString()
         // Bind other fields if needed
     }
 
