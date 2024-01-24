@@ -1,64 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="300dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
         android:id="@+id/textViewTitle"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
         android:text="Title"
-        android:textSize="24sp"
+        android:layout_height="90dp"
+        android:layout_width="match_parent"
+        android:textSize="38dp"
         android:textStyle="bold"
         android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/textViewDate"
+        app:layout_constraintBottom_toTopOf="@+id/textViewDateTitle"
         app:layout_constraintDimensionRatio="2:1" />
+
+    <TextView
+        android:id="@+id/textViewDateTitle"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="Date:"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/numOfRoundsTitle"
+        app:layout_constraintBottom_toTopOf="@+id/textViewDate" />
+
+    <TextView
+        android:id="@+id/numOfRoundsTitle"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="Number of Rounds:"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTitle"
+        app:layout_constraintStart_toEndOf="@+id/textViewDateTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/numOfRounds" />
 
     <TextView
         android:id="@+id/textViewDate"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="Text 1"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@+id/textViewTitle"
+        android:text="Text 3"
+        android:textSize="30dp"
+        app:layout_constraintTop_toBottomOf="@+id/textViewDateTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/numOfRounds"
-        app:layout_constraintBottom_toTopOf="@+id/intensity" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <TextView
         android:id="@+id/numOfRounds"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="Text 2"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@+id/textViewTitle"
-        app:layout_constraintStart_toEndOf="@+id/textViewDate"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/textView4" />
-
-    <TextView
-        android:id="@+id/intensity"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:text="Text 3"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@+id/textViewDate"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textView4"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_marginStart="20dp"
         android:text="Text 4"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@+id/numOfRounds"
-        app:layout_constraintStart_toEndOf="@+id/intensity"
+        android:textSize="38dp"
+        app:layout_constraintTop_toBottomOf="@+id/numOfRoundsTitle"
+        app:layout_constraintStart_toEndOf="@+id/textViewDate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
