@@ -15,6 +15,7 @@ class TrainingAdapter(private val trainingList: List<Training>) :
         val titleTextView: TextView = itemView.findViewById(R.id.textViewTitle)
         val dateTextView: TextView = itemView.findViewById(R.id.textViewDate)
         val numOfRoundsTextView: TextView = itemView.findViewById(R.id.numOfRounds)
+        val descriptionTextView: TextView = itemView.findViewById(R.id.description)
         // Add more TextViews for other fields if needed
     }
 
@@ -28,6 +29,7 @@ class TrainingAdapter(private val trainingList: List<Training>) :
         holder.titleTextView.text = training.title
         holder.dateTextView.text = training.date
         holder.numOfRoundsTextView.text = training.numberOfRounds.toString()
+        holder.descriptionTextView.text = training.description
         // Bind other fields if needed
     }
 

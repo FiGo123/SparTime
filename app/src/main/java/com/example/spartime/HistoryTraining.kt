@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.spartime.data.DBHandler
 import com.example.spartime.data.models.Training
@@ -31,7 +32,9 @@ class HistoryTraining : Fragment() {
         val layoutManager = LinearLayoutManager(requireContext())
 
         binding.recyclerView.layoutManager = layoutManager
-
+        binding.historyBackBtn.setOnClickListener{
+            this.findNavController().navigate(R.id.action_historyTraining_to_first)
+        }
         val adapter = TrainingAdapter(trainingList)
         binding.recyclerView.adapter = adapter
         return binding.root
