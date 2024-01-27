@@ -31,6 +31,9 @@
         <action
             android:id="@+id/action_second_to_rest"
             app:destination="@id/rest" />
+        <action
+            android:id="@+id/action_second_to_dialog"
+            app:destination="@id/dialog" />
     </fragment>
     <fragment
         android:id="@+id/rest"
@@ -59,6 +62,14 @@
         android:label="HistoryTraining" >
         <action
             android:id="@+id/action_historyTraining_to_first"
+            app:destination="@id/first" />
+    </fragment>
+    <fragment
+        android:id="@+id/dialog"
+        android:name="com.example.spartime.Dialog"
+        android:label="Dialog" >
+        <action
+            android:id="@+id/action_dialog_to_first"
             app:destination="@id/first" />
     </fragment>/>
 </navigation>
