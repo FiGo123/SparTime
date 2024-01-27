@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_first_to_historyTraining"
             app:destination="@id/historyTraining" />
+        <action
+            android:id="@+id/action_first_to_survey"
+            app:destination="@id/survey" />
     </fragment>
     <fragment
         android:id="@+id/second"
@@ -70,6 +73,14 @@
         android:label="Dialog" >
         <action
             android:id="@+id/action_dialog_to_first"
+            app:destination="@id/first" />
+    </fragment>
+    <fragment
+        android:id="@+id/survey"
+        android:name="com.example.spartime.Survey"
+        android:label="Survey" >
+        <action
+            android:id="@+id/action_survey_to_first"
             app:destination="@id/first" />
     </fragment>/>
 </navigation>
