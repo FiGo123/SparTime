@@ -41,6 +41,7 @@ class Second : Fragment() {
     private lateinit var countDownTimer: CountDownTimer
     private var timeRemainingInMillis = 0L
     private var initialTimeInMinutes = 0
+    private var timeForSave = 0
     private lateinit var timeTextView: TextView
 
 
@@ -75,7 +76,10 @@ class Second : Fragment() {
         val navController = findNavController()
         binding.roundFragmentBtn.setOnClickListener {
             countDownTimer.cancel()
-            it.findNavController().navigate(R.id.action_second_to_first)
+            it.findNavController().navigate(R.id.action_second_to_dialog)
+            println("Time If Interupt")
+            println(timeForSave)
+
         }
 
         if (mainViewModel.currentRound.value!! > mainViewModel.numOfRounds.value!! && mainViewModel.currentRound.value!! > 0){
@@ -222,6 +226,8 @@ class Second : Fragment() {
         val minutes = timeRemainingInMillis / 60000
         val seconds = (timeRemainingInMillis % 60000) / 1000
         val formattedTime = String.format("%02d:%02d", minutes, seconds)
+        val numTime = minutes * 60 + seconds
+        timeForSave = numTime.toInt()
         binding.timeCounter.text = formattedTime
 
     }

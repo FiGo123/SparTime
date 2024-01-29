@@ -4,11 +4,13 @@ class Dao (private val preferencesProvider: PreferencesProvider){
     var isInProgress: Boolean? = preferencesProvider.getBoolean(KEY_PROGRESS)
     var defaultTraining: String? = preferencesProvider.getString(KEY_DEFAULT)
     var soundStatus: Boolean? = preferencesProvider.getBoolean(KEY_STATUS)
+    var timeIfInterupt: Int? = preferencesProvider.getInt(KEY_TIME_IF_INTERUPT)
 
     companion object {
         private const val KEY_PROGRESS = "progress"
         private const val KEY_DEFAULT = "default"
         private const val KEY_STATUS = "sound_status"
+        private const val KEY_TIME_IF_INTERUPT = "time_if_interupt"
     }
 
     fun saveIsInProgress(isInProgress: Boolean) {
@@ -28,6 +30,15 @@ class Dao (private val preferencesProvider: PreferencesProvider){
     fun saveSoundStatus(status: Boolean) {
         this.soundStatus = status
         return preferencesProvider.putBoolean(KEY_STATUS, status)
+    }
+
+    fun saveIfInterupt(status: Int) {
+        this.timeIfInterupt = status
+        return preferencesProvider.putInt(KEY_TIME_IF_INTERUPT, status)
+    }
+
+    fun getIfInterupt(): Int {
+        return preferencesProvider.getInt(KEY_TIME_IF_INTERUPT)
     }
 
 
