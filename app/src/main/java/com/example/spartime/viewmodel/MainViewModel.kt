@@ -16,6 +16,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application){
     val pauseLengthInMin = MutableLiveData<Int>()
     val currentRound = MutableLiveData<Int>()
     var trainingType = MutableLiveData<String>()
+    var finishedRounds = MutableLiveData<Int>()
 
     fun setNumOfRounds(numberOfRounds:Int){
         numOfRounds.value = numberOfRounds
@@ -42,6 +43,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application){
 
     fun setSoundSettings(status: Boolean){
         repository.saveSoundStatus(status)
+    }
+
+    fun setLastTrainingRound(finishedRounds: Int){
+        repository.saveIfInterupt(finishedRounds)
+    }
+    fun getLastTrainingRound(){
+        finishedRounds.value = repository.getIfInterupt()
+    }
+
+    fun setDialogAnswer(status: Boolean){
+        repository.saveDialogAnswer(status)
     }
 
 

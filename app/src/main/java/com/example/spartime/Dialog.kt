@@ -22,9 +22,11 @@ class Dialog : Fragment() {
     ): View {
         val binding = FragmentDialogBinding.inflate(inflater, container, false)
         binding.yesButton.setOnClickListener{
+            mainViewModel.setDialogAnswer(true)
             it.findNavController().navigate(R.id.action_dialog_to_first)
         }
         binding.noButton.setOnClickListener{
+            mainViewModel.setDialogAnswer(false)
             it.findNavController().navigate(R.id.action_dialog_to_first)
         }
         return binding.root
