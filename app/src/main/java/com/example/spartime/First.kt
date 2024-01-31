@@ -1,5 +1,6 @@
 package com.example.spartime
 
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -8,12 +9,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
+import com.example.spartime.data.DBHandler
 import com.example.spartime.data.Dao
+import com.example.spartime.data.models.Training
 import com.example.spartime.databinding.FragmentFirstBinding
 import com.example.spartime.viewmodel.MainViewModel
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  * A simple [Fragment] subclass.
@@ -30,11 +36,13 @@ class First() : Fragment() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
 
         val view = inflater.inflate(R.layout.fragment_first, container, false)
         val binding= FragmentFirstBinding.inflate(layoutInflater)
@@ -52,6 +60,14 @@ class First() : Fragment() {
         }
         historyBtn.setOnClickListener{
             it.findNavController().navigate(R.id.action_first_to_historyTraining)
+        }
+        val dialogAnswer = mainViewModel.getDialogAnswer()
+        var db = DBHandler(requireContext())
+        val time = getCurrentDateTime()
+        if (dialogAnswer == true){
+            //TODO Change training to save
+            val training = Training("Boxing Training", time, 12, 3,3, "Odradjen boks trening")
+            db.insertData(training)
         }
         mainViewModel.getDefaultTrainingType()
         val trainingType = mainViewModel.trainingType.value
@@ -132,5 +148,11 @@ class First() : Fragment() {
             }
         })
 
+    }
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getCurrentDateTime(): String {
+        val currentDateTime = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        return currentDateTime.format(formatter)
     }
 }

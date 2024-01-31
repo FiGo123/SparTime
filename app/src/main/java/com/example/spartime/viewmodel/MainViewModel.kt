@@ -56,6 +56,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application){
         repository.saveDialogAnswer(status)
     }
 
+    fun getDialogAnswer(): Boolean? {
+        return repository.getDialogAnswer()
+    }
+
+
 
 
 
