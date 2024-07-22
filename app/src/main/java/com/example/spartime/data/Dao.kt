@@ -1,6 +1,6 @@
 package com.example.spartime.data
 
-class Dao (private val preferencesProvider: PreferencesProvider){
+class Dao(private val preferencesProvider: PreferencesProvider) {
     var isInProgress: Boolean? = preferencesProvider.getBoolean(KEY_PROGRESS)
     var defaultTraining: String? = preferencesProvider.getString(KEY_DEFAULT)
     var soundStatus: Boolean? = preferencesProvider.getBoolean(KEY_STATUS)
@@ -31,26 +31,24 @@ class Dao (private val preferencesProvider: PreferencesProvider){
 
     fun saveSoundStatus(status: Boolean) {
         this.soundStatus = status
-        return preferencesProvider.putBoolean(KEY_STATUS, status)
+        preferencesProvider.putBoolean(KEY_STATUS, status)
     }
 
     fun saveIfInterupt(status: Int) {
         this.timeIfInterupt = status
-        return preferencesProvider.putInt(KEY_TIME_IF_INTERUPT, status)
+        preferencesProvider.putInt(KEY_TIME_IF_INTERUPT, status)
     }
 
-    fun getIfInterupt(): Int {
+    fun getIfInterupt(): Int? {
         return preferencesProvider.getInt(KEY_TIME_IF_INTERUPT)
     }
 
     fun saveDialogAnswer(status: Boolean) {
         this.dialogAnswer = status
-        return preferencesProvider.putBoolean(KEY_DIALOG, status)
+        preferencesProvider.putBoolean(KEY_DIALOG, status)
     }
 
-    fun getDialogAnswer(): Boolean? {
+    fun fetchDialogAnswer(): Boolean? {
         return preferencesProvider.getBoolean(KEY_DIALOG)
     }
-
-
 }

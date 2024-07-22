@@ -61,11 +61,13 @@ class First() : Fragment() {
         historyBtn.setOnClickListener{
             it.findNavController().navigate(R.id.action_first_to_historyTraining)
         }
-        val dialogAnswer = mainViewModel.getDialogAnswer()
+        var dialogAnswer = mainViewModel.getDialogAnswer()
         var db = DBHandler(requireContext())
         val time = getCurrentDateTime()
         if (dialogAnswer == true){
             //TODO Change training to save
+            println("foxgrca")
+            mainViewModel.setDialogAnswer(false)
             val training = Training("Boxing Training", time, 12, 3,3, "Odradjen boks trening")
             db.insertData(training)
         }
