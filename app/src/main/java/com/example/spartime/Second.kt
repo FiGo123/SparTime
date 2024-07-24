@@ -41,7 +41,7 @@ class Second : Fragment() {
     private lateinit var countDownTimer: CountDownTimer
     private var timeRemainingInMillis = 0L
     private var initialTimeInMinutes = 0
-    private var timeForSave = 0
+    val timeForSave: MutableMap<String, Int> = mutableMapOf()
     private lateinit var timeTextView: TextView
 
 
@@ -77,7 +77,8 @@ class Second : Fragment() {
         binding.roundFragmentBtn.setOnClickListener {
             countDownTimer.cancel()
             it.findNavController().navigate(R.id.action_second_to_dialog)
-            println("Time If Interupt")
+            timeForSave["round"] = currentRound
+            println("Time If Interupt $timeForSave $currentRound")
             println(timeForSave)
 
         }
@@ -85,15 +86,16 @@ class Second : Fragment() {
         if (mainViewModel.currentRound.value!! > mainViewModel.numOfRounds.value!! && mainViewModel.currentRound.value!! > 0){
             var db = DBHandler(requireContext())
             val time = getCurrentDateTime()
+            println("kukaraca")
             if(mainViewModel.trainingType.value == "BOXING"){
-                val training = Training("Boxing Training", time, 12, 3,3, "Odradjen boks trening")
+                val training = Training("Boxing Training", time, currentRound, roundLength,3, "Odradjen boks trening")
                 db.insertData(training)
 
             }else if (mainViewModel.trainingType.value == "MMA"){
-                val training = Training("MMA Training", time, 5, 5,3, "Odradjen mma trening")
+                val training = Training("MMA Training", time, currentRound, roundLength,3, "Odradjen mma trening")
                 db.insertData(training)
             }else{
-                val training = Training("Custom Test", time, 5, 5,3, "Odradjen mma trening")
+                val training = Training("Custom Test", time, currentRound, roundLength,3, "Odradjen trening")
                 db.insertData(training)
             }
 
@@ -200,6 +202,7 @@ class Second : Fragment() {
                 var db = DBHandler(requireContext())
 
                 if (currRound == numOfRounds){
+                    println("printezies")
                     if(mainViewModel.trainingType.value == "BOXING"){
                         val training = Training("Boxing Training", LocalTime.now().toString(), 12, 3,3, "Odradjen boks trening")
                         db.insertData(training)
@@ -227,7 +230,8 @@ class Second : Fragment() {
         val seconds = (timeRemainingInMillis % 60000) / 1000
         val formattedTime = String.format("%02d:%02d", minutes, seconds)
         val numTime = minutes * 60 + seconds
-        timeForSave = numTime.toInt()
+        timeForSave["leftTime"] = numTime.toInt()
+
         binding.timeCounter.text = formattedTime
 
     }
