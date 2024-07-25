@@ -17,11 +17,9 @@ import android.os.CountDownTimer
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.spartime.data.DBHandler
 import com.example.spartime.data.models.Training
-import java.sql.Time
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -78,6 +76,7 @@ class Second : Fragment() {
             countDownTimer.cancel()
             it.findNavController().navigate(R.id.action_second_to_dialog)
             timeForSave["round"] = currentRound
+            timeForSave["leftTime"]?.let { it1 -> mainViewModel.setLeftTime(it1) }
             println("Time If Interupt $timeForSave $currentRound")
             println(timeForSave)
 
@@ -86,7 +85,6 @@ class Second : Fragment() {
         if (mainViewModel.currentRound.value!! > mainViewModel.numOfRounds.value!! && mainViewModel.currentRound.value!! > 0){
             var db = DBHandler(requireContext())
             val time = getCurrentDateTime()
-            println("kukaraca")
             if(mainViewModel.trainingType.value == "BOXING"){
                 val training = Training("Boxing Training", time, currentRound, roundLength,3, "Odradjen boks trening")
                 db.insertData(training)
@@ -202,7 +200,6 @@ class Second : Fragment() {
                 var db = DBHandler(requireContext())
 
                 if (currRound == numOfRounds){
-                    println("printezies")
                     if(mainViewModel.trainingType.value == "BOXING"){
                         val training = Training("Boxing Training", LocalTime.now().toString(), 12, 3,3, "Odradjen boks trening")
                         db.insertData(training)

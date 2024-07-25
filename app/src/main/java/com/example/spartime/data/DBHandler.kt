@@ -5,7 +5,6 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-import android.widget.Toast
 import com.example.spartime.data.models.Training
 
 val DATABASE_NAME = "spartime"
@@ -96,8 +95,6 @@ class DBHandler (var context: Context) :SQLiteOpenHelper(context, DATABASE_NAME,
             cursor.close()
         }
 
-        println("Cista Lista")
-        println(trainingList)
         return trainingList
     }
 }

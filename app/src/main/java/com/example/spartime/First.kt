@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.example.spartime.data.DBHandler
-import com.example.spartime.data.Dao
 import com.example.spartime.data.models.Training
 import com.example.spartime.databinding.FragmentFirstBinding
 import com.example.spartime.viewmodel.MainViewModel
@@ -66,10 +65,17 @@ class First() : Fragment() {
         val time = getCurrentDateTime()
         if (dialogAnswer == true){
             //TODO Change training to save
-            println("foxgrca")
             mainViewModel.setDialogAnswer(false)
-            val training = Training("Boxing Training", time, 12, 3,3, "Odradjen boks trening")
-            db.insertData(training)
+            val training =
+                mainViewModel.currentRound.value?.let {
+                    mainViewModel.leftTime.value?.let { it1 ->
+                        Training("Boxing Training", time,
+                            it, it1,3, "Odradjen boks trening")
+                    }
+                }
+            if (training != null) {
+                db.insertData(training)
+            }
         }
         mainViewModel.getDefaultTrainingType()
         val trainingType = mainViewModel.trainingType.value
@@ -139,7 +145,6 @@ class First() : Fragment() {
         edtxtTime.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 time = Integer.parseInt(s.toString())
-                println("hajnbc")
                 mainViewModel.setRoundLengthInMin(time)
             }
 
