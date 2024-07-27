@@ -201,14 +201,14 @@ class Second : Fragment() {
 
                 if (currRound == numOfRounds){
                     if(mainViewModel.trainingType.value == "BOXING"){
-                        val training = Training("Boxing Training", LocalTime.now().toString(), 12, 3,3, "Odradjen boks trening")
+                        val training = Training("Boxing Training", getCurrentDateTime(), 12, 3,3, "Odradjen boks trening")
                         db.insertData(training)
 
                     }else if (mainViewModel.trainingType.value == "MMA"){
-                        val training = Training("MMA Training", LocalTime.now().toString(), 5, 5,3, "Odradjen mma trening")
+                        val training = Training("MMA Training", getCurrentDateTime(), 5, 5,3, "Odradjen mma trening")
                         db.insertData(training)
                     }else{
-                        val training = Training("Custom Test", LocalTime.now().toString(), 5, 5,3, "Odradjen mma trening")
+                        val training = Training("Custom Test", getCurrentDateTime(), 5, 5,3, "Odradjen mma trening")
                         db.insertData(training)
                     }
                     findNavController.navigate(R.id.action_second_to_first)

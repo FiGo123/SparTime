@@ -1,81 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    android:layout_margin="16dp">
 
-    <TextView
-        android:id="@+id/textViewTitle"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Title"
-        android:gravity="center"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/textViewDateTitle"
-        app:layout_constraintDimensionRatio="2:1" />
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/textViewDateTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Date:"
-        android:textSize="18sp"
-        android:layout_margin="10dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/numOfRoundsTitle"
-        app:layout_constraintTop_toBottomOf="@+id/textViewTitle" />
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Title"
+            android:gravity="center"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/textViewDateTitle"
+            app:layout_constraintDimensionRatio="2:1" />
 
-    <TextView
-        android:id="@+id/numOfRoundsTitle"
-        android:layout_width="0dp"
-        android:layout_margin="10dp"
-        android:layout_height="wrap_content"
-        android:text="Number of Rounds:"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@+id/textViewTitle"
-        app:layout_constraintStart_toEndOf="@+id/textViewDateTitle"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <TextView
+            android:id="@+id/textViewDateTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Date:"
+            android:textSize="18sp"
+            android:layout_margin="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/numOfRoundsTitle"
+            app:layout_constraintTop_toBottomOf="@+id/textViewTitle" />
 
-    <TextView
-        android:id="@+id/textViewDate"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Text 3"
-        android:layout_margin="10dp"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/numOfRounds"
-        app:layout_constraintTop_toBottomOf="@+id/numOfRoundsTitle" />
+        <TextView
+            android:id="@+id/numOfRoundsTitle"
+            android:layout_width="0dp"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Number of Rounds:"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/textViewTitle"
+            app:layout_constraintStart_toEndOf="@+id/textViewDateTitle"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    <TextView
-        android:id="@+id/numOfRounds"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:text="Text 4"
-        android:textSize="28sp"
-        android:layout_margin="10dp"
-        app:layout_constraintTop_toBottomOf="@+id/numOfRoundsTitle"
-        app:layout_constraintStart_toEndOf="@+id/textViewDate"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <TextView
+            android:id="@+id/textViewDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Text 3"
+            android:layout_margin="10dp"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/numOfRounds"
+            app:layout_constraintTop_toBottomOf="@+id/numOfRoundsTitle" />
 
-    <TextView
-        android:id="@+id/description"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:text="Text 5"
-        android:layout_margin="10dp"
-        android:textSize="28sp"
-        app:layout_constraintTop_toBottomOf="@+id/numOfRounds"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        <TextView
+            android:id="@+id/numOfRounds"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="Text 4"
+            android:textSize="28sp"
+            android:layout_margin="10dp"
+            app:layout_constraintTop_toBottomOf="@+id/numOfRoundsTitle"
+            app:layout_constraintStart_toEndOf="@+id/textViewDate"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="Text 5"
+            android:layout_margin="10dp"
+            android:textSize="28sp"
+            app:layout_constraintTop_toBottomOf="@+id/numOfRounds"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
