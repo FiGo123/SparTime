@@ -208,7 +208,7 @@ class Second : Fragment() {
                         val training = Training("MMA Training", getCurrentDateTime(), 5, 5,3, "Odradjen mma trening")
                         db.insertData(training)
                     }else{
-                        val training = Training("Custom Test", getCurrentDateTime(), 5, 5,3, "Odradjen mma trening")
+                        val training = Training("Custom Training", getCurrentDateTime(), 5, 5,3, "Odradjen mma trening")
                         db.insertData(training)
                     }
                     findNavController.navigate(R.id.action_second_to_first)
