@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.widget.Toast
 import com.airbnb.lottie.LottieAnimationView
 import com.example.spartime.databinding.ActivityMainBinding
-import com.example.spartime.databinding.FragmentFirstBinding
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
@@ -14,28 +13,25 @@ import com.google.android.play.core.install.model.UpdateAvailability
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val REQUEST_CODE_UPDATE = 123
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val animationView: LottieAnimationView = binding.boxingGloveTimerAnimation
-
-        // Start animation
         animationView.playAnimation()
 
-        // Optionally set a listener
         animationView.addAnimatorUpdateListener { valueAnimator ->
-            // Add custom behavior for updates
+            // Custom behavior during animation updates
         }
 
+        checkForUpdates()
     }
 
-    private val REQUEST_CODE_UPDATE = 123
-
-    fun checkForUpdates() {
+    private fun checkForUpdates() {
         val appUpdateManager = AppUpdateManagerFactory.create(this)
-
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
 
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
@@ -63,7 +59,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
 }
-
