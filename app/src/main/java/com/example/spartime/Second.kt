@@ -35,129 +35,142 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class Second : Fragment() {
-    // TODO: Rename and change types of parameters
+    private var currentRoundNumber = 0
     private lateinit var countDownTimer: CountDownTimer
     private var timeRemainingInMillis = 0L
     private var initialTimeInMinutes = 0
-    val timeForSave: MutableMap<String, Int> = mutableMapOf()
-    private lateinit var timeTextView: TextView
-
+    private val timeForSave: MutableMap<String, Int> = mutableMapOf()
 
     private var param1: String? = null
     private var param2: String? = null
     private var currentRound = 0
     private var roundNum = 0
     private var roundLength = 0
-    private var pauseLength = 0
 
     private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
-
     }
 
-
     @RequiresApi(Build.VERSION_CODES.O)
-    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentSecondBinding.inflate(inflater, container, false)
 
-        val navController = findNavController()
-        binding.roundFragmentBtn.setOnClickListener {
-            countDownTimer.cancel()
-            it.findNavController().navigate(R.id.action_second_to_dialog)
-            timeForSave["round"] = currentRound
-            timeForSave["leftTime"]?.let { it1 -> mainViewModel.setLeftTime(it1) }
-            println("Time If Interupt $timeForSave $currentRound")
-            println(timeForSave)
+        setupNavigation(binding)
+        observeViewModel(binding)
 
-        }
-
-        if (mainViewModel.currentRound.value!! > mainViewModel.numOfRounds.value!! && mainViewModel.currentRound.value!! > 0){
-            var db = DBHandler(requireContext())
-            val time = getCurrentDateTime()
-            if(mainViewModel.trainingType.value == "BOXING"){
-                val training = Training("Boxing Training", time, currentRound, roundLength,3, "Odradjen boks trening")
-                db.insertData(training)
-
-            }else if (mainViewModel.trainingType.value == "MMA"){
-                val training = Training("MMA Training", time, currentRound, roundLength,3, "Odradjen mma trening")
-                db.insertData(training)
-            }else{
-                val training = Training("Custom Test", time, currentRound, roundLength,3, "Odradjen trening")
-                db.insertData(training)
-            }
-
-            navController.navigate(R.id.action_second_to_first)
-        }
-
-        val roundTime = binding.timeCounter
-        mainViewModel.currentRound.observe(viewLifecycleOwner
-        ) {
-            currentRoundValue -> currentRound = currentRoundValue
-            binding.roundNum.text = "Round $currentRound"
-        }
-        mainViewModel.numOfRounds.observe(viewLifecycleOwner
-        ) {
-                numOfRoundsValue -> roundNum = numOfRoundsValue
-        }
-        mainViewModel.roundLengthInMin.observe(viewLifecycleOwner
-        ) {
-                length -> roundTime.text = length.toString()
-            roundLength = length
-            initialTimeInMinutes = roundLength // Example value
-            timeRemainingInMillis = (initialTimeInMinutes * 60 * 1000).toLong()
-            val currRound = mainViewModel.currentRound.value!!
-            val numOfRounds = mainViewModel.numOfRounds.value!!
-            if (currRound > numOfRounds && currRound > 0){
-                println()
-            }else{
-                startTimer(binding,findNavController(), currRound, numOfRounds)
-            }
-
-            when (currentRound) {
-                1 -> playSound(requireContext(),"sound_round_one")
-                2 -> playSound(requireContext(),"sound_round_two")
-                3 -> playSound(requireContext(),"sound_round_three")
-                4 -> playSound(requireContext(),"sound_round_four")
-                5 -> playSound(requireContext(),"sound_round_five")
-                6 -> playSound(requireContext(),"sound_round_six")
-                7 -> playSound(requireContext(),"sound_round_seven")
-                8 -> playSound(requireContext(),"sound_round_eight")
-                9 -> playSound(requireContext(),"sound_round_nine")
-                10 -> playSound(requireContext(),"sound_round_ten")
-                11 -> playSound(requireContext(),"sound_round_eleven")
-                12 -> playSound(requireContext(),"sound_round_twelve")
-                else -> ""
-            }
-
-
-        }
-
-
-        // Inflate the layout for this fragment
         return binding.root
     }
 
+    private fun setupNavigation(binding: FragmentSecondBinding) {
+        binding.roundFragmentBtn.setOnClickListener {
+            countDownTimer.cancel()
+            it.findNavController().navigate(R.id.action_second_to_dialog)
+            saveCurrentState()
+        }
+    }
+
+    private fun saveCurrentState() {
+        timeForSave["round"] = currentRound
+        timeForSave["leftTime"]?.let { mainViewModel.setLeftTime(it) }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun observeViewModel(binding: FragmentSecondBinding) {
+        mainViewModel.apply {
+            currentRound.observe(viewLifecycleOwner) { round ->
+                currentRoundNumber = round
+                binding.roundNum.text = "Round $round"
+            }
+
+            numOfRounds.observe(viewLifecycleOwner) { rounds ->
+                roundNum = rounds
+            }
+
+            roundLengthInMin.observe(viewLifecycleOwner) { length ->
+                setupRoundTimer(binding, length)
+            }
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setupRoundTimer(binding: FragmentSecondBinding, length: Int) {
+        roundLength = length
+        initialTimeInMinutes = length
+        timeRemainingInMillis = (initialTimeInMinutes * 60 * 1000).toLong()
+
+        if (currentRound > roundNum && currentRound > 0) {
+            saveTraining()
+        } else {
+            startTimer(binding, findNavController())
+        }
+        playRoundSound(currentRound)
+    }
+
+    private fun playRoundSound(round: Int) {
+        val soundResource = "sound_round_$round"
+        playSound(requireContext(), soundResource)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun saveTraining() {
+        val db = DBHandler(requireContext())
+        val time = getCurrentDateTime()
+        val trainingType = mainViewModel.trainingType.value ?: "Custom"
+        val training = when (trainingType) {
+            "BOXING" -> Training("Boxing Training", time, currentRound, roundLength, 3, "Completed boxing training")
+            "MMA" -> Training("MMA Training", time, currentRound, roundLength, 3, "Completed MMA training")
+            else -> Training("Custom Training", time, currentRound, roundLength, 3, "Completed custom training")
+        }
+        db.insertData(training)
+        findNavController().navigate(R.id.action_second_to_first)
+    }
+
+    private fun startTimer(binding: FragmentSecondBinding, navController: NavController) {
+        countDownTimer = object : CountDownTimer(timeRemainingInMillis, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeRemainingInMillis = millisUntilFinished
+                updateTimeText(binding)
+            }
+
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onFinish() {
+                handleTimerFinish(navController)
+            }
+        }.start()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun handleTimerFinish(navController: NavController) {
+        val mediaPlayer = MediaPlayer.create(context, R.raw.boxingbell)
+        mediaPlayer.start()
+
+        if (currentRound == roundNum) {
+            saveTraining()
+        } else {
+            navController.navigate(R.id.action_second_to_rest)
+        }
+    }
+
+    private fun updateTimeText(binding: FragmentSecondBinding) {
+        val minutes = timeRemainingInMillis / 60000
+        val seconds = (timeRemainingInMillis % 60000) / 1000
+        val formattedTime = String.format("%02d:%02d", minutes, seconds)
+
+        timeForSave["leftTime"] = (minutes * 60 + seconds).toInt()
+        binding.timeCounter.text = formattedTime
+    }
+
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Second.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             Second().apply {
@@ -169,68 +182,17 @@ class Second : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getCurrentDateTime(): String {
-        val currentDateTime = LocalDateTime.now()
+    private fun getCurrentDateTime(): String {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        return currentDateTime.format(formatter)
+        return LocalDateTime.now().format(formatter)
     }
 
-    fun playSound(context: Context, resourceName: String) {
+    private fun playSound(context: Context, resourceName: String) {
         val resId = context.resources.getIdentifier(resourceName, "raw", context.packageName)
-
         if (resId != 0) {
-            val mediaPlayer = MediaPlayer.create(context, resId)
-            mediaPlayer.start()
+            MediaPlayer.create(context, resId).start()
         } else {
             println("Resource not found for $resourceName")
         }
     }
-
-    private fun startTimer(roundTime: FragmentSecondBinding, findNavController: NavController, currRound: Int, numOfRounds: Int) {
-        countDownTimer = object : CountDownTimer(timeRemainingInMillis, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                timeRemainingInMillis = millisUntilFinished
-                updateTimeText(roundTime, findNavController)
-            }
-
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onFinish() {
-                val mediaPlayer = MediaPlayer.create(context, R.raw.boxingbell)
-                mediaPlayer.start()
-                var db = DBHandler(requireContext())
-
-                if (currRound == numOfRounds){
-                    if(mainViewModel.trainingType.value == "BOXING"){
-                        val training = Training("Boxing Training", getCurrentDateTime(), 12, 3,3, "Odradjen boks trening")
-                        db.insertData(training)
-
-                    }else if (mainViewModel.trainingType.value == "MMA"){
-                        val training = Training("MMA Training", getCurrentDateTime(), 5, 5,3, "Odradjen mma trening")
-                        db.insertData(training)
-                    }else{
-                        val training = Training("Custom Training", getCurrentDateTime(), 5, 5,3, "Odradjen mma trening")
-                        db.insertData(training)
-                    }
-                    findNavController.navigate(R.id.action_second_to_first)
-
-                }else{
-                    findNavController.navigate(R.id.action_second_to_rest)
-                }
-
-
-            }
-        }.start()
-    }
-
-    private fun updateTimeText(binding: FragmentSecondBinding, findNavController: NavController) {
-        val minutes = timeRemainingInMillis / 60000
-        val seconds = (timeRemainingInMillis % 60000) / 1000
-        val formattedTime = String.format("%02d:%02d", minutes, seconds)
-        val numTime = minutes * 60 + seconds
-        timeForSave["leftTime"] = numTime.toInt()
-
-        binding.timeCounter.text = formattedTime
-
-    }
-
 }

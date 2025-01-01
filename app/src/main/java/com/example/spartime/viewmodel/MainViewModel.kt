@@ -12,7 +12,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application){
     val numOfRounds = MutableLiveData<Int>()
     val roundLengthInMin = MutableLiveData<Int>()
     val pauseLengthInMin = MutableLiveData<Int>()
-    val currentRound = MutableLiveData<Int>()
+    var currentRound = MutableLiveData<Int>()
     val leftTime = MutableLiveData<Int>()
     var trainingType = MutableLiveData<String>()
     var finishedRounds = MutableLiveData<Int>()
