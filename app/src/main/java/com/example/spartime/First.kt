@@ -25,136 +25,165 @@ import java.time.format.DateTimeFormatter
  * Use the [First.newInstance] factory method to
  * create an instance of this fragment.
  */
-class First() : Fragment() {
-    private lateinit var bindingRoundFragment : FragmentFirstBinding
-    var round = 0
-    var rest = 0
-    var time = 0
+class First : Fragment() {
+    private var _binding: FragmentFirstBinding? = null
+    private val binding get() = _binding!!
+    
+    private var round = 0
+    private var rest = 0
+    private var time = 0
 
     private val mainViewModel: MainViewModel by activityViewModels()
-
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
-
-        val view = inflater.inflate(R.layout.fragment_first, container, false)
-        val binding= FragmentFirstBinding.inflate(layoutInflater)
-        val startBtn: Button = view.findViewById(R.id.first_fragment_start_btn)
-        val settingsBtn: Button = view.findViewById(R.id.btn_settings)
-        val historyBtn: Button = view.findViewById(R.id.btn_history)
-        val roundBtn: EditText = view.findViewById(R.id.fragment_first_edtxt_round)
-        val restBtn: EditText = view.findViewById(R.id.edtxt_rest)
-        val roundTime: EditText = view.findViewById(R.id.edtxt_time)
-        startBtn.setOnClickListener {
-            it.findNavController().navigate(R.id.action_first_to_second)
+    ): View {
+        _binding = FragmentFirstBinding.inflate(inflater, container, false)
+        
+        setupUI()
+        setupListeners()
+        observeViewModel()
+        handleDialogResponse()
+        
+        return binding.root
+    }
+    
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+    
+    private fun setupUI() {
+        binding.apply {
+            firstFragmentStartBtn.setOnClickListener {
+                it.findNavController().navigate(R.id.action_first_to_second)
+            }
+            btnSettings.setOnClickListener {
+                it.findNavController().navigate(R.id.action_first_to_settings)
+            }
+            btnHistory.setOnClickListener {
+                it.findNavController().navigate(R.id.action_first_to_historyTraining)
+            }
         }
-        settingsBtn.setOnClickListener {
-            it.findNavController().navigate(R.id.action_first_to_settings)
-        }
-        historyBtn.setOnClickListener{
-            it.findNavController().navigate(R.id.action_first_to_historyTraining)
-        }
-        var dialogAnswer = mainViewModel.getDialogAnswer()
-        var db = DBHandler(requireContext())
-        val time = getCurrentDateTime()
-        if (dialogAnswer == true){
-            //TODO Change training to save
+    }
+    
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun handleDialogResponse() {
+        val dialogAnswer = mainViewModel.getDialogAnswer()
+        if (dialogAnswer == true) {
             mainViewModel.setDialogAnswer(false)
-            val training =
-                mainViewModel.currentRound.value?.let {
-                    mainViewModel.leftTime.value?.let { it1 ->
-                        Training("Boxing Training", time,
-                            it, it1,3, "Odradjen boks trening")
-                    }
-                }
-            if (training != null) {
-                db.insertData(training)
-            }
+            saveInterruptedTraining()
         }
+    }
+    
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun saveInterruptedTraining() {
+        val db = DBHandler(requireContext())
+        val currentTime = getCurrentDateTime()
+        
+        val currentRound = mainViewModel.currentRound.value ?: 0
+        val leftTime = mainViewModel.leftTime.value ?: 0
+        
+        val training = Training(
+            "Boxing Training", 
+            currentTime,
+            currentRound, 
+            leftTime, 
+            3, 
+            "Interrupted training session"
+        )
+        db.insertData(training)
+    }
+    
+    private fun observeViewModel() {
         mainViewModel.getDefaultTrainingType()
-        val trainingType = mainViewModel.trainingType.value
-        if (trainingType != null){
-            if (trainingType == "MMA"){
-                roundBtn.setText("5")
-                restBtn.setText("1")
-                roundTime.setText("5")
-                binding.fragmentFirstEdtxtRound.setText("5")
-                binding.edtxtRest.setText("1")
-                binding.edtxtTime.setText("5")
-                mainViewModel.numOfRounds.value = 5
-                mainViewModel.currentRound.value = 1
-                mainViewModel.roundLengthInMin.value = 5
-                mainViewModel.pauseLengthInMin.value = 1
-            }else if (trainingType == "BOXING"){
-                roundBtn.setText("12")
-                restBtn.setText("1")
-                roundTime.setText("3")
-                mainViewModel.numOfRounds.value = 12
-                mainViewModel.currentRound.value = 1
-                mainViewModel.roundLengthInMin.value = 3
-                mainViewModel.pauseLengthInMin.value = 1
+        
+        mainViewModel.trainingType.observe(viewLifecycleOwner) { trainingType ->
+            when (trainingType) {
+                "MMA" -> setupMMADefaults()
+                "BOXING" -> setupBoxingDefaults()
+                else -> setupCustomDefaults()
             }
-        }else{
-            mainViewModel.numOfRounds.value = 0
-            mainViewModel.currentRound.value = 0
-            mainViewModel.roundLengthInMin.value = 0
-            mainViewModel.pauseLengthInMin.value = 0
         }
-
-
-        setupListeners(binding,view)
-
-        return view
+    }
+    
+    private fun setupMMADefaults() {
+        binding.apply {
+            fragmentFirstEdtxtRound.setText("5")
+            edtxtRest.setText("1")
+            edtxtTime.setText("5")
+        }
+        mainViewModel.apply {
+            setNumOfRounds(5)
+            setCurrentRound(1)
+            setRoundLengthInMin(5)
+            setPauseLengthInSecs(1)
+        }
+    }
+    
+    private fun setupBoxingDefaults() {
+        binding.apply {
+            fragmentFirstEdtxtRound.setText("12")
+            edtxtRest.setText("1")
+            edtxtTime.setText("3")
+        }
+        mainViewModel.apply {
+            setNumOfRounds(12)
+            setCurrentRound(1)
+            setRoundLengthInMin(3)
+            setPauseLengthInSecs(1)
+        }
+    }
+    
+    private fun setupCustomDefaults() {
+        mainViewModel.apply {
+            setNumOfRounds(0)
+            setCurrentRound(0)
+            setRoundLengthInMin(0)
+            setPauseLengthInSecs(0)
+        }
     }
 
 
-    private fun setupListeners(binding: FragmentFirstBinding, view: View){
-
-        val edtxtRound: EditText = view.findViewById(R.id.fragment_first_edtxt_round)
-        edtxtRound.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                round = Integer.parseInt(s.toString())
-                mainViewModel.setNumOfRounds(round)
-                mainViewModel.setCurrentRound(1)
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-        val edtxtRest: EditText = view.findViewById(R.id.edtxt_rest)
-        edtxtRest.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                rest = Integer.parseInt(s.toString())
-                mainViewModel.setPauseLengthInSecs(rest)
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
-        })
-        val edtxtTime: EditText = view.findViewById(R.id.edtxt_time)
-        edtxtTime.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                time = Integer.parseInt(s.toString())
-                mainViewModel.setRoundLengthInMin(time)
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
-        })
-
+    private fun setupListeners() {
+        binding.apply {
+            fragmentFirstEdtxtRound.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                    s?.toString()?.toIntOrNull()?.let { rounds ->
+                        round = rounds
+                        mainViewModel.setNumOfRounds(rounds)
+                        mainViewModel.setCurrentRound(1)
+                    }
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
+            
+            edtxtRest.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                    s?.toString()?.toIntOrNull()?.let { restTime ->
+                        rest = restTime
+                        mainViewModel.setPauseLengthInSecs(restTime)
+                    }
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
+            
+            edtxtTime.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                    s?.toString()?.toIntOrNull()?.let { roundTime ->
+                        time = roundTime
+                        mainViewModel.setRoundLengthInMin(roundTime)
+                    }
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
+        }
     }
     @RequiresApi(Build.VERSION_CODES.O)
     fun getCurrentDateTime(): String {

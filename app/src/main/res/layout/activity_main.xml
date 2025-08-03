@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:background="#2E7828">
+    android:background="@color/primary_green">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/boxingGloveTimerAnimation"
@@ -13,20 +13,19 @@
         android:layout_height="match_parent"
         app:lottie_rawRes="@raw/boxing_glove_timer"
         app:lottie_autoPlay="true"
-        app:lottie_loop="true"/>
-
+        app:lottie_loop="true"
+        android:alpha="0.3"/>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_graph"
-        tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="1dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/nav_graph" />
+        
 </androidx.constraintlayout.widget.ConstraintLayout>
