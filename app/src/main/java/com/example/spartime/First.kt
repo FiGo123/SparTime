@@ -43,12 +43,32 @@ class First : Fragment() {
     ): View {
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         
+        initializeDefaults()
         setupUI()
         setupListeners()
         observeViewModel()
         handleDialogResponse()
         
         return binding.root
+    }
+    
+    private fun initializeDefaults() {
+        // Initialize with boxing defaults immediately
+        binding.apply {
+            fragmentFirstEdtxtRound.setText("3")
+            edtxtRest.setText("1")
+            edtxtTime.setText("3")
+        }
+        
+        // Set ViewModel defaults
+        mainViewModel.apply {
+            setNumOfRounds(3)
+            setCurrentRound(1)
+            setRoundLengthInMin(3)
+            setPauseLengthInSecs(1)
+        }
+        
+        updateLocalValues(3, 1, 3)
     }
     
     override fun onDestroyView() {
@@ -59,7 +79,9 @@ class First : Fragment() {
     private fun setupUI() {
         binding.apply {
             firstFragmentStartBtn.setOnClickListener {
-                it.findNavController().navigate(R.id.action_first_to_second)
+                if (validateInputs()) {
+                    it.findNavController().navigate(R.id.action_first_to_second)
+                }
             }
             btnSettings.setOnClickListener {
                 it.findNavController().navigate(R.id.action_first_to_settings)
@@ -68,6 +90,37 @@ class First : Fragment() {
                 it.findNavController().navigate(R.id.action_first_to_historyTraining)
             }
         }
+    }
+    
+    private fun validateInputs(): Boolean {
+        val rounds = binding.fragmentFirstEdtxtRound.text.toString().toIntOrNull()
+        val restTime = binding.edtxtRest.text.toString().toIntOrNull()
+        val roundTime = binding.edtxtTime.text.toString().toIntOrNull()
+        
+        if (rounds == null || rounds <= 0 || rounds > 50) {
+            binding.fragmentFirstEdtxtRound.error = "Enter valid number of rounds (1-50)"
+            return false
+        }
+        
+        if (restTime == null || restTime <= 0 || restTime > 60) {
+            binding.edtxtRest.error = "Enter valid rest time (1-60 minutes)"
+            return false
+        }
+        
+        if (roundTime == null || roundTime <= 0 || roundTime > 60) {
+            binding.edtxtTime.error = "Enter valid round time (1-60 minutes)"
+            return false
+        }
+        
+        // Update ViewModel with validated values
+        mainViewModel.apply {
+            setNumOfRounds(rounds)
+            setCurrentRound(1)
+            setRoundLengthInMin(roundTime)
+            setPauseLengthInSecs(restTime)
+        }
+        
+        return true
     }
     
     @RequiresApi(Build.VERSION_CODES.O)
@@ -99,13 +152,14 @@ class First : Fragment() {
     }
     
     private fun observeViewModel() {
+        // Set default boxing configuration if no training type is set
         mainViewModel.getDefaultTrainingType()
         
         mainViewModel.trainingType.observe(viewLifecycleOwner) { trainingType ->
             when (trainingType) {
                 "MMA" -> setupMMADefaults()
                 "BOXING" -> setupBoxingDefaults()
-                else -> setupCustomDefaults()
+                else -> setupDefaultBoxingConfig() // Always provide defaults
             }
         }
     }
@@ -122,6 +176,7 @@ class First : Fragment() {
             setRoundLengthInMin(5)
             setPauseLengthInSecs(1)
         }
+        updateLocalValues(5, 1, 5)
     }
     
     private fun setupBoxingDefaults() {
@@ -136,15 +191,41 @@ class First : Fragment() {
             setRoundLengthInMin(3)
             setPauseLengthInSecs(1)
         }
+        updateLocalValues(12, 1, 3)
     }
     
-    private fun setupCustomDefaults() {
-        mainViewModel.apply {
-            setNumOfRounds(0)
-            setCurrentRound(0)
-            setRoundLengthInMin(0)
-            setPauseLengthInSecs(0)
+    private fun setupDefaultBoxingConfig() {
+        // Provide reasonable defaults for boxing training
+        binding.apply {
+            if (fragmentFirstEdtxtRound.text.isNullOrEmpty()) {
+                fragmentFirstEdtxtRound.setText("3")
+            }
+            if (edtxtRest.text.isNullOrEmpty()) {
+                edtxtRest.setText("1")
+            }
+            if (edtxtTime.text.isNullOrEmpty()) {
+                edtxtTime.setText("3")
+            }
         }
+        
+        // Set defaults in ViewModel if not already set
+        val currentRounds = binding.fragmentFirstEdtxtRound.text.toString().toIntOrNull() ?: 3
+        val currentRest = binding.edtxtRest.text.toString().toIntOrNull() ?: 1
+        val currentTime = binding.edtxtTime.text.toString().toIntOrNull() ?: 3
+        
+        mainViewModel.apply {
+            setNumOfRounds(currentRounds)
+            setCurrentRound(1)
+            setRoundLengthInMin(currentTime)
+            setPauseLengthInSecs(currentRest)
+        }
+        updateLocalValues(currentRounds, currentRest, currentTime)
+    }
+    
+    private fun updateLocalValues(rounds: Int, rest: Int, time: Int) {
+        this.round = rounds
+        this.rest = rest
+        this.time = time
     }
 
 

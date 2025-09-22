@@ -32,7 +32,9 @@ class Rest : Fragment() {
         binding = FragmentRestBinding.inflate(inflater, container, false)
         timeTextView = binding.restTimeCounter
         binding.btnRestStop.setOnClickListener {
-            countDownTimer.cancel()
+            if (::countDownTimer.isInitialized) {
+                countDownTimer.cancel()
+            }
             it.findNavController().navigate(R.id.action_rest_to_first)
         }
         mainViewModel.pauseLengthInMin.observe(viewLifecycleOwner

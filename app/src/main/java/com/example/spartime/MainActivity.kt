@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.airbnb.lottie.LottieAnimationView
 import com.example.spartime.databinding.ActivityMainBinding
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
@@ -27,17 +26,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupLottieAnimation()
         checkForUpdates()
-    }
-
-    private fun setupLottieAnimation() {
-        val animationView: LottieAnimationView = binding.boxingGloveTimerAnimation
-        animationView.playAnimation()
-        
-        animationView.addAnimatorUpdateListener { valueAnimator ->
-            // Custom behavior during animation updates if needed
-        }
     }
 
     private fun checkForUpdates() {
