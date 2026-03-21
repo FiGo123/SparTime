@@ -51,4 +51,8 @@ class Dao(private val preferencesProvider: PreferencesProvider) {
     fun fetchDialogAnswer(): Boolean? {
         return preferencesProvider.getBoolean(KEY_DIALOG)
     }
+
+    fun getSoundStatus(): Boolean {
+        return preferencesProvider.getBoolean(KEY_STATUS) ?: true
+    }
 }

@@ -81,4 +81,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun getDialogAnswer(): Boolean? {
         return repository.fetchDialogAnswer()
     }
+
+    fun getSoundStatus(): Boolean {
+        return repository.getSoundStatus()
+    }
 }

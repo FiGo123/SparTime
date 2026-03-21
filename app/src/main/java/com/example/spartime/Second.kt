@@ -141,20 +141,21 @@ class Second : Fragment() {
     }
 
     private fun playRoundSound(round: Int) {
-        initializeTextToSpeech()
-        announceRound(round)
-    }
-    
-    private fun initializeTextToSpeech() {
-        if (textToSpeech == null) {
+        if (!mainViewModel.getSoundStatus()) return
+        if (textToSpeech != null) {
+            announceRound(round)
+        } else {
             textToSpeech = TextToSpeech(requireContext()) { status ->
                 if (status == TextToSpeech.SUCCESS) {
-                    textToSpeech?.language = Locale.getDefault()
+                    val result = textToSpeech?.setLanguage(Locale.getDefault())
+                    if (result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
+                        announceRound(round)
+                    }
                 }
             }
         }
     }
-    
+
     private fun announceRound(round: Int) {
         textToSpeech?.speak(
             "Round $round",
@@ -259,6 +260,7 @@ class Second : Fragment() {
     }
     
     private fun playComplianceBellSound() {
+        if (!mainViewModel.getSoundStatus()) return
         try {
             val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
             val ringtone = RingtoneManager.getRingtone(requireContext(), notification)
