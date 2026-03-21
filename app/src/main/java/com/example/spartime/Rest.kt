@@ -40,11 +40,11 @@ class Rest : Fragment() {
             it.findNavController().navigate(R.id.action_rest_to_first)
         }
 
-        // Increment round counter so Second shows the correct next round
-        val nextRound = (mainViewModel.currentRound.value ?: 1) + 1
-        mainViewModel.setCurrentRound(nextRound)
-
+        // Round was already incremented in Second.kt before navigating here.
+        // Observer guarded: cancel any running timer before starting a new one
+        // so rotation (onCreateView re-called) doesn't create duplicate timers.
         mainViewModel.pauseLengthInMin.observe(viewLifecycleOwner) { minutes ->
+            if (::countDownTimer.isInitialized) countDownTimer.cancel()
             timeRemainingInMillis = (minutes * 60 * 1000).toLong()
             announceRest()
             startTimer(findNavController())

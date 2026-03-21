@@ -102,6 +102,11 @@ class Second : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setupRoundTimer(length: Int) {
+        // Cancel any in-flight timers before setting up (guards against observer re-fires on rotation)
+        prepareCountDownTimer?.cancel()
+        if (::countDownTimer.isInitialized) countDownTimer.cancel()
+        isTimerRunning = false
+
         roundLength = length
         initialTimeInMillis = (length * 60 * 1000).toLong()
         timeRemainingInMillis = initialTimeInMillis
@@ -245,6 +250,7 @@ class Second : Fragment() {
         if (currentRoundNumber >= roundNum) {
             saveTraining()
         } else {
+            mainViewModel.setCurrentRound(currentRoundNumber + 1)
             navController.navigate(R.id.action_second_to_rest)
         }
     }
