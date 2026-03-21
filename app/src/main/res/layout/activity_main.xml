@@ -7,15 +7,6 @@
     tools:context=".MainActivity"
     android:background="@color/primary_green">
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/boxingGloveTimerAnimation"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:lottie_rawRes="@raw/boxing_glove_timer"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true"
-        android:alpha="0.3"/>
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView"
         android:name="androidx.navigation.fragment.NavHostFragment"
