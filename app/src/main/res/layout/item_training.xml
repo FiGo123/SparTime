@@ -1,100 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp"
-    android:layout_margin="16dp">
+    android:layout_marginHorizontal="4dp"
+    android:layout_marginVertical="6dp"
+    app:cardBackgroundColor="@color/surface"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
+        <!-- Title -->
         <TextView
             android:id="@+id/textViewTitle"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Title"
-            android:gravity="center"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="parent"
+            android:fontFamily="sans-serif-black"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@+id/deleteButton"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Delete button -->
+        <ImageButton
+            android:id="@+id/deleteButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Delete training"
+            android:src="@android:drawable/ic_menu_delete"
+            android:tint="@color/accent_red"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/textViewDateTitle"
-            app:layout_constraintDimensionRatio="2:1" />
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/textViewDateTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Date:"
-            android:textSize="18sp"
-            android:layout_margin="10dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/numOfRoundsTitle"
-            app:layout_constraintTop_toBottomOf="@+id/textViewTitle" />
-
-        <TextView
-            android:id="@+id/numOfRoundsTitle"
-            android:layout_width="0dp"
-            android:layout_margin="10dp"
-            android:layout_height="wrap_content"
-            android:text="Number of Rounds:"
-            android:textSize="18sp"
-            app:layout_constraintTop_toBottomOf="@+id/textViewTitle"
-            app:layout_constraintStart_toEndOf="@+id/textViewDateTitle"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
+        <!-- Date -->
         <TextView
             android:id="@+id/textViewDate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Text 3"
-            android:layout_margin="10dp"
-            android:textSize="24sp"
+            android:layout_marginTop="4dp"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/gray_medium"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/numOfRounds"
-            app:layout_constraintTop_toBottomOf="@+id/numOfRoundsTitle" />
+            app:layout_constraintTop_toBottomOf="@id/textViewTitle" />
 
-        <TextView
-            android:id="@+id/numOfRounds"
+        <!-- Stats row -->
+        <LinearLayout
+            android:id="@+id/statsRow"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:text="Text 4"
-            android:textSize="28sp"
-            android:layout_margin="10dp"
-            app:layout_constraintTop_toBottomOf="@+id/numOfRoundsTitle"
-            app:layout_constraintStart_toEndOf="@+id/textViewDate"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            android:layout_marginTop="12dp"
+            android:gravity="start"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewDate">
 
+            <!-- Rounds badge -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:background="@color/background_secondary"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp">
+
+                <TextView
+                    android:id="@+id/numOfRounds"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="@color/timer_active"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="rounds"
+                    android:textColor="@color/gray_medium"
+                    android:textSize="11sp" />
+
+            </LinearLayout>
+
+            <!-- Duration badge -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:background="@color/background_secondary"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp">
+
+                <TextView
+                    android:id="@+id/roundDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="@color/accent_orange"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="min/round"
+                    android:textColor="@color/gray_medium"
+                    android:textSize="11sp" />
+
+            </LinearLayout>
+
+            <!-- Difficulty badge -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/background_secondary"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp">
+
+                <TextView
+                    android:id="@+id/difficultyValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="@color/timer_warning"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="difficulty"
+                    android:textColor="@color/gray_medium"
+                    android:textSize="11sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Description -->
         <TextView
             android:id="@+id/description"
-            android:layout_width="match_parent"
-            android:gravity="center"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:text="Text 5"
-            android:layout_margin="10dp"
-            android:textSize="28sp"
-            app:layout_constraintTop_toBottomOf="@+id/numOfRounds"
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/gray_medium"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
-        <ImageButton
-            android:id="@+id/deleteButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_margin="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_delete"
-            android:contentDescription="Delete training"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/statsRow" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.cardview.widget.CardView>
+
+</com.google.android.material.card.MaterialCardView>

@@ -1,95 +1,204 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#782E2E">
+    android:background="@color/background_primary"
+    android:fillViewport="true">
 
-    <!-- First section with dropdown -->
-    <TextView
-        android:id="@+id/textTrainingType"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Default training type"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:padding="16dp"
-        android:clickable="true"
-        android:background="?android:attr/selectableItemBackground"
-        android:layout_marginTop="16dp"/>
-
-    <LinearLayout
-        android:id="@+id/dropdownChoices"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:orientation="vertical"
-        android:layout_below="@id/textTrainingType">
-
-        <!-- Dropdown choices -->
-        <TextView
-            android:id="@+id/mmaTrainingTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="MMA Training"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:padding="12dp"/>
+        android:padding="24dp">
 
         <TextView
-            android:id="@+id/boxingTrainingTextView"
+            android:id="@+id/settings_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Boxing Training"
+            android:layout_marginTop="32dp"
+            android:fontFamily="sans-serif-black"
+            android:gravity="center_horizontal"
+            android:text="Settings"
             android:textColor="@color/white"
-            android:textSize="16sp"
-            android:padding="12dp"/>
+            android:textSize="36sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Training Type Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/trainingTypeCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            app:cardBackgroundColor="@color/surface"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/settings_title">
 
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
 
-    <!-- Second section with checkbox -->
-    <TextView
-        android:id="@+id/textSound"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Sound"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:padding="16dp"
-        android:layout_below="@id/dropdownChoices"
-        android:layout_marginTop="32dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Default Training Type"
+                    android:textColor="@color/gray_medium"
+                    android:textSize="13sp" />
 
-    <CheckBox
-        android:id="@+id/checkboxSound"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Enable sound"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:padding="12dp"
-        android:layout_below="@id/textSound"
-        android:layout_marginStart="16dp"/>
+                <TextView
+                    android:id="@+id/textTrainingType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:drawableEnd="@android:drawable/arrow_down_float"
+                    android:fontFamily="sans-serif-black"
+                    android:padding="8dp"
+                    android:text="Tap to select type"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
 
-    <Button
-        app:backgroundTint="@null"
-        android:id="@+id/btn_back"
-        android:layout_width="150dp"
-        android:background="#808080"
-        android:layout_height="100dp"
-        android:layout_below="@id/checkboxSound"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="40dp"
-        android:text="Back" />
-    <Button
-        app:backgroundTint="@null"
-        android:id="@+id/btn_save"
-        android:layout_width="150dp"
-        android:background="#808080"
-        android:layout_height="100dp"
-        android:layout_toEndOf="@id/btn_back"
-        android:text="Save Changes"
-        android:layout_marginTop="40dp"
-        android:layout_below="@id/checkboxSound"/>
-</RelativeLayout>
+                <LinearLayout
+                    android:id="@+id/dropdownChoices"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/background_secondary" />
+
+                    <TextView
+                        android:id="@+id/boxingTrainingTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:fontFamily="sans-serif-medium"
+                        android:padding="16dp"
+                        android:text="Boxing  —  12 × 3 min"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/mmaTrainingTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:fontFamily="sans-serif-medium"
+                        android:padding="16dp"
+                        android:text="MMA  —  5 × 5 min"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Sound Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/soundCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/surface"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/trainingTypeCard">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="24dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-black"
+                        android:text="Sound"
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Bell, TTS announcements, warning beeps"
+                        android:textColor="@color/gray_medium"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/checkboxSound"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    app:thumbTint="@color/timer_active"
+                    app:trackTint="@color/background_secondary" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Buttons -->
+        <LinearLayout
+            android:id="@+id/buttonsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/soundCard">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_back"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-black"
+                android:text="Back"
+                android:textColor="@color/white"
+                app:cornerRadius="30dp"
+                app:strokeColor="@color/white" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_save"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-black"
+                android:text="Save"
+                android:textSize="16sp"
+                app:backgroundTint="@color/timer_active"
+                app:cornerRadius="30dp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

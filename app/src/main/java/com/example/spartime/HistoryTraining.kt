@@ -26,10 +26,13 @@ class HistoryTraining : Fragment() {
         adapter = TrainingAdapter(trainingList) { training, position ->
             dbHandler.deleteTraining(training.id)
             adapter.removeAt(position)
+            binding.emptyStateText.visibility = if (trainingList.isEmpty()) View.VISIBLE else View.GONE
         }
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = adapter
+
+        binding.emptyStateText.visibility = if (trainingList.isEmpty()) View.VISIBLE else View.GONE
 
         binding.historyBackBtn.setOnClickListener {
             findNavController().navigate(R.id.action_historyTraining_to_first)

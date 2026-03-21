@@ -12,72 +12,69 @@ import com.example.spartime.databinding.FragmentSettingsBinding
 import com.example.spartime.viewmodel.MainViewModel
 
 class Settings : Fragment() {
+
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
-    lateinit var trainingType: String
+    private var selectedTrainingType: String? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
-        binding.mmaTrainingTextView.setOnClickListener {
+
+        // Show current training type
+        val currentType = mainViewModel.trainingType.value
+        if (currentType != null) {
+            binding.textTrainingType.text = if (currentType == "MMA") "MMA — 5 × 5 min" else "Boxing — 12 × 3 min"
+            selectedTrainingType = currentType
+        }
+
+        // Toggle dropdown on header tap
+        binding.textTrainingType.setOnClickListener {
             val isVisible = binding.dropdownChoices.visibility == View.VISIBLE
             binding.dropdownChoices.visibility = if (isVisible) View.GONE else View.VISIBLE
-            trainingType = "MMA"
-
         }
+
+        // Boxing choice
         binding.boxingTrainingTextView.setOnClickListener {
-            val isVisible = binding.dropdownChoices.visibility == View.VISIBLE
-            binding.dropdownChoices.visibility = if (isVisible) View.GONE else View.VISIBLE
-            trainingType = "BOXING"
+            selectedTrainingType = "BOXING"
+            binding.textTrainingType.text = "Boxing — 12 × 3 min"
+            binding.dropdownChoices.visibility = View.GONE
         }
-        binding.checkboxSound.setOnCheckedChangeListener{ _, isChecked ->
 
-            if (isChecked) {
-                mainViewModel.setSoundSettings(true)
+        // MMA choice
+        binding.mmaTrainingTextView.setOnClickListener {
+            selectedTrainingType = "MMA"
+            binding.textTrainingType.text = "MMA — 5 × 5 min"
+            binding.dropdownChoices.visibility = View.GONE
+        }
+
+        // Sound toggle — read current state
+        binding.checkboxSound.isChecked = mainViewModel.getSoundStatus()
+        binding.checkboxSound.setOnCheckedChangeListener { _, isChecked ->
+            mainViewModel.setSoundSettings(isChecked)
+        }
+
+        binding.btnSave.setOnClickListener {
+            if (selectedTrainingType != null) {
+                mainViewModel.setDefaultTrainingType(selectedTrainingType!!)
+                Toast.makeText(context, "Settings saved!", Toast.LENGTH_SHORT).show()
             } else {
-                mainViewModel.setSoundSettings(false)
+                Toast.makeText(context, "Select a training type first.", Toast.LENGTH_SHORT).show()
             }
         }
-        binding.btnSave.setOnClickListener{
 
-            if (this::trainingType.isInitialized){
-                Toast.makeText(context, "Default training saved!", Toast.LENGTH_LONG).show()
-                mainViewModel.setDefaultTrainingType(trainingType)
-            }else{
-                Toast.makeText(context, "Choose training type first.", Toast.LENGTH_LONG).show()
-            }
-
+        binding.btnBack.setOnClickListener {
+            it.findNavController().navigate(R.id.action_settings_to_first)
         }
-
 
         return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setupDropdown()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
-    private fun setupDropdown() {
-        binding.btnBack.setOnClickListener{
-            it.findNavController().navigate(R.id.action_settings_to_first)
-        }
-        binding.textTrainingType.setOnClickListener {
-            // Toggle visibility of dropdownChoices LinearLayout
-            val isVisible = binding.dropdownChoices.visibility == View.VISIBLE
-            binding.dropdownChoices.visibility = if (isVisible) View.GONE else View.VISIBLE
-        }
-
-
-    }
-
-
 }

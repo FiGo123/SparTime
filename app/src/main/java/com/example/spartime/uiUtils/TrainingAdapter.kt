@@ -15,10 +15,12 @@ class TrainingAdapter(
 ) : RecyclerView.Adapter<TrainingAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val titleTextView: TextView = itemView.findViewById(R.id.textViewTitle)
-        val dateTextView: TextView = itemView.findViewById(R.id.textViewDate)
-        val numOfRoundsTextView: TextView = itemView.findViewById(R.id.numOfRounds)
-        val descriptionTextView: TextView = itemView.findViewById(R.id.description)
+        val title: TextView = itemView.findViewById(R.id.textViewTitle)
+        val date: TextView = itemView.findViewById(R.id.textViewDate)
+        val numOfRounds: TextView = itemView.findViewById(R.id.numOfRounds)
+        val roundDuration: TextView = itemView.findViewById(R.id.roundDuration)
+        val difficultyValue: TextView = itemView.findViewById(R.id.difficultyValue)
+        val description: TextView = itemView.findViewById(R.id.description)
         val deleteButton: ImageButton = itemView.findViewById(R.id.deleteButton)
     }
 
@@ -29,14 +31,16 @@ class TrainingAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val training = trainingList[position]
-        holder.titleTextView.text = training.title
-        holder.dateTextView.text = training.date
-        holder.numOfRoundsTextView.text = training.numberOfRounds.toString()
-        holder.descriptionTextView.text = training.description
+        holder.title.text = training.title
+        holder.date.text = training.date
+        holder.numOfRounds.text = training.numberOfRounds.toString()
+        holder.roundDuration.text = training.roundDuration.toString()
+        holder.difficultyValue.text = "${training.difficultyScale}/5"
+        holder.description.text = training.description
         holder.deleteButton.setOnClickListener {
-            val adapterPosition = holder.adapterPosition
-            if (adapterPosition != RecyclerView.NO_ID.toInt()) {
-                onDelete(training, adapterPosition)
+            val pos = holder.adapterPosition
+            if (pos != RecyclerView.NO_ID.toInt()) {
+                onDelete(training, pos)
             }
         }
     }
