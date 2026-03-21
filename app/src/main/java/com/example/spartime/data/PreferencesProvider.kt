@@ -9,7 +9,7 @@ class PreferencesProvider(context: Context) {
 
     fun getString(key: String): String? = sharedPreferences.getString(key, null)
 
-    fun getBoolean(key: String): Boolean? = sharedPreferences.getBoolean(key, false)
+    fun getBoolean(key: String): Boolean? = if (sharedPreferences.contains(key)) sharedPreferences.getBoolean(key, false) else null
 
     fun putInt(key: String, value: Int) =  sharedPreferences.edit().putInt(key,value).apply()
 

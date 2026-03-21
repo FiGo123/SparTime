@@ -1,27 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:background="@color/primary_green">
+    android:background="@color/background_primary">
 
+    <!-- Glove icon circle -->
+    <FrameLayout
+        android:id="@+id/iconCircle"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:background="@drawable/circle_green"
+        app:layout_constraintBottom_toTopOf="@id/appName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintVertical_bias="0.42">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="🥊"
+            android:textSize="52sp" />
+
+    </FrameLayout>
+
+    <!-- App name -->
+    <TextView
+        android:id="@+id/appName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:fontFamily="sans-serif-black"
+        android:letterSpacing="0.05"
+        android:text="SPARTIME"
+        android:textColor="@color/white"
+        android:textSize="42sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iconCircle" />
+
+    <!-- Green accent line -->
+    <View
+        android:id="@+id/accentLine"
+        android:layout_width="48dp"
+        android:layout_height="4dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/timer_active"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appName" />
+
+    <!-- Tagline -->
+    <TextView
+        android:id="@+id/tagline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.12"
+        android:text="TRAIN HARD. TRACK SMART."
+        android:textColor="@color/gray_medium"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/accentLine" />
+
+    <!-- Bottom version -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SparTime"
-        android:textColor="@color/white"
-        android:textSize="48sp"
-        android:fontFamily="sans-serif-black" />
+        android:layout_marginBottom="32dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="v1.0"
+        android:textColor="#3D3D3D"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Boxing Timer"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:layout_marginTop="8dp"
-        android:alpha="0.8" />
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,7 +1,6 @@
 package com.example.spartime
 
 import android.media.AudioManager
-import android.media.RingtoneManager
 import android.media.ToneGenerator
 import android.os.Build
 import android.os.Bundle
@@ -246,10 +245,11 @@ class Second : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun handleRoundFinish(navController: NavController) {
-        playBellSound()
         if (currentRoundNumber >= roundNum) {
+            announceWorkoutDone()
             saveTraining()
         } else {
+            playBellSound()
             mainViewModel.setCurrentRound(currentRoundNumber + 1)
             navController.navigate(R.id.action_second_to_rest)
         }
@@ -289,31 +289,48 @@ class Second : Fragment() {
 
     // --- Audio ---
 
-    private fun playRoundSound(round: Int) {
-        if (!mainViewModel.getSoundStatus()) return
-        if (textToSpeech != null) {
-            speakText("Round $round", "round_$round")
+    private fun initTtsIfNeeded(onReady: (TextToSpeech) -> Unit) {
+        val tts = textToSpeech
+        if (tts != null) {
+            onReady(tts)
         } else {
             textToSpeech = TextToSpeech(requireContext()) { status ->
                 if (status == TextToSpeech.SUCCESS) {
-                    val result = textToSpeech?.setLanguage(Locale.getDefault())
+                    val ttsReady = textToSpeech ?: return@TextToSpeech
+                    var result = ttsReady.setLanguage(Locale.getDefault())
+                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        result = ttsReady.setLanguage(Locale.ENGLISH)
+                    }
                     if (result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
-                        speakText("Round $round", "round_$round")
+                        onReady(ttsReady)
                     }
                 }
             }
         }
     }
 
-    private fun speakText(text: String, utteranceId: String) {
-        textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId)
+    private fun playRoundSound(round: Int) {
+        if (!mainViewModel.getSoundStatus()) return
+        initTtsIfNeeded { tts ->
+            tts.speak("Round $round, begin!", TextToSpeech.QUEUE_FLUSH, null, "round_$round")
+        }
+    }
+
+    private fun announceWorkoutDone() {
+        if (!mainViewModel.getSoundStatus()) return
+        playBellSound()
+        initTtsIfNeeded { tts ->
+            tts.speak("Workout complete! Well done!", TextToSpeech.QUEUE_FLUSH, null, "workout_done")
+        }
     }
 
     private fun playBellSound() {
         if (!mainViewModel.getSoundStatus()) return
         try {
-            val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-            RingtoneManager.getRingtone(requireContext(), uri)?.play()
+            if (toneGenerator == null) {
+                toneGenerator = ToneGenerator(AudioManager.STREAM_ALARM, 100)
+            }
+            toneGenerator?.startTone(ToneGenerator.TONE_PROP_BEEP2, 800)
         } catch (e: Exception) { /* no-op */ }
     }
 

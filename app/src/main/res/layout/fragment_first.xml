@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_primary"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -10,19 +11,49 @@
         android:layout_height="wrap_content"
         android:padding="24dp">
 
-        <TextView
+        <LinearLayout
             android:id="@+id/header_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:fontFamily="sans-serif-black"
+            android:layout_marginTop="40dp"
             android:gravity="center_horizontal"
-            android:text="SparTime"
-            android:textColor="@color/white"
-            android:textSize="48sp"
+            android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🥊"
+                android:textSize="40sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:letterSpacing="0.05"
+                android:text="SPARTIME"
+                android:textColor="@color/white"
+                android:textSize="42sp" />
+
+            <View
+                android:layout_width="48dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="8dp"
+                android:background="@color/timer_active" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.12"
+                android:text="TRAIN HARD. TRACK SMART."
+                android:textColor="@color/gray_medium"
+                android:textSize="12sp" />
+
+        </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/timer_setup_card"
@@ -163,31 +194,37 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_settings"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
-                android:layout_height="56dp"
+                android:layout_height="52dp"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
                 android:text="Settings"
                 android:textColor="@color/white"
+                android:textSize="14sp"
                 app:icon="@drawable/baseline_settings_24"
                 app:iconGravity="textStart"
-                app:iconPadding="8dp"
-                app:strokeColor="@color/white" />
+                app:iconPadding="6dp"
+                app:iconSize="18dp"
+                app:iconTint="@color/white"
+                app:strokeColor="@color/gray_dark" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_history"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
-                android:layout_height="56dp"
+                android:layout_height="52dp"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:text="History"
                 android:textColor="@color/white"
+                android:textSize="14sp"
                 app:icon="@android:drawable/ic_menu_recent_history"
                 app:iconGravity="textStart"
-                app:iconPadding="8dp"
-                app:strokeColor="@color/white" />
+                app:iconPadding="6dp"
+                app:iconSize="18dp"
+                app:iconTint="@color/white"
+                app:strokeColor="@color/gray_dark" />
 
         </LinearLayout>
 

@@ -1,7 +1,6 @@
 package com.example.spartime
 
 import android.media.AudioManager
-import android.media.RingtoneManager
 import android.media.ToneGenerator
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -95,31 +94,40 @@ class Rest : Fragment() {
         binding.restTimeCounter.text = String.format("%02d:%02d", minutes, seconds)
     }
 
-    private fun announceRest() {
-        if (!mainViewModel.getSoundStatus()) return
-        if (textToSpeech != null) {
-            speakText("Rest")
+    private fun initTtsIfNeeded(onReady: (TextToSpeech) -> Unit) {
+        val tts = textToSpeech
+        if (tts != null) {
+            onReady(tts)
         } else {
             textToSpeech = TextToSpeech(requireContext()) { status ->
                 if (status == TextToSpeech.SUCCESS) {
-                    val result = textToSpeech?.setLanguage(Locale.getDefault())
+                    val ttsReady = textToSpeech ?: return@TextToSpeech
+                    var result = ttsReady.setLanguage(Locale.getDefault())
+                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        result = ttsReady.setLanguage(Locale.ENGLISH)
+                    }
                     if (result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
-                        speakText("Rest")
+                        onReady(ttsReady)
                     }
                 }
             }
         }
     }
 
-    private fun speakText(text: String) {
-        textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "rest_announcement")
+    private fun announceRest() {
+        if (!mainViewModel.getSoundStatus()) return
+        initTtsIfNeeded { tts ->
+            tts.speak("Rest time. Recover!", TextToSpeech.QUEUE_FLUSH, null, "rest_announcement")
+        }
     }
 
     private fun playBellSound() {
         if (!mainViewModel.getSoundStatus()) return
         try {
-            val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-            RingtoneManager.getRingtone(requireContext(), uri)?.play()
+            if (toneGenerator == null) {
+                toneGenerator = ToneGenerator(AudioManager.STREAM_ALARM, 100)
+            }
+            toneGenerator?.startTone(ToneGenerator.TONE_PROP_BEEP2, 800)
         } catch (e: Exception) { /* no-op */ }
     }
 
