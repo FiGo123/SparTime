@@ -136,17 +136,25 @@ class First : Fragment() {
     private fun saveInterruptedTraining() {
         val db = DBHandler(requireContext())
         val currentTime = getCurrentDateTime()
-        
+
         val currentRound = mainViewModel.currentRound.value ?: 0
-        val leftTime = mainViewModel.leftTime.value ?: 0
-        
+        val roundLength = mainViewModel.roundLengthInMin.value ?: 0
+        val difficulty = mainViewModel.getSelectedDifficulty()
+        val trainingType = mainViewModel.trainingType.value ?: "Custom"
+
+        val title = when (trainingType) {
+            "BOXING" -> "Boxing Training"
+            "MMA" -> "MMA Training"
+            else -> "Custom Training"
+        }
+
         val training = Training(
-            "Boxing Training", 
+            title,
             currentTime,
-            currentRound, 
-            leftTime, 
-            3, 
-            "Interrupted training session"
+            currentRound,
+            roundLength,
+            difficulty,
+            "Interrupted at round $currentRound"
         )
         db.insertData(training)
     }

@@ -32,6 +32,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _finishedRounds = MutableLiveData<Int>()
     val finishedRounds: LiveData<Int> = _finishedRounds
 
+    private val _selectedDifficulty = MutableLiveData<Int>(3)
+    val selectedDifficulty: LiveData<Int> = _selectedDifficulty
+
     fun setNumOfRounds(numberOfRounds: Int) {
         _numOfRounds.value = numberOfRounds
     }
@@ -85,4 +88,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun getSoundStatus(): Boolean {
         return repository.getSoundStatus()
     }
+
+    fun setSelectedDifficulty(rating: Int) {
+        _selectedDifficulty.value = rating
+    }
+
+    fun getSelectedDifficulty(): Int = _selectedDifficulty.value ?: 3
 }

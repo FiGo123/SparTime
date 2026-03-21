@@ -37,17 +37,22 @@ class DBHandler (var context: Context) :SQLiteOpenHelper(context, DATABASE_NAME,
         TODO("Not yet implemented")
     }
 
-    fun insertData(training: Training){
+    fun insertData(training: Training) {
         val db = this.writableDatabase
         val cv = ContentValues()
         cv.put(COL_TITLE, training.title)
         cv.put(COL_DATE, training.date)
         cv.put(COL_NUMBER_OF_ROUNDS, training.numberOfRounds)
+        cv.put(COL_ROUND_DURATION, training.roundDuration)
         cv.put(COL_DIFICULTY_SCALE, training.difficultyScale)
         cv.put(COL_DESCRIPTION, training.description)
-        val result = db.insert(TABLE_NAME, null,cv)
+        db.insert(TABLE_NAME, null, cv)
+    }
 
-
+    fun deleteTraining(id: Int) {
+        val db = this.writableDatabase
+        db.delete(TABLE_NAME, "$COL_ID = ?", arrayOf(id.toString()))
+        db.close()
     }
 
     fun getAllTraining(): List<Training> {
@@ -86,6 +91,7 @@ class DBHandler (var context: Context) :SQLiteOpenHelper(context, DATABASE_NAME,
                     val description = cursor.getString(descriptionIndex)
 
                     val training = Training(title, date, numberOfRounds, roundDuration, difficultyScale, description)
+                    training.id = id
                     trainingList.add(training)
                 } while (cursor.moveToNext())
             }

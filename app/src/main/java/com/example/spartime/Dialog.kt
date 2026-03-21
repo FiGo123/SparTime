@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.example.spartime.databinding.FragmentDialogBinding
-import com.example.spartime.databinding.FragmentFirstBinding
 import com.example.spartime.viewmodel.MainViewModel
 
 class Dialog : Fragment() {
@@ -21,14 +20,19 @@ class Dialog : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentDialogBinding.inflate(inflater, container, false)
-        binding.yesButton.setOnClickListener{
+
+        binding.yesButton.setOnClickListener {
+            val rating = binding.difficultyRating.rating.toInt().coerceIn(1, 5)
+            mainViewModel.setSelectedDifficulty(rating)
             mainViewModel.setDialogAnswer(true)
             it.findNavController().navigate(R.id.action_dialog_to_first)
         }
-        binding.noButton.setOnClickListener{
+
+        binding.noButton.setOnClickListener {
             mainViewModel.setDialogAnswer(false)
             it.findNavController().navigate(R.id.action_dialog_to_first)
         }
+
         return binding.root
     }
 }

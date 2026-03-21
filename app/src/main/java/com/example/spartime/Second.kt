@@ -1,168 +1,252 @@
 package com.example.spartime
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.media.MediaPlayer
+import android.media.AudioManager
 import android.media.RingtoneManager
-import android.speech.tts.TextToSpeech
-import java.util.Locale
+import android.media.ToneGenerator
 import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.os.CountDownTimer
+import android.speech.tts.TextToSpeech
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
-import androidx.navigation.findNavController
-import com.example.spartime.databinding.FragmentSecondBinding
-import com.example.spartime.viewmodel.MainViewModel
-import android.os.CountDownTimer
-import android.widget.TextView
+import android.view.WindowManager
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.example.spartime.data.DBHandler
 import com.example.spartime.data.models.Training
+import com.example.spartime.databinding.FragmentSecondBinding
+import com.example.spartime.viewmodel.MainViewModel
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [Second.newInstance] factory method to
- * create an instance of this fragment.
- */
 class Second : Fragment() {
-    private var currentRoundNumber = 0
-    private lateinit var countDownTimer: CountDownTimer
-    private var timeRemainingInMillis = 0L
-    private var initialTimeInMinutes = 0
-    private val timeForSave: MutableMap<String, Int> = mutableMapOf()
-    private var isTimerPaused = false
-    private var isTimerRunning = false
-    private var textToSpeech: TextToSpeech? = null
 
-    private var param1: String? = null
-    private var param2: String? = null
-    private var currentRound = 0
+    private lateinit var binding: FragmentSecondBinding
+    private lateinit var countDownTimer: CountDownTimer
+    private var prepareCountDownTimer: CountDownTimer? = null
+
+    private var timeRemainingInMillis = 0L
+    private var initialTimeInMillis = 0L
+    private var halfTimeBellPlayed = false
+    private var isTimerRunning = false
+    private var isTimerPaused = false
+
+    private var currentRoundNumber = 0
     private var roundNum = 0
     private var roundLength = 0
 
+    private var textToSpeech: TextToSpeech? = null
+    private var toneGenerator: ToneGenerator? = null
+
     private val mainViewModel: MainViewModel by activityViewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentSecondBinding.inflate(inflater, container, false)
-
-        setupNavigation(binding)
-        observeViewModel(binding)
-
+        binding = FragmentSecondBinding.inflate(inflater, container, false)
+        setupNavigation()
+        observeViewModel()
         return binding.root
     }
 
-    private fun setupNavigation(binding: FragmentSecondBinding) {
-        binding.roundFragmentBtn.setOnClickListener {
-            if (isTimerRunning && !isTimerPaused) {
-                pauseTimer(binding)
-            } else if (isTimerPaused) {
-                resumeTimer(binding)
-            } else {
-                stopTimer(it.findNavController())
-            }
-        }
-        
-        binding.stopTrainingBtn.setOnClickListener {
-            stopTimer(it.findNavController())
-        }
+    override fun onResume() {
+        super.onResume()
+        activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
-    private fun saveCurrentState() {
-        timeForSave["round"] = currentRound
-        val leftTimeInSeconds = (timeRemainingInMillis / 1000).toInt()
-        timeForSave["leftTime"] = leftTimeInSeconds
-        mainViewModel.setLeftTime(leftTimeInSeconds)
+    override fun onPause() {
+        super.onPause()
+        activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+
+    private fun setupNavigation() {
+        binding.roundFragmentBtn.setOnClickListener {
+            if (isTimerRunning && !isTimerPaused) {
+                pauseTimer()
+            } else if (isTimerPaused) {
+                resumeTimer()
+            } else {
+                stopSession(it.findNavController())
+            }
+        }
+        binding.stopTrainingBtn.setOnClickListener {
+            stopSession(it.findNavController())
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun observeViewModel(binding: FragmentSecondBinding) {
+    private fun observeViewModel() {
         mainViewModel.apply {
             currentRound.observe(viewLifecycleOwner) { round ->
                 currentRoundNumber = round
                 binding.roundNum.text = "Round $round"
+                binding.currentRoundIndicator.text = round.toString()
             }
-
             numOfRounds.observe(viewLifecycleOwner) { rounds ->
                 roundNum = rounds
+                binding.totalRoundsIndicator.text = rounds.toString()
             }
-
             roundLengthInMin.observe(viewLifecycleOwner) { length ->
-                setupRoundTimer(binding, length)
-            }
-            
-            numOfRounds.observe(viewLifecycleOwner) { total ->
-                binding.totalRoundsIndicator.text = total.toString()
-            }
-            
-            currentRound.observe(viewLifecycleOwner) { current ->
-                binding.currentRoundIndicator.text = current.toString()
+                setupRoundTimer(length)
             }
         }
     }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun setupRoundTimer(binding: FragmentSecondBinding, length: Int) {
+    private fun setupRoundTimer(length: Int) {
         roundLength = length
-        initialTimeInMinutes = length
-        timeRemainingInMillis = (initialTimeInMinutes * 60 * 1000).toLong()
+        initialTimeInMillis = (length * 60 * 1000).toLong()
+        timeRemainingInMillis = initialTimeInMillis
+        halfTimeBellPlayed = false
 
-        if (currentRound > roundNum) {
+        if (currentRoundNumber > roundNum) {
             saveTraining()
-        } else {
-            startTimer(binding, findNavController())
+            return
         }
-        playRoundSound(currentRound)
+
+        if (currentRoundNumber == 1) {
+            startPrepareCountdown()
+        } else {
+            playRoundSound(currentRoundNumber)
+            startTimer(findNavController())
+        }
     }
 
-    private fun playRoundSound(round: Int) {
-        if (!mainViewModel.getSoundStatus()) return
-        if (textToSpeech != null) {
-            announceRound(round)
-        } else {
-            textToSpeech = TextToSpeech(requireContext()) { status ->
-                if (status == TextToSpeech.SUCCESS) {
-                    val result = textToSpeech?.setLanguage(Locale.getDefault())
-                    if (result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
-                        announceRound(round)
-                    }
+    // 10-second "GET READY" countdown before round 1
+    private fun startPrepareCountdown() {
+        binding.roundNum.text = "GET READY"
+        binding.timeCounter.setTextColor(ContextCompat.getColor(requireContext(), R.color.timer_warning))
+        binding.pauseHintText.text = "Get in position!"
+
+        prepareCountDownTimer = object : CountDownTimer(10_000L, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsLeft = (millisUntilFinished / 1000).toInt() + 1
+                binding.timeCounter.text = secondsLeft.toString()
+                if (secondsLeft <= 3) {
+                    playWarningBeep()
                 }
             }
+
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onFinish() {
+                binding.timeCounter.setTextColor(
+                    ContextCompat.getColor(requireContext(), R.color.timer_active)
+                )
+                binding.roundNum.text = "Round $currentRoundNumber"
+                binding.pauseHintText.text = "Tap to pause training"
+                playRoundSound(currentRoundNumber)
+                startTimer(findNavController())
+            }
+        }.start()
+    }
+
+    private fun startTimer(navController: NavController) {
+        isTimerRunning = true
+        isTimerPaused = false
+        updateButtonState()
+        binding.timeCounter.setTextColor(ContextCompat.getColor(requireContext(), R.color.timer_active))
+
+        countDownTimer = object : CountDownTimer(timeRemainingInMillis, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeRemainingInMillis = millisUntilFinished
+                updateTimeDisplay()
+
+                // Half-time bell
+                if (!halfTimeBellPlayed && millisUntilFinished <= initialTimeInMillis / 2) {
+                    halfTimeBellPlayed = true
+                    playBellSound()
+                }
+
+                // Last 10 seconds: color turns red + beep each second
+                if (millisUntilFinished <= 10_000) {
+                    binding.timeCounter.setTextColor(
+                        ContextCompat.getColor(requireContext(), R.color.timer_danger)
+                    )
+                    playWarningBeep()
+                }
+            }
+
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onFinish() {
+                isTimerRunning = false
+                isTimerPaused = false
+                binding.timeCounter.setTextColor(
+                    ContextCompat.getColor(requireContext(), R.color.timer_active)
+                )
+                handleRoundFinish(navController)
+            }
+        }.start()
+    }
+
+    private fun pauseTimer() {
+        if (::countDownTimer.isInitialized && isTimerRunning) {
+            countDownTimer.cancel()
+            isTimerPaused = true
+            mainViewModel.setLeftTime((timeRemainingInMillis / 1000).toInt())
+            updateButtonState()
         }
     }
 
-    private fun announceRound(round: Int) {
-        textToSpeech?.speak(
-            "Round $round",
-            TextToSpeech.QUEUE_FLUSH,
-            null,
-            "round_announcement_$round"
-        )
+    private fun resumeTimer() {
+        isTimerPaused = false
+        updateButtonState()
+        val resumeColor = if (timeRemainingInMillis <= 10_000) R.color.timer_danger else R.color.timer_active
+        binding.timeCounter.setTextColor(ContextCompat.getColor(requireContext(), resumeColor))
+
+        countDownTimer = object : CountDownTimer(timeRemainingInMillis, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeRemainingInMillis = millisUntilFinished
+                updateTimeDisplay()
+                if (!halfTimeBellPlayed && millisUntilFinished <= initialTimeInMillis / 2) {
+                    halfTimeBellPlayed = true
+                    playBellSound()
+                }
+                if (millisUntilFinished <= 10_000) {
+                    binding.timeCounter.setTextColor(
+                        ContextCompat.getColor(requireContext(), R.color.timer_danger)
+                    )
+                    playWarningBeep()
+                }
+            }
+
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onFinish() {
+                isTimerRunning = false
+                isTimerPaused = false
+                binding.timeCounter.setTextColor(
+                    ContextCompat.getColor(requireContext(), R.color.timer_active)
+                )
+                handleRoundFinish(findNavController())
+            }
+        }.start()
+        isTimerRunning = true
+    }
+
+    private fun stopSession(navController: NavController) {
+        prepareCountDownTimer?.cancel()
+        if (::countDownTimer.isInitialized) countDownTimer.cancel()
+        isTimerRunning = false
+        isTimerPaused = false
+        mainViewModel.setLeftTime((timeRemainingInMillis / 1000).toInt())
+        navController.navigate(R.id.action_second_to_dialog)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun handleRoundFinish(navController: NavController) {
+        playBellSound()
+        if (currentRoundNumber >= roundNum) {
+            saveTraining()
+        } else {
+            navController.navigate(R.id.action_second_to_rest)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -179,64 +263,13 @@ class Second : Fragment() {
         findNavController().navigate(R.id.action_second_to_first)
     }
 
-    private fun startTimer(binding: FragmentSecondBinding, navController: NavController) {
-        isTimerRunning = true
-        isTimerPaused = false
-        updateButtonState(binding)
-        
-        countDownTimer = object : CountDownTimer(timeRemainingInMillis, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                timeRemainingInMillis = millisUntilFinished
-                updateTimeText(binding)
-            }
+    private fun updateTimeDisplay() {
+        val minutes = timeRemainingInMillis / 60000
+        val seconds = (timeRemainingInMillis % 60000) / 1000
+        binding.timeCounter.text = String.format("%02d:%02d", minutes, seconds)
+    }
 
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onFinish() {
-                isTimerRunning = false
-                isTimerPaused = false
-                handleTimerFinish(navController)
-            }
-        }.start()
-    }
-    
-    private fun pauseTimer(binding: FragmentSecondBinding) {
-        if (::countDownTimer.isInitialized && isTimerRunning) {
-            countDownTimer.cancel()
-            isTimerPaused = true
-            updateButtonState(binding)
-        }
-    }
-    
-    private fun resumeTimer(binding: FragmentSecondBinding) {
-        isTimerPaused = false
-        updateButtonState(binding)
-        
-        countDownTimer = object : CountDownTimer(timeRemainingInMillis, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                timeRemainingInMillis = millisUntilFinished
-                updateTimeText(binding)
-            }
-
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onFinish() {
-                isTimerRunning = false
-                isTimerPaused = false
-                handleTimerFinish(findNavController())
-            }
-        }.start()
-    }
-    
-    private fun stopTimer(navController: NavController) {
-        if (::countDownTimer.isInitialized) {
-            countDownTimer.cancel()
-        }
-        isTimerRunning = false
-        isTimerPaused = false
-        navController.navigate(R.id.action_second_to_dialog)
-        saveCurrentState()
-    }
-    
-    private fun updateButtonState(binding: FragmentSecondBinding) {
+    private fun updateButtonState() {
         if (isTimerPaused) {
             binding.roundFragmentBtn.text = "RESUME"
             binding.roundFragmentBtn.icon = context?.getDrawable(android.R.drawable.ic_media_play)
@@ -248,46 +281,44 @@ class Second : Fragment() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun handleTimerFinish(navController: NavController) {
-        playComplianceBellSound()
+    // --- Audio ---
 
-        if (currentRound >= roundNum) {
-            saveTraining()
-        } else {
-            navController.navigate(R.id.action_second_to_rest)
-        }
-    }
-    
-    private fun playComplianceBellSound() {
+    private fun playRoundSound(round: Int) {
         if (!mainViewModel.getSoundStatus()) return
-        try {
-            val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-            val ringtone = RingtoneManager.getRingtone(requireContext(), notification)
-            ringtone?.play()
-        } catch (e: Exception) {
-            // Fallback - no sound if system notification fails
-        }
-    }
-
-    private fun updateTimeText(binding: FragmentSecondBinding) {
-        val minutes = timeRemainingInMillis / 60000
-        val seconds = (timeRemainingInMillis % 60000) / 1000
-        val formattedTime = String.format("%02d:%02d", minutes, seconds)
-
-        timeForSave["leftTime"] = (minutes * 60 + seconds).toInt()
-        binding.timeCounter.text = formattedTime
-    }
-
-    companion object {
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            Second().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+        if (textToSpeech != null) {
+            speakText("Round $round", "round_$round")
+        } else {
+            textToSpeech = TextToSpeech(requireContext()) { status ->
+                if (status == TextToSpeech.SUCCESS) {
+                    val result = textToSpeech?.setLanguage(Locale.getDefault())
+                    if (result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
+                        speakText("Round $round", "round_$round")
+                    }
                 }
             }
+        }
+    }
+
+    private fun speakText(text: String, utteranceId: String) {
+        textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId)
+    }
+
+    private fun playBellSound() {
+        if (!mainViewModel.getSoundStatus()) return
+        try {
+            val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            RingtoneManager.getRingtone(requireContext(), uri)?.play()
+        } catch (e: Exception) { /* no-op */ }
+    }
+
+    private fun playWarningBeep() {
+        if (!mainViewModel.getSoundStatus()) return
+        try {
+            if (toneGenerator == null) {
+                toneGenerator = ToneGenerator(AudioManager.STREAM_ALARM, 80)
+            }
+            toneGenerator?.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
+        } catch (e: Exception) { /* no-op */ }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -298,9 +329,14 @@ class Second : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        prepareCountDownTimer?.cancel()
+        if (::countDownTimer.isInitialized) countDownTimer.cancel()
         textToSpeech?.shutdown()
-        if (::countDownTimer.isInitialized) {
-            countDownTimer.cancel()
-        }
+        toneGenerator?.release()
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(param1: String, param2: String) = Second()
     }
 }
