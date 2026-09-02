@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
                 android:letterSpacing="0.05"
-                android:text="SPARTIME"
+                android:text="BOOMBEE"
                 android:textColor="@color/white"
                 android:textSize="42sp" />
 

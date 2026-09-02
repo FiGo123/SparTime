@@ -1,8 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.SparTime" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.BoomBee" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/timer_active</item>
         <item name="colorPrimaryVariant">@color/primary_green_dark</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/black</item>
         <item name="colorSecondary">@color/accent_orange</item>
         <item name="colorOnSecondary">@color/white</item>
         <item name="android:windowBackground">@color/background_primary</item>

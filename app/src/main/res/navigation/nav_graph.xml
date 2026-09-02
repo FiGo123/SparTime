@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/first"
-        android:name="com.example.spartime.First"
+        android:name="com.example.boombee.First"
         android:label="fragment_first"
         tools:layout="@layout/fragment_first" >
         <action
@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/second"
-        android:name="com.example.spartime.Second"
+        android:name="com.example.boombee.Second"
         android:label="fragment_second"
         tools:layout="@layout/fragment_second" >
         <action
@@ -40,7 +40,7 @@
     </fragment>
     <fragment
         android:id="@+id/rest"
-        android:name="com.example.spartime.Rest"
+        android:name="com.example.boombee.Rest"
         android:label="Rest"
         tools:layout="@layout/fragment_rest">
         <action
@@ -52,7 +52,7 @@
     </fragment>
     <fragment
         android:id="@+id/settings"
-        android:name="com.example.spartime.Settings"
+        android:name="com.example.boombee.Settings"
         android:label="Settings"
         tools:layout="@layout/fragment_settings">
         <action
@@ -61,7 +61,7 @@
     </fragment>
     <fragment
         android:id="@+id/historyTraining"
-        android:name="com.example.spartime.HistoryTraining"
+        android:name="com.example.boombee.HistoryTraining"
         android:label="HistoryTraining" >
         <action
             android:id="@+id/action_historyTraining_to_first"
@@ -69,7 +69,7 @@
     </fragment>
     <fragment
         android:id="@+id/dialog"
-        android:name="com.example.spartime.Dialog"
+        android:name="com.example.boombee.Dialog"
         android:label="Dialog" >
         <action
             android:id="@+id/action_dialog_to_first"
@@ -77,7 +77,7 @@
     </fragment>
     <fragment
         android:id="@+id/survey"
-        android:name="com.example.spartime.Survey"
+        android:name="com.example.boombee.Survey"
         android:label="Survey" >
         <action
             android:id="@+id/action_survey_to_first"
