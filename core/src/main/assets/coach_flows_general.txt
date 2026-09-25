@@ -1,0 +1,44 @@
+# BoomBee Coach — tactical flow library ("general" school)
+#
+# A "flow" is a short, tied-together sequence of beats — e.g. "just closed
+# distance, throw power, get back out, counter, reset" — instead of each
+# beat being picked independently. While a flow plays, pacing is faster
+# (higher TTS rate, shorter gaps between calls); it reverts to normal once
+# the flow finishes. See COACH_MODE_TACTICS.md's "Tactical flows" section.
+#
+# One flow per line, steps separated by " > ". Step vocabulary:
+#   close_distance / make_distance / move_more / hands_up
+#       -> a literal phrase
+#   power
+#       -> a random `| power`-tagged combo from coach_combos_general.txt,
+#          re-rolled fresh every time this flow fires
+#   attack
+#       -> a normal ramp/library-driven Attack pick, same as if no flow
+#          were active
+#   1-6, hyphen-separated, slip/duck allowed mid-combo (e.g. 1-2-3,
+#   1-2-slip-2-3, 1-3-duck-5-2)
+#       -> a fixed combo, spoken exactly as written every time — same
+#          vocabulary as coach_combos_general.txt. Don't write 2-1
+#          ("cross, jab") — CoachSession bans it outright, so a literal
+#          step using it would never actually get spoken as written.
+#
+# " | notes" (optional) — free text after a `|`, not parsed, just for
+# humans reading this file.
+#
+# Loaded by FlowLibrary.kt. Every flow below currently opens on
+# close_distance since that's the only trigger CoachSession wires up today
+# (a "Close distance" call rolls FLOW_TRIGGER_CHANCE to fire one, picked at
+# random) — add more lines any time to grow the variety, no code changes
+# needed. New entry points (e.g. triggering off Defense) are a natural
+# future extension, not built yet.
+
+close_distance > power > make_distance > hands_up
+close_distance > power > make_distance > 2-1 > move_more
+close_distance > power > move_more > power > make_distance
+close_distance > power > power > make_distance > hands_up
+close_distance > 1-2-slip-2-3 > make_distance > hands_up
+close_distance > 1-3-duck-5-2 > make_distance
+close_distance > power > 1-1-2-slip-3 > make_distance > hands_up
+close_distance > attack > power > make_distance > move_more
+close_distance > 1-2-3 > power > make_distance > hands_up
+close_distance > power > 1-2-duck-2-4 > make_distance

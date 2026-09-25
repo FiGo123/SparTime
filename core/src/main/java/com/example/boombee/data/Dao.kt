@@ -13,6 +13,8 @@ class Dao(private val preferencesProvider: PreferencesProvider) {
         private const val KEY_STATUS = "sound_status"
         private const val KEY_DIALOG = "key_dialog"
         private const val KEY_TIME_IF_INTERUPT = "time_if_interupt"
+        private const val KEY_FREESTYLE_ENABLED = "coach_freestyle_enabled"
+        private const val KEY_TACTICAL_COMMANDS_ENABLED = "coach_tactical_commands_enabled"
     }
 
     fun saveIsInProgress(isInProgress: Boolean) {
@@ -54,5 +56,21 @@ class Dao(private val preferencesProvider: PreferencesProvider) {
 
     fun getSoundStatus(): Boolean {
         return preferencesProvider.getBoolean(KEY_STATUS) ?: true
+    }
+
+    fun saveFreestyleEnabled(enabled: Boolean) {
+        preferencesProvider.putBoolean(KEY_FREESTYLE_ENABLED, enabled)
+    }
+
+    fun getFreestyleEnabled(): Boolean {
+        return preferencesProvider.getBoolean(KEY_FREESTYLE_ENABLED) ?: true
+    }
+
+    fun saveTacticalCommandsEnabled(enabled: Boolean) {
+        preferencesProvider.putBoolean(KEY_TACTICAL_COMMANDS_ENABLED, enabled)
+    }
+
+    fun getTacticalCommandsEnabled(): Boolean {
+        return preferencesProvider.getBoolean(KEY_TACTICAL_COMMANDS_ENABLED) ?: true
     }
 }

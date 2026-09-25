@@ -36,7 +36,12 @@ class TrainingAdapter(
         holder.numOfRounds.text = training.numberOfRounds.toString()
         holder.roundDuration.text = training.roundDuration.toString()
         holder.difficultyValue.text = "${training.difficultyScale}/5"
-        holder.description.text = training.description
+        holder.description.text = if (training.trainingMode == "BOXING_COACH") {
+            val difficultyLabel = training.coachDifficulty?.lowercase()?.replaceFirstChar { it.uppercase() }
+            "${training.description} · $difficultyLabel · ${training.totalPunches} punches · ${training.totalCombos} combos"
+        } else {
+            training.description
+        }
         holder.deleteButton.setOnClickListener {
             val pos = holder.adapterPosition
             if (pos != RecyclerView.NO_ID.toInt()) {

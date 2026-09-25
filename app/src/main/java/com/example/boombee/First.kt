@@ -2,17 +2,16 @@ package com.example.boombee
 
 import android.os.Build
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
+import com.example.boombee.coach.Difficulty
+import com.example.boombee.coach.TrainingMode
+import com.example.boombee.coach.VoiceStyle
 import com.example.boombee.data.DBHandler
 import com.example.boombee.data.models.Training
 import com.example.boombee.databinding.FragmentFirstBinding
@@ -42,24 +41,17 @@ class First : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
-        
+
         initializeDefaults()
         setupUI()
-        setupListeners()
         observeViewModel()
         handleDialogResponse()
-        
+        binding.versionLabel.text = "v${AppVersion.VERSION}"
+
         return binding.root
     }
     
     private fun initializeDefaults() {
-        // Initialize with boxing defaults immediately
-        binding.apply {
-            fragmentFirstEdtxtRound.setText("3")
-            edtxtRest.setText("1")
-            edtxtTime.setText("3")
-        }
-        
         // Set ViewModel defaults
         mainViewModel.apply {
             setNumOfRounds(3)
@@ -67,7 +59,7 @@ class First : Fragment() {
             setRoundLengthInMin(3)
             setPauseLengthInSecs(1)
         }
-        
+
         updateLocalValues(3, 1, 3)
     }
     
@@ -80,6 +72,7 @@ class First : Fragment() {
         binding.apply {
             firstFragmentStartBtn.setOnClickListener {
                 if (validateInputs()) {
+                    mainViewModel.resetCoachSession()
                     it.findNavController().navigate(R.id.action_first_to_second)
                 }
             }
@@ -89,37 +82,83 @@ class First : Fragment() {
             btnHistory.setOnClickListener {
                 it.findNavController().navigate(R.id.action_first_to_historyTraining)
             }
+
+            modeToggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+                if (!isChecked) return@addOnButtonCheckedListener
+                val isCoach = checkedId == R.id.mode_coach_btn
+                mainViewModel.setTrainingMode(if (isCoach) TrainingMode.BOXING_COACH else TrainingMode.TIMER_ONLY)
+                val visibility = if (isCoach) View.VISIBLE else View.GONE
+                difficultyLabel.visibility = visibility
+                difficultyToggleGroup.visibility = visibility
+                voiceStyleLabel.visibility = visibility
+                voiceStyleToggleGroup.visibility = visibility
+                warmupLabel.visibility = visibility
+                warmupToggleGroup.visibility = visibility
+            }
+
+            difficultyToggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+                if (!isChecked) return@addOnButtonCheckedListener
+                val difficulty = when (checkedId) {
+                    R.id.difficulty_intermediate_btn -> Difficulty.INTERMEDIATE
+                    R.id.difficulty_advanced_btn -> Difficulty.ADVANCED
+                    else -> Difficulty.BEGINNER
+                }
+                mainViewModel.setCoachDifficulty(difficulty)
+            }
+
+            voiceStyleToggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+                if (!isChecked) return@addOnButtonCheckedListener
+                val style = if (checkedId == R.id.voice_words_btn) VoiceStyle.WORDS else VoiceStyle.NUMBERS
+                mainViewModel.setVoiceStyle(style)
+            }
+
+            warmupToggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+                if (!isChecked) return@addOnButtonCheckedListener
+                val seconds = when (checkedId) {
+                    R.id.warmup_30_btn -> 30
+                    R.id.warmup_60_btn -> 60
+                    else -> 0
+                }
+                mainViewModel.setWarmupSeconds(seconds)
+            }
+
+            roundsMinusBtn.setOnClickListener { stepRounds(-1) }
+            roundsPlusBtn.setOnClickListener { stepRounds(1) }
+            roundTimeMinusBtn.setOnClickListener { stepRoundTime(-1) }
+            roundTimePlusBtn.setOnClickListener { stepRoundTime(1) }
+            restMinusBtn.setOnClickListener { stepRest(-1) }
+            restPlusBtn.setOnClickListener { stepRest(1) }
         }
+    }
+
+    private fun stepRounds(delta: Int) {
+        round = (round + delta).coerceIn(1, 50)
+        binding.roundsValue.text = round.toString()
+        mainViewModel.setNumOfRounds(round)
+        mainViewModel.setCurrentRound(1)
+    }
+
+    private fun stepRoundTime(delta: Int) {
+        time = (time + delta).coerceIn(1, 60)
+        binding.roundTimeValue.text = time.toString()
+        mainViewModel.setRoundLengthInMin(time)
+    }
+
+    private fun stepRest(delta: Int) {
+        rest = (rest + delta).coerceIn(1, 60)
+        binding.restValue.text = rest.toString()
+        mainViewModel.setPauseLengthInSecs(rest)
     }
     
     private fun validateInputs(): Boolean {
-        val rounds = binding.fragmentFirstEdtxtRound.text.toString().toIntOrNull()
-        val restTime = binding.edtxtRest.text.toString().toIntOrNull()
-        val roundTime = binding.edtxtTime.text.toString().toIntOrNull()
-        
-        if (rounds == null || rounds <= 0 || rounds > 50) {
-            binding.fragmentFirstEdtxtRound.error = "Enter valid number of rounds (1-50)"
-            return false
-        }
-        
-        if (restTime == null || restTime <= 0 || restTime > 60) {
-            binding.edtxtRest.error = "Enter valid rest time (1-60 minutes)"
-            return false
-        }
-        
-        if (roundTime == null || roundTime <= 0 || roundTime > 60) {
-            binding.edtxtTime.error = "Enter valid round time (1-60 minutes)"
-            return false
-        }
-        
-        // Update ViewModel with validated values
+        // The steppers (stepRounds/stepRoundTime/stepRest) clamp on every
+        // click, so there's no out-of-range value to reject here.
         mainViewModel.apply {
-            setNumOfRounds(rounds)
+            setNumOfRounds(round)
             setCurrentRound(1)
-            setRoundLengthInMin(roundTime)
-            setPauseLengthInSecs(restTime)
+            setRoundLengthInMin(time)
+            setPauseLengthInSecs(rest)
         }
-        
         return true
     }
     
@@ -147,6 +186,8 @@ class First : Fragment() {
             "MMA" -> "MMA Training"
             else -> "Custom Training"
         }
+        val mode = mainViewModel.trainingMode.value ?: TrainingMode.TIMER_ONLY
+        val stats = mainViewModel.coachSession?.stats
 
         val training = Training(
             title,
@@ -154,7 +195,13 @@ class First : Fragment() {
             currentRound,
             roundLength,
             difficulty,
-            "Interrupted at round $currentRound"
+            "Interrupted at round $currentRound",
+            trainingMode = mode.name,
+            coachDifficulty = mainViewModel.coachDifficulty.value?.name,
+            totalPunches = stats?.totalPunches() ?: 0,
+            totalCombos = stats?.attackCalls ?: 0,
+            totalTacticalCommands = (stats?.defenseCalls ?: 0) + (stats?.distanceCalls ?: 0),
+            punchBreakdown = stats?.serializeBreakdown(),
         )
         db.insertData(training)
     }
@@ -173,11 +220,6 @@ class First : Fragment() {
     }
     
     private fun setupMMADefaults() {
-        binding.apply {
-            fragmentFirstEdtxtRound.setText("5")
-            edtxtRest.setText("1")
-            edtxtTime.setText("5")
-        }
         mainViewModel.apply {
             setNumOfRounds(5)
             setCurrentRound(1)
@@ -188,11 +230,6 @@ class First : Fragment() {
     }
     
     private fun setupBoxingDefaults() {
-        binding.apply {
-            fragmentFirstEdtxtRound.setText("12")
-            edtxtRest.setText("1")
-            edtxtTime.setText("3")
-        }
         mainViewModel.apply {
             setNumOfRounds(12)
             setCurrentRound(1)
@@ -203,24 +240,12 @@ class First : Fragment() {
     }
     
     private fun setupDefaultBoxingConfig() {
-        // Provide reasonable defaults for boxing training
-        binding.apply {
-            if (fragmentFirstEdtxtRound.text.isNullOrEmpty()) {
-                fragmentFirstEdtxtRound.setText("3")
-            }
-            if (edtxtRest.text.isNullOrEmpty()) {
-                edtxtRest.setText("1")
-            }
-            if (edtxtTime.text.isNullOrEmpty()) {
-                edtxtTime.setText("3")
-            }
-        }
-        
-        // Set defaults in ViewModel if not already set
-        val currentRounds = binding.fragmentFirstEdtxtRound.text.toString().toIntOrNull() ?: 3
-        val currentRest = binding.edtxtRest.text.toString().toIntOrNull() ?: 1
-        val currentTime = binding.edtxtTime.text.toString().toIntOrNull() ?: 3
-        
+        // Provide reasonable defaults for boxing training, keeping whatever
+        // the user already dialed in on the steppers if they touched them.
+        val currentRounds = if (round > 0) round else 3
+        val currentRest = if (rest > 0) rest else 1
+        val currentTime = if (time > 0) time else 3
+
         mainViewModel.apply {
             setNumOfRounds(currentRounds)
             setCurrentRound(1)
@@ -234,46 +259,12 @@ class First : Fragment() {
         this.round = rounds
         this.rest = rest
         this.time = time
+        binding.roundsValue.text = rounds.toString()
+        binding.restValue.text = rest.toString()
+        binding.roundTimeValue.text = time.toString()
     }
 
 
-    private fun setupListeners() {
-        binding.apply {
-            fragmentFirstEdtxtRound.addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) {
-                    s?.toString()?.toIntOrNull()?.let { rounds ->
-                        round = rounds
-                        mainViewModel.setNumOfRounds(rounds)
-                        mainViewModel.setCurrentRound(1)
-                    }
-                }
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            })
-            
-            edtxtRest.addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) {
-                    s?.toString()?.toIntOrNull()?.let { restTime ->
-                        rest = restTime
-                        mainViewModel.setPauseLengthInSecs(restTime)
-                    }
-                }
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            })
-            
-            edtxtTime.addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) {
-                    s?.toString()?.toIntOrNull()?.let { roundTime ->
-                        time = roundTime
-                        mainViewModel.setRoundLengthInMin(roundTime)
-                    }
-                }
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            })
-        }
-    }
     @RequiresApi(Build.VERSION_CODES.O)
     fun getCurrentDateTime(): String {
         val currentDateTime = LocalDateTime.now()

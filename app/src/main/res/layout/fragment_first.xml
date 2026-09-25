@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_primary"
@@ -84,84 +85,451 @@
                     android:textSize="20sp" />
 
                 <LinearLayout
+                    android:id="@+id/rounds_stepper_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <com.google.android.material.textfield.TextInputLayout
+                    <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
                         android:layout_weight="1"
-                        android:hint="Rounds"
-                        app:boxBackgroundColor="@color/background_secondary"
-                        app:boxBackgroundMode="filled"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
-                        app:hintTextColor="@color/gray_medium">
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Rounds"
+                        android:textColor="@color/white"
+                        android:textSize="15sp" />
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/fragment_first_edtxt_round"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:inputType="number"
-                            android:textColor="@color/white"
-                            android:textSize="24sp" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/rounds_minus_btn"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:padding="0dp"
+                        android:text="−"
+                        android:textColor="@color/timer_active"
+                        android:textSize="20sp"
+                        app:backgroundTint="@color/background_secondary"
+                        app:cornerRadius="20dp" />
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/rounds_value"
+                        android:layout_width="48dp"
                         android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:layout_weight="1"
-                        android:hint="Rest (min)"
-                        app:boxBackgroundColor="@color/background_secondary"
-                        app:boxBackgroundMode="filled"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
-                        app:hintTextColor="@color/gray_medium">
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center"
+                        android:text="3"
+                        android:textColor="@color/white"
+                        android:textSize="22sp"
+                        tools:text="3" />
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edtxt_rest"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:inputType="number"
-                            android:textColor="@color/white"
-                            android:textSize="24sp" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:layout_weight="1"
-                        android:hint="Time (min)"
-                        app:boxBackgroundColor="@color/background_secondary"
-                        app:boxBackgroundMode="filled"
-                        app:boxCornerRadiusBottomEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusTopStart="8dp"
-                        app:hintTextColor="@color/gray_medium">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edtxt_time"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:inputType="number"
-                            android:textColor="@color/white"
-                            android:textSize="24sp" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/rounds_plus_btn"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:padding="0dp"
+                        android:text="+"
+                        android:textColor="@color/timer_active"
+                        android:textSize="20sp"
+                        app:backgroundTint="@color/background_secondary"
+                        app:cornerRadius="20dp" />
 
                 </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="14dp"
+                    android:background="@color/background_secondary" />
+
+                <LinearLayout
+                    android:id="@+id/round_time_stepper_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Round time (min)"
+                        android:textColor="@color/white"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/round_time_minus_btn"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:padding="0dp"
+                        android:text="−"
+                        android:textColor="@color/timer_active"
+                        android:textSize="20sp"
+                        app:backgroundTint="@color/background_secondary"
+                        app:cornerRadius="20dp" />
+
+                    <TextView
+                        android:id="@+id/round_time_value"
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center"
+                        android:text="3"
+                        android:textColor="@color/white"
+                        android:textSize="22sp"
+                        tools:text="3" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/round_time_plus_btn"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:padding="0dp"
+                        android:text="+"
+                        android:textColor="@color/timer_active"
+                        android:textSize="20sp"
+                        app:backgroundTint="@color/background_secondary"
+                        app:cornerRadius="20dp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="14dp"
+                    android:background="@color/background_secondary" />
+
+                <LinearLayout
+                    android:id="@+id/rest_stepper_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Rest (min)"
+                        android:textColor="@color/white"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/rest_minus_btn"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:padding="0dp"
+                        android:text="−"
+                        android:textColor="@color/timer_active"
+                        android:textSize="20sp"
+                        app:backgroundTint="@color/background_secondary"
+                        app:cornerRadius="20dp" />
+
+                    <TextView
+                        android:id="@+id/rest_value"
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center"
+                        android:text="1"
+                        android:textColor="@color/white"
+                        android:textSize="22sp"
+                        tools:text="1" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/rest_plus_btn"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:padding="0dp"
+                        android:text="+"
+                        android:textColor="@color/timer_active"
+                        android:textSize="20sp"
+                        app:backgroundTint="@color/background_secondary"
+                        app:cornerRadius="20dp" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/coach_mode_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/surface"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/timer_setup_card">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:text="Training Mode"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/mode_toggle_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/mode_timer_btn"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
+                        android:minWidth="0dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:text="Timer only"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/mode_coach_btn"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
+                        android:minWidth="0dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:text="Boxing Coach"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <TextView
+                    android:id="@+id/difficulty_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.08"
+                    android:text="DIFFICULTY"
+                    android:textColor="@color/gray_medium"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/difficulty_toggle_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/difficulty_beginner_btn"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="Beginner"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
+                        android:minWidth="0dp"
+                        android:paddingStart="2dp"
+                        android:paddingEnd="2dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/difficulty_intermediate_btn"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Intermediate"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
+                        android:minWidth="0dp"
+                        android:paddingStart="2dp"
+                        android:paddingEnd="2dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/difficulty_advanced_btn"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Advanced"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
+                        android:minWidth="0dp"
+                        android:paddingStart="2dp"
+                        android:paddingEnd="2dp" />
+
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <TextView
+                    android:id="@+id/voice_style_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.08"
+                    android:text="VOICE STYLE"
+                    android:textColor="@color/gray_medium"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/voice_style_toggle_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/voice_numbers_btn"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Numbers"
+                        android:textColor="@color/white"
+                        android:textSize="13sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/voice_words_btn"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="Words"
+                        android:textColor="@color/white"
+                        android:textSize="13sp" />
+
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <TextView
+                    android:id="@+id/warmup_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.08"
+                    android:text="WARM-UP"
+                    android:textColor="@color/gray_medium"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/warmup_toggle_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/warmup_off_btn"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="Off"
+                        android:textColor="@color/white"
+                        android:textSize="13sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/warmup_30_btn"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="30s"
+                        android:textColor="@color/white"
+                        android:textSize="13sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/warmup_60_btn"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="60s"
+                        android:textColor="@color/white"
+                        android:textSize="13sp" />
+
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -180,9 +548,10 @@
             app:iconPadding="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/timer_setup_card" />
+            app:layout_constraintTop_toBottomOf="@id/coach_mode_card" />
 
         <LinearLayout
+            android:id="@+id/settings_history_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
@@ -227,6 +596,20 @@
                 app:strokeColor="@color/gray_dark" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/version_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:alpha="0.5"
+            android:textColor="@color/gray_medium"
+            android:textSize="11sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/settings_history_row"
+            tools:text="v2.0.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

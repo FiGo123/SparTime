@@ -17,7 +17,17 @@ val COL_DIFICULTY_SCALE = "difficultyScale"
 val COL_DESCRIPTION = "description"
 val COL_ID = "id"
 
-class DBHandler (var context: Context) :SQLiteOpenHelper(context, DATABASE_NAME, null, 1){
+// Boxing Coach (v2) columns — added in DATABASE_VERSION 2.
+val COL_TRAINING_MODE = "trainingMode"
+val COL_COACH_DIFFICULTY = "coachDifficulty"
+val COL_TOTAL_PUNCHES = "totalPunches"
+val COL_TOTAL_COMBOS = "totalCombos"
+val COL_TOTAL_TACTICAL_COMMANDS = "totalTacticalCommands"
+val COL_PUNCH_BREAKDOWN = "punchBreakdown"
+
+private const val DATABASE_VERSION = 2
+
+class DBHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     override fun onCreate(p0: SQLiteDatabase?) {
         val createTable = "CREATE TABLE " + TABLE_NAME + " (" +
                 COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -26,15 +36,26 @@ class DBHandler (var context: Context) :SQLiteOpenHelper(context, DATABASE_NAME,
                 COL_NUMBER_OF_ROUNDS + " INTEGER, " +
                 COL_ROUND_DURATION + " INTEGER, " +
                 COL_DIFICULTY_SCALE + " INTEGER, " +
-                COL_DESCRIPTION + " VARCHAR(256))";
-
+                COL_DESCRIPTION + " VARCHAR(256), " +
+                COL_TRAINING_MODE + " VARCHAR(32), " +
+                COL_COACH_DIFFICULTY + " VARCHAR(32), " +
+                COL_TOTAL_PUNCHES + " INTEGER, " +
+                COL_TOTAL_COMBOS + " INTEGER, " +
+                COL_TOTAL_TACTICAL_COMMANDS + " INTEGER, " +
+                COL_PUNCH_BREAKDOWN + " VARCHAR(128))"
 
         p0?.execSQL(createTable)
-
     }
 
-    override fun onUpgrade(p0: SQLiteDatabase?, p1: Int, p2: Int) {
-        TODO("Not yet implemented")
+    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+        if (oldVersion < 2) {
+            db?.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COL_TRAINING_MODE VARCHAR(32)")
+            db?.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COL_COACH_DIFFICULTY VARCHAR(32)")
+            db?.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COL_TOTAL_PUNCHES INTEGER")
+            db?.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COL_TOTAL_COMBOS INTEGER")
+            db?.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COL_TOTAL_TACTICAL_COMMANDS INTEGER")
+            db?.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COL_PUNCH_BREAKDOWN VARCHAR(128)")
+        }
     }
 
     fun insertData(training: Training) {
@@ -46,6 +67,12 @@ class DBHandler (var context: Context) :SQLiteOpenHelper(context, DATABASE_NAME,
         cv.put(COL_ROUND_DURATION, training.roundDuration)
         cv.put(COL_DIFICULTY_SCALE, training.difficultyScale)
         cv.put(COL_DESCRIPTION, training.description)
+        cv.put(COL_TRAINING_MODE, training.trainingMode)
+        cv.put(COL_COACH_DIFFICULTY, training.coachDifficulty)
+        cv.put(COL_TOTAL_PUNCHES, training.totalPunches)
+        cv.put(COL_TOTAL_COMBOS, training.totalCombos)
+        cv.put(COL_TOTAL_TACTICAL_COMMANDS, training.totalTacticalCommands)
+        cv.put(COL_PUNCH_BREAKDOWN, training.punchBreakdown)
         db.insert(TABLE_NAME, null, cv)
     }
 
@@ -90,7 +117,60 @@ class DBHandler (var context: Context) :SQLiteOpenHelper(context, DATABASE_NAME,
                     val difficultyScale = cursor.getInt(difficultyScaleIndex)
                     val description = cursor.getString(descriptionIndex)
 
-                    val training = Training(title, date, numberOfRounds, roundDuration, difficultyScale, description)
+                    // Boxing Coach columns: absent on rows written before this
+                    // schema version, so every read here is null-tolerant.
+                    val trainingModeIndex = cursor.getColumnIndex(COL_TRAINING_MODE)
+                    val coachDifficultyIndex = cursor.getColumnIndex(COL_COACH_DIFFICULTY)
+                    val totalPunchesIndex = cursor.getColumnIndex(COL_TOTAL_PUNCHES)
+                    val totalCombosIndex = cursor.getColumnIndex(COL_TOTAL_COMBOS)
+                    val totalTacticalIndex = cursor.getColumnIndex(COL_TOTAL_TACTICAL_COMMANDS)
+                    val punchBreakdownIndex = cursor.getColumnIndex(COL_PUNCH_BREAKDOWN)
+
+                    val trainingMode = if (trainingModeIndex != -1 && !cursor.isNull(trainingModeIndex)) {
+                        cursor.getString(trainingModeIndex)
+                    } else {
+                        "TIMER_ONLY"
+                    }
+                    val coachDifficulty = if (coachDifficultyIndex != -1 && !cursor.isNull(coachDifficultyIndex)) {
+                        cursor.getString(coachDifficultyIndex)
+                    } else {
+                        null
+                    }
+                    val totalPunches = if (totalPunchesIndex != -1 && !cursor.isNull(totalPunchesIndex)) {
+                        cursor.getInt(totalPunchesIndex)
+                    } else {
+                        0
+                    }
+                    val totalCombos = if (totalCombosIndex != -1 && !cursor.isNull(totalCombosIndex)) {
+                        cursor.getInt(totalCombosIndex)
+                    } else {
+                        0
+                    }
+                    val totalTacticalCommands = if (totalTacticalIndex != -1 && !cursor.isNull(totalTacticalIndex)) {
+                        cursor.getInt(totalTacticalIndex)
+                    } else {
+                        0
+                    }
+                    val punchBreakdown = if (punchBreakdownIndex != -1 && !cursor.isNull(punchBreakdownIndex)) {
+                        cursor.getString(punchBreakdownIndex)
+                    } else {
+                        null
+                    }
+
+                    val training = Training(
+                        title,
+                        date,
+                        numberOfRounds,
+                        roundDuration,
+                        difficultyScale,
+                        description,
+                        trainingMode,
+                        coachDifficulty,
+                        totalPunches,
+                        totalCombos,
+                        totalTacticalCommands,
+                        punchBreakdown,
+                    )
                     training.id = id
                     trainingList.add(training)
                 } while (cursor.moveToNext())

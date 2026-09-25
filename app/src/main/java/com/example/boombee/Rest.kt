@@ -4,6 +4,8 @@ import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +30,9 @@ class Rest : Fragment() {
     private var toneGenerator: ToneGenerator? = null
     private val mainViewModel: MainViewModel by activityViewModels()
 
+    private val handler = Handler(Looper.getMainLooper())
+    private var pendingNavigateToSecond: Runnable? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -36,6 +41,7 @@ class Rest : Fragment() {
 
         binding.btnRestStop.setOnClickListener {
             if (::countDownTimer.isInitialized) countDownTimer.cancel()
+            cancelPendingNavigateToSecond()
             it.findNavController().navigate(R.id.action_rest_to_first)
         }
 
@@ -83,7 +89,16 @@ class Rest : Fragment() {
                     ContextCompat.getColor(requireContext(), R.color.accent_orange)
                 )
                 playBellSound()
-                navController.navigate(R.id.action_rest_to_second)
+                // Second.kt has its own separate TextToSpeech instance, so
+                // it has no way to know this fragment's bell tone is still
+                // physically ringing — navigating immediately made "Round
+                // X, begin!" start speaking right over it. Wait out the
+                // bell's duration first.
+                val runnable = Runnable {
+                    if (isAdded) navController.navigate(R.id.action_rest_to_second)
+                }
+                pendingNavigateToSecond = runnable
+                handler.postDelayed(runnable, BELL_DURATION_MS)
             }
         }.start()
     }
@@ -141,10 +156,26 @@ class Rest : Fragment() {
         } catch (e: Exception) { /* no-op */ }
     }
 
+    private fun cancelPendingNavigateToSecond() {
+        pendingNavigateToSecond?.let { handler.removeCallbacks(it) }
+        pendingNavigateToSecond = null
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         if (::countDownTimer.isInitialized) countDownTimer.cancel()
+        cancelPendingNavigateToSecond()
         textToSpeech?.shutdown()
         toneGenerator?.release()
+    }
+
+    companion object {
+        // playBellSound()'s ToneGenerator duration (800ms) plus a little
+        // extra breathing room — Second.kt has its own separate TTS
+        // instance with no way to know this fragment's bell is still
+        // ringing, so navigation waits it out first. Real-device testing
+        // found the bare tone duration alone still read as running into
+        // the next announcement, hence the padding on top.
+        private const val BELL_DURATION_MS = 1300L
     }
 }

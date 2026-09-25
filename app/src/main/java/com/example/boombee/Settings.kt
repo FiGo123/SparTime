@@ -57,6 +57,18 @@ class Settings : Fragment() {
             mainViewModel.setSoundSettings(isChecked)
         }
 
+        // Coach: Tactics toggle (Move/Distance/Hands up — off = punches only)
+        binding.checkboxTacticalCommands.isChecked = mainViewModel.getTacticalCommandsEnabled()
+        binding.checkboxTacticalCommands.setOnCheckedChangeListener { _, isChecked ->
+            mainViewModel.setTacticalCommandsEnabled(isChecked)
+        }
+
+        // Coach: Freestyle toggle
+        binding.checkboxFreestyle.isChecked = mainViewModel.getFreestyleEnabled()
+        binding.checkboxFreestyle.setOnCheckedChangeListener { _, isChecked ->
+            mainViewModel.setFreestyleEnabled(isChecked)
+        }
+
         binding.btnSave.setOnClickListener {
             if (selectedTrainingType != null) {
                 mainViewModel.setDefaultTrainingType(selectedTrainingType!!)

@@ -13,12 +13,22 @@ fun defaultsFor(trainingType: String?): SessionConfig = when (trainingType) {
     else -> SessionConfig(rounds = 3, roundMinutes = 3, restMinutes = 1)
 }
 
-sealed class WearScreen {
-    object Setup : WearScreen()
-    data class RoundTimer(val round: Int) : WearScreen()
-    data class Rest(val nextRound: Int) : WearScreen()
-    object Settings : WearScreen()
-    object History : WearScreen()
-}
+/**
+ * Navigation state for screens *outside* an active session. An active
+ * round/rest is tracked separately by [RoundTimerService.state] — whenever
+ * that's non-null, the running session takes over the UI regardless of
+ * [WearScreen], since the service (not this local state) is the source of
+ * truth once a session starts (see Notes in WEAR_OS_IMPLEMENTATION.md).
+ */
+enum class WearScreen { Setup, Settings, History }
 
-enum class TimerPhase { ROUND, REST }
+enum class TimerPhase { WARMUP, ROUND, REST }
+
+/** Live state of the round/rest currently running in [RoundTimerService]. */
+data class RoundTimerState(
+    val phase: TimerPhase,
+    val roundNumber: Int,
+    val totalRounds: Int,
+    val remainingSeconds: Int,
+    val isPaused: Boolean,
+)
