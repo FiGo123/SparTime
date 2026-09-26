@@ -74,8 +74,9 @@ update, and a commit.
 - [x] New applicationId `com.filipgolovic.boombee` in `app/` **and**
       `wear/`. Both debug builds pass. `ExampleInstrumentedTest` updated
       to the new package name.
-- [ ] Toolchain upgrade: AGP / Gradle / Kotlin to versions that support
-      the target SDK Play currently requires; drop `jcenter()`.
+- [x] Toolchain upgrade: AGP 8.13.2, Gradle 8.14, Kotlin 2.2.21, Compose
+      compiler plugin in `:wear`; `jcenter()` dropped. Build with the
+      Android Studio JDK 21 (Gradle 8.14 can't run on the system JDK 26).
 - [ ] targetSdk / compileSdk raised to Play's current requirement; fix
       Android 15 edge-to-edge insets on every phone screen.
 - [ ] Versioning scheme (one source of truth for the version name, and
