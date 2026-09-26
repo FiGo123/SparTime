@@ -77,8 +77,10 @@ update, and a commit.
 - [x] Toolchain upgrade: AGP 8.13.2, Gradle 8.14, Kotlin 2.2.21, Compose
       compiler plugin in `:wear`; `jcenter()` dropped. Build with the
       Android Studio JDK 21 (Gradle 8.14 can't run on the system JDK 26).
-- [ ] targetSdk / compileSdk raised to Play's current requirement; fix
-      Android 15 edge-to-edge insets on every phone screen.
+- [x] targetSdk / compileSdk 36; edge-to-edge insets handled once in
+      `MainActivity` for every phone screen; back during a round/rest now
+      acts like STOP. Checked on a Pixel 10 emulator (API 37). Still to do:
+      a real phone, and the watch checks (see `RELEASE_PLAY_STORE.md` §3).
 - [ ] Versioning scheme (one source of truth for the version name, and
       unique versionCodes for phone vs watch).
 - [ ] Upload keystore + release signing config; `bundleRelease` works for

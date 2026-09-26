@@ -1,11 +1,9 @@
 package com.example.boombee
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
@@ -34,7 +32,6 @@ class First : Fragment() {
 
     private val mainViewModel: MainViewModel by activityViewModels()
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -162,7 +159,6 @@ class First : Fragment() {
         return true
     }
     
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleDialogResponse() {
         val dialogAnswer = mainViewModel.getDialogAnswer()
         if (dialogAnswer == true) {
@@ -171,7 +167,6 @@ class First : Fragment() {
         }
     }
     
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun saveInterruptedTraining() {
         val db = DBHandler(requireContext())
         val currentTime = getCurrentDateTime()
@@ -265,7 +260,6 @@ class First : Fragment() {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun getCurrentDateTime(): String {
         val currentDateTime = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")

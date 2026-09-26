@@ -2,7 +2,6 @@ package com.example.boombee
 
 import android.media.AudioManager
 import android.media.ToneGenerator
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
@@ -13,9 +12,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.activity.addCallback
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -101,9 +100,13 @@ class Second : Fragment() {
         binding.stopTrainingBtn.setOnClickListener {
             stopSession(it.findNavController())
         }
+        // Back mid-round would otherwise pop straight to the home screen and
+        // silently drop the session; treat it exactly like STOP.
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            stopSession(findNavController())
+        }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun observeViewModel() {
         mainViewModel.apply {
             currentRound.observe(viewLifecycleOwner) { round ->
@@ -121,7 +124,6 @@ class Second : Fragment() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun setupRoundTimer(length: Int) {
         // Cancel any in-flight timers before setting up (guards against observer re-fires on rotation)
         prepareCountDownTimer?.cancel()
@@ -166,7 +168,6 @@ class Second : Fragment() {
                 }
             }
 
-            @RequiresApi(Build.VERSION_CODES.O)
             override fun onFinish() {
                 binding.timeCounter.setTextColor(
                     ContextCompat.getColor(requireContext(), R.color.timer_active)
@@ -300,7 +301,6 @@ class Second : Fragment() {
                 }
             }
 
-            @RequiresApi(Build.VERSION_CODES.O)
             override fun onFinish() {
                 isTimerRunning = false
                 isTimerPaused = false
@@ -348,7 +348,6 @@ class Second : Fragment() {
                 }
             }
 
-            @RequiresApi(Build.VERSION_CODES.O)
             override fun onFinish() {
                 isTimerRunning = false
                 isTimerPaused = false
@@ -374,7 +373,6 @@ class Second : Fragment() {
         navController.navigate(R.id.action_second_to_dialog)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleRoundFinish(navController: NavController) {
         stopCoachLoop()
         if (currentRoundNumber >= roundNum) {
@@ -400,7 +398,6 @@ class Second : Fragment() {
         pendingRestNavigateRunnable = null
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun saveTraining() {
         val db = DBHandler(requireContext())
         val time = getCurrentDateTime()
@@ -600,7 +597,6 @@ class Second : Fragment() {
         } catch (e: Exception) { /* no-op */ }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun getCurrentDateTime(): String {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
         return LocalDateTime.now().format(formatter)

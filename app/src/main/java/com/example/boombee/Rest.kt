@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.activity.addCallback
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -43,6 +44,11 @@ class Rest : Fragment() {
             if (::countDownTimer.isInitialized) countDownTimer.cancel()
             cancelPendingNavigateToSecond()
             it.findNavController().navigate(R.id.action_rest_to_first)
+        }
+        // Back during rest behaves like STOP instead of popping back to the
+        // finished round screen.
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            binding.btnRestStop.performClick()
         }
 
         // Round was already incremented in Second.kt before navigating here.

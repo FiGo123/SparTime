@@ -44,7 +44,7 @@ Kotlin/R package and don't need to match the applicationId. Changing only
 
 ## §3 Toolchain + target SDK
 
-- [ ] Check the current requirement: Play Console → Policy → *Target API
+- [x] Check the current requirement: Play Console → Policy → *Target API
       level requirements*. Plan for **API 36**.
 - [x] Use Android Studio's **AGP Upgrade Assistant** to move AGP and the
       Gradle wrapper to a version that supports that compileSdk. Kotlin
@@ -52,10 +52,10 @@ Kotlin/R package and don't need to match the applicationId. Changing only
 - [x] With Kotlin 2.x, Compose (`:wear`) switches from
       `composeOptions.kotlinCompilerExtensionVersion` to the
       `org.jetbrains.kotlin.plugin.compose` Gradle plugin.
-- [ ] Raise `compileSdk` / `targetSdk` in `app`, `wear` and `core`
+- [x] Raise `compileSdk` / `targetSdk` in `app`, `wear` and `core`
       (`core` only needs compileSdk).
-- [ ] Bump the Compose BOM / Wear Compose to versions built for that SDK.
-- [ ] **Behaviour changes to test on the phone:**
+- [x] Bump the Compose BOM / Wear Compose to versions built for that SDK.
+- [x] **Behaviour changes to test on the phone:**
   - Android 15 (API 35) forces **edge-to-edge**. Every fragment layout
     can draw under the status and navigation bars. Apply window insets on
     `First`, `Second`, `Rest`, `Settings`, `HistoryTraining`, `Survey` and
