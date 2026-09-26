@@ -13,13 +13,13 @@ a human: accounts, payments, console clicks, device testing.
 
 | Blocker | Where | Fix |
 |---|---|---|
-| `applicationId "com.example.boombee"`. Play rejects `com.example.*` | `app/build.gradle`, `wear/build.gradle` | New ID, the **same** in both modules (§2) |
-| Watch uses a different ID (`com.example.boombee.wear`) | `wear/build.gradle` | Phone and watch must share one package name to be in one Play listing |
+| ~~`applicationId "com.example.boombee"`. Play rejects `com.example.*`~~ ✅ fixed | `app/build.gradle`, `wear/build.gradle` | Now `com.filipgolovic.boombee` (§2) |
+| ~~Watch uses a different ID (`com.example.boombee.wear`)~~ ✅ fixed | `wear/build.gradle` | Same ID as the phone |
 | `targetSdk 34`. Play requires new apps and updates to target a recent API (35 since Aug 2025; the yearly bump to 36 was due Aug 2026) | all modules | Raise to the current requirement (§3) |
 | AGP 8.1.4 / Kotlin 1.9.10 can't compile against API 35/36 | root `build.gradle` | Toolchain upgrade (§3) |
 | Phone and watch both use `versionCode 24` | both | Every uploaded artifact needs a unique versionCode (§4) |
 | No release signing config | both | Upload keystore (§4) |
-| `local.properties` tracked in git | repo | Untrack + `.gitignore` |
+| ~~`local.properties` tracked in git~~ ✅ fixed | repo | Untracked in `491d09b` |
 | `jcenter()` in `settings.gradle` | settings | Remove (shut down) |
 | Watch uses a `specialUse` foreground service | `wear/AndroidManifest.xml` | Needs a Foreground Service declaration in Play Console (§5) |
 
@@ -31,9 +31,13 @@ Kotlin/R package and don't need to match the applicationId. Changing only
 
 ## §2 Package name
 
-- [ ] **(you)** Pick the ID (see the roadmap's decisions). It is permanent.
-- [ ] `applicationId "<new id>"` in `app/build.gradle` **and**
-      `wear/build.gradle`.
+- [x] **(you)** Pick the ID: **`com.filipgolovic.boombee`** (2026-09-26).
+      It is permanent.
+- [x] `applicationId "com.filipgolovic.boombee"` in `app/build.gradle`
+      **and** `wear/build.gradle`. The watch no longer uses the `.wear`
+      suffix.
+- [ ] Update `ExampleInstrumentedTest`, which still asserts
+      `com.example.boombee`.
 - [ ] Uninstall the old `com.example.*` builds from the phone and watch.
       The new ID installs as a separate app, and old local history isn't
       carried over, which is fine before release.

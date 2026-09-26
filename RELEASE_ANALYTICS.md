@@ -20,7 +20,7 @@ this stage comes first.
 ### Firebase project (you)
 - [ ] console.firebase.google.com → Add project "BoomBee" → **enable
       Google Analytics** (creates the GA4 property).
-- [ ] Add an Android app with the new applicationId → download
+- [ ] Add an Android app with package name `com.filipgolovic.boombee` → download
       `google-services.json` into `app/`. The watch has the same
       applicationId, so a copy goes in `wear/` when watch analytics is
       added.

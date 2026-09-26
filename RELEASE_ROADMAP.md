@@ -40,9 +40,9 @@ Created 2026-09-25. Update the checkboxes here as stages complete.
 
 ## Decisions needed from you (before / during Stage 1)
 
-- [ ] **Package name (applicationId)**, for example `com.filipgolovic.boombee`
-      or `app.boombee`. It must be a reverse domain you're OK with forever.
-      The phone and watch apps use **the same** ID.
+- [x] **Package name (applicationId)**: **`com.filipgolovic.boombee`**
+      (decided 2026-09-26). Permanent once published. The phone and
+      watch apps use **the same** ID.
 - [ ] **Play developer account type**: personal or organization. This
       decides whether the 12-tester, 14-day rule applies. It's a one-time $25
       fee plus identity verification.
@@ -65,14 +65,15 @@ Each stage ends with: builds for `:app` and `:wear`, tested on a real phone
 update, and a commit.
 
 ### Stage 0 — Housekeeping (S)
-- [ ] Commit the current Coach Mode + Wear work (it's all uncommitted as
-      of 2026-09-25).
-- [ ] Remove `local.properties` from git tracking (`git rm --cached`) and
-      add it to `.gitignore` (it holds a machine-specific SDK path).
-- [ ] Tag the commit `v2.9.6-pre-release` as a rollback point.
+- [x] Commit the current Coach Mode + Wear work (commit `491d09b`).
+- [x] Remove `local.properties` from git tracking (`git rm --cached`). It
+      was already in `.gitignore`.
+- [x] Tag the commit `v2.9.6-pre-release` as a rollback point.
 
 ### Stage 1 — Release foundations (M) → `RELEASE_PLAY_STORE.md` §1–§4
-- [ ] New applicationId in `app/` **and** `wear/` (the same ID in both).
+- [x] New applicationId `com.filipgolovic.boombee` in `app/` **and**
+      `wear/`. Both debug builds pass. `ExampleInstrumentedTest` updated
+      to the new package name.
 - [ ] Toolchain upgrade: AGP / Gradle / Kotlin to versions that support
       the target SDK Play currently requires; drop `jcenter()`.
 - [ ] targetSdk / compileSdk raised to Play's current requirement; fix
