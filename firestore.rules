@@ -1,0 +1,20 @@
+rules_version = '2';
+// Survey answers (see RELEASE_SURVEY.md). The app may only create
+// validated documents; nobody can read, change or delete them from a client.
+service cloud.firestore {
+  match /databases/{db}/documents {
+    match /feedback/{id} {
+      allow create: if request.resource.data.keys().hasOnly(
+            ['rating', 'comment', 'appVersion', 'platform', 'androidSdk',
+             'locale', 'completedTrainings', 'createdAt'])
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && (!('comment' in request.resource.data)
+            || (request.resource.data.comment is string
+                && request.resource.data.comment.size() <= 1000))
+        && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if false;
+    }
+  }
+}

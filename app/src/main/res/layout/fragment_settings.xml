@@ -266,6 +266,46 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Feedback Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/feedbackCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/surface"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/coachOptionsCard">
+
+            <LinearLayout
+                android:id="@+id/feedbackRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Rate &amp; feedback"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Tell us how BoomBee is working for you"
+                    android:textColor="@color/gray_medium"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Buttons -->
         <LinearLayout
             android:id="@+id/buttonsLayout"
@@ -276,7 +316,7 @@
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/coachOptionsCard">
+            app:layout_constraintTop_toBottomOf="@id/feedbackCard">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_back"
@@ -288,6 +328,7 @@
                 android:fontFamily="sans-serif-black"
                 android:text="Back"
                 android:textColor="@color/white"
+                android:textSize="16sp"
                 app:cornerRadius="30dp"
                 app:strokeColor="@color/white" />
 

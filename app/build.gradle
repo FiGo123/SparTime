@@ -3,6 +3,13 @@ plugins {
     id 'kotlin-android'
 }
 
+// Firebase is configured by app/google-services.json (download it from the
+// Firebase console). Without it the app still builds and survey answers wait
+// in a local outbox until a build with Firebase is installed.
+if (file('google-services.json').exists()) {
+    apply plugin: 'com.google.gms.google-services'
+}
+
 android {
     namespace 'com.example.boombee'
     compileSdk 36
@@ -63,6 +70,10 @@ dependencies {
     implementation 'com.google.android.play:app-update:2.1.0'
     implementation 'com.google.android.play:app-update-ktx:2.1.0'
     
+    // Firebase (survey answers → Firestore)
+    implementation platform('com.google.firebase:firebase-bom:34.19.0')
+    implementation 'com.google.firebase:firebase-firestore'
+
     // Testing
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

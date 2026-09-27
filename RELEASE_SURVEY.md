@@ -38,11 +38,12 @@ new survey. It needs the paid Blaze plan, so skip it for 1.0.
 
 Store the state in the existing `PreferencesProvider`:
 `survey_completed_trainings`, `survey_last_shown_at`, `survey_times_shown`,
-`survey_submitted`, `survey_never`.
+`survey_submitted_version`, `survey_never`, `survey_pending`,
+`survey_outbox`. The rules live in `survey/SurveyTrigger.kt`.
 
 Show it on the **home screen after a completed training** (never
 mid-round, never after an aborted session) only if all of these are true:
-- ≥ 3 completed trainings in total
+- ≥ 10 completed trainings in total (your call, 2026-09-27)
 - ≥ 14 days since it was last shown
 - shown fewer than 3 times in total
 - not submitted for this version (`survey_submitted_version` ≠ current)
@@ -105,21 +106,24 @@ Optional hardening later: Firebase **App Check** (Play Integrity) so only
 the real app can write.
 
 ## Steps
+- [x] Until `app/google-services.json` exists, answers wait in a local
+      outbox (`survey_outbox`) and are sent by the first build with Firebase.
 - [ ] **(you)** Firebase console → Firestore → create database (production
       mode, EU region if most users are in Europe).
-- [ ] Deploy the rules above (console editor, or `firebase deploy` if we
-      add `firestore.rules` to the repo, which is preferable).
-- [ ] `firebase-firestore` dependency (via the BoM from Stage 2).
-- [ ] Replace the stub `Survey.kt` / `fragment_survey.xml` (currently an
+- [ ] Deploy the rules: they're in `firestore.rules` in the repo root.
+      Paste them into Firestore → Rules, or run `firebase deploy --only firestore:rules`.
+- [x] `firebase-firestore` dependency (via the BoM from Stage 2).
+- [x] Replace the stub `Survey.kt` / `fragment_survey.xml` (currently an
       unrelated "intensity 1–10" form) with the rating UI. Use Material
       `RatingBar` restyled in bee-yellow, `TextInputLayout` with a
       counter, and Send disabled until a star is picked.
-- [ ] `SurveyRepository` (in `:app`): `submit()` → Firestore `add()`.
+- [x] `SurveyRepository` (in `:app`): `submit()` → Firestore `add()`.
       Treat success as local (the write is queued offline), so there's no
       spinner.
-- [ ] `SurveyTrigger`: the rules above, called by `First` when it
+- [x] `SurveyTrigger`: the rules above, called by `First` when it
       resumes after a completed training.
-- [ ] Settings: "Rate & feedback" + "Contact us" rows.
+- [x] Settings: "Rate & feedback" row.
+- [ ] Settings: "Contact us" row (needs the support email decision).
 - [ ] Analytics: `survey_shown`, `survey_submit(rating)`,
       `survey_dismiss(reason)`.
 - [ ] Test: submit on airplane mode → reconnect → the document appears.

@@ -1,49 +1,106 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:background="@color/surface"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingHorizontal="24dp"
+    android:paddingTop="28dp"
+    android:paddingBottom="16dp">
 
-    <!-- Survey Description -->
     <TextView
-        android:id="@+id/textViewDescription"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Survey Description:"
-        android:textSize="18sp"
-        android:layout_marginTop="16dp"/>
+        android:fontFamily="sans-serif-black"
+        android:gravity="center"
+        android:text="How's BoomBee working for you?"
+        android:textColor="@color/white"
+        android:textSize="22sp" />
 
-    <!-- Description Input Field -->
-    <EditText
-        android:id="@+id/editTextDescription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/textViewDescription"
+    <View
+        android:layout_width="60dp"
+        android:layout_height="3dp"
         android:layout_marginTop="8dp"
-        android:hint="Type your description here"
-        android:inputType="textMultiLine"
-        android:gravity="top"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:background="@color/timer_active" />
 
-    <!-- Question: Intensity of Training -->
-    <TextView
-        android:id="@+id/textViewIntensityQuestion"
+    <RatingBar
+        android:id="@+id/surveyRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:contentDescription="Rate BoomBee from 1 to 5 stars"
+        android:numStars="5"
+        android:progressBackgroundTint="@color/gray_dark"
+        android:progressTint="@color/timer_active"
+        android:rating="0"
+        android:secondaryProgressTint="@color/timer_active"
+        android:stepSize="1" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/surveyCommentLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="What was the intensity of training? (Scale: 1-10)"
-        android:textSize="18sp"
-        android:layout_below="@id/editTextDescription"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp"
+        android:hint="What should we improve? (optional)"
+        android:textColorHint="@color/gray_medium"
+        app:boxStrokeColor="@color/timer_active"
+        app:counterEnabled="true"
+        app:counterMaxLength="1000"
+        app:counterTextColor="@color/gray_medium"
+        app:hintTextColor="@color/timer_active">
 
-    <!-- Intensity Answer Input Field -->
-    <EditText
-        android:id="@+id/editTextIntensity"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/surveyComment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|start"
+            android:inputType="textMultiLine|textCapSentences"
+            android:maxLength="1000"
+            android:maxLines="5"
+            android:minLines="3"
+            android:textColor="@color/white" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/surveySend"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="16dp"
+        android:enabled="false"
+        android:fontFamily="sans-serif-black"
+        android:text="Send"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:backgroundTint="@color/timer_active"
+        app:cornerRadius="28dp" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/textViewIntensityQuestion"
-        android:layout_marginTop="8dp"
-        android:hint="Enter a number between 1 and 10"
-        android:inputType="number"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-</RelativeLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/surveyNotNow"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Not now"
+            android:textAllCaps="false"
+            android:textColor="@color/gray_medium" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/surveyNever"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Don't ask again"
+            android:textAllCaps="false"
+            android:textColor="@color/gray_medium" />
+    </LinearLayout>
+</LinearLayout>

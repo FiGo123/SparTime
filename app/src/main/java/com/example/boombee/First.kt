@@ -13,6 +13,9 @@ import com.example.boombee.coach.VoiceStyle
 import com.example.boombee.data.DBHandler
 import com.example.boombee.data.models.Training
 import com.example.boombee.databinding.FragmentFirstBinding
+import com.example.boombee.survey.SurveyRepository
+import com.example.boombee.survey.SurveySheet
+import com.example.boombee.survey.SurveyTrigger
 import com.example.boombee.viewmodel.MainViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -60,6 +63,13 @@ class First : Fragment() {
         updateLocalValues(3, 1, 3)
     }
     
+    override fun onResume() {
+        super.onResume()
+        val context = requireContext()
+        SurveyRepository.flush(context)
+        if (SurveyTrigger.consumePending(context)) SurveySheet.show(childFragmentManager, fromSettings = false)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

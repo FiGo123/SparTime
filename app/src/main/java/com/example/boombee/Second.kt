@@ -28,6 +28,7 @@ import com.example.boombee.coach.VoiceStyle
 import com.example.boombee.data.DBHandler
 import com.example.boombee.data.models.Training
 import com.example.boombee.databinding.FragmentSecondBinding
+import com.example.boombee.survey.SurveyTrigger
 import com.example.boombee.viewmodel.MainViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -425,6 +426,7 @@ class Second : Fragment() {
             punchBreakdown = stats?.serializeBreakdown(),
         )
         db.insertData(training)
+        SurveyTrigger.onTrainingCompleted(requireContext())
         findNavController().navigate(R.id.action_second_to_first)
     }
 

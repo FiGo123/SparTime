@@ -101,10 +101,12 @@ update, and a commit.
 - [ ] Verified via Internal App Sharing (two builds, N → N+1).
 
 ### Stage 4 — Survey (M) → `RELEASE_SURVEY.md`
-- [ ] Firestore + security rules (create-only, validated).
-- [ ] Survey screen (replaces the empty `Survey.kt` stub): 5 stars +
-      optional text.
-- [ ] Trigger rules after completed trainings + entry in Settings.
+- [ ] Firestore + security rules (create-only, validated). Rules are in
+      `firestore.rules`; waiting on the Firebase project + `google-services.json`.
+- [x] Survey sheet (`survey/SurveySheet.kt`): 5 stars + optional text.
+      Answers queue locally until Firebase is connected.
+- [x] Trigger rules (first after 10 completed trainings) + "Rate &
+      feedback" in Settings. Built ahead of Stages 2–3 on request.
 - [ ] Analytics events.
 
 ### Stage 5 — Tutorial + mini-game (L) → `RELEASE_TUTORIAL.md`

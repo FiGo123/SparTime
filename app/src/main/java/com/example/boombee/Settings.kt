@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.example.boombee.databinding.FragmentSettingsBinding
+import com.example.boombee.survey.SurveySheet
 import com.example.boombee.viewmodel.MainViewModel
 
 class Settings : Fragment() {
@@ -76,6 +77,10 @@ class Settings : Fragment() {
             } else {
                 Toast.makeText(context, "Select a training type first.", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        binding.feedbackRow.setOnClickListener {
+            SurveySheet.show(childFragmentManager, fromSettings = true)
         }
 
         binding.btnBack.setOnClickListener {
