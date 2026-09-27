@@ -43,9 +43,10 @@ Created 2026-09-25. Update the checkboxes here as stages complete.
 - [x] **Package name (applicationId)**: **`com.filipgolovic.boombee`**
       (decided 2026-09-26). Permanent once published. The phone and
       watch apps use **the same** ID.
-- [ ] **Play developer account type**: personal or organization. This
-      decides whether the 12-tester, 14-day rule applies. It's a one-time $25
-      fee plus identity verification.
+- [x] **Play developer account type**: **personal** (decided 2026-09-27;
+      no company or D-U-N-S number). So the closed test with 12+ testers
+      for 14 days is required before production. One-time $25 fee plus
+      identity verification.
 - [ ] **Survey backend**: Firebase Firestore (recommended) or email. See
       `RELEASE_SURVEY.md` for the trade-off.
 - [ ] **Tutorial artwork source**: commissioned, AI-generated then cleaned
