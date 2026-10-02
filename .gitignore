@@ -11,3 +11,8 @@ local.properties
 
 **/build/
 .dev_screens/
+
+# Release signing (never commit)
+keystore.properties
+*.jks
+*.keystore

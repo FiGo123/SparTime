@@ -4,6 +4,18 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose'
 }
 
+// Release signing reads keystore.properties in the repo root (gitignored):
+//   storeFile=/Users/you/keys/boombee-upload.jks
+//   storePassword=…
+//   keyAlias=upload
+//   keyPassword=…
+// Without it, release builds are produced unsigned.
+def keystorePropsFile = rootProject.file('keystore.properties')
+def keystoreProps = new Properties()
+if (keystorePropsFile.exists()) {
+    keystorePropsFile.withInputStream { keystoreProps.load(it) }
+}
+
 android {
     namespace 'com.example.boombee.wear'
     compileSdk 36
@@ -12,15 +24,29 @@ android {
         applicationId "com.filipgolovic.boombee"
         minSdk 30
         targetSdk 36
-        versionCode 24
-        versionName "2.9.6"
+        versionCode 1_000_000 + boombeeVersionCode.toInteger()
+        versionName boombeeVersionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
 
+    signingConfigs {
+        if (keystorePropsFile.exists()) {
+            release {
+                storeFile file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (keystorePropsFile.exists()) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

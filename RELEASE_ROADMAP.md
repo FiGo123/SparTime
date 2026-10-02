@@ -82,10 +82,13 @@ update, and a commit.
       `MainActivity` for every phone screen; back during a round/rest now
       acts like STOP. Checked on a Pixel 10 emulator (API 37). Still to do:
       a real phone, and the watch checks (see `RELEASE_PLAY_STORE.md` §3).
-- [ ] Versioning scheme (one source of truth for the version name, and
-      unique versionCodes for phone vs watch).
-- [ ] Upload keystore + release signing config; `bundleRelease` works for
-      both modules.
+- [x] Versioning scheme: `boombeeVersionName` / `boombeeVersionCode` in
+      `gradle.properties` (3.0.0 / 30000); watch = 1_000_000 + code;
+      `AppVersion.VERSION` generated from it.
+- [x] Release signing config reading `keystore.properties` (gitignored);
+      `bundleRelease` works for both modules (unsigned until the keystore exists).
+- [ ] **(you)** Create the upload keystore + `keystore.properties`, then
+      build signed AABs.
 - [ ] Play Console: account, create app, enable Wear OS form factor.
 - [ ] First **closed testing** release (phone + watch) + recruit testers.
       **The 14-day clock starts here.**

@@ -1,11 +1,10 @@
 package com.example.boombee
 
 /**
- * Single source of truth for the version watermark shown on the phone and
- * watch Setup screens, so you can always tell which build you're running
- * (e.g. when comparing against a tagged checkpoint like v1). Bump this
- * alongside `versionName` in app/build.gradle and wear/build.gradle.
+ * Version watermark shown on the phone and watch Setup screens, so you can
+ * always tell which build you're running. Generated from
+ * `boombeeVersionName` in gradle.properties — bump it there, not here.
  */
 object AppVersion {
-    const val VERSION = "2.9.6"
+    const val VERSION = com.example.boombee.core.BuildConfig.VERSION_NAME
 }

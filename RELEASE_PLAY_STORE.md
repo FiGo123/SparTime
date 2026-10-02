@@ -17,7 +17,7 @@ a human: accounts, payments, console clicks, device testing.
 | ~~Watch uses a different ID (`com.example.boombee.wear`)~~ ✅ fixed | `wear/build.gradle` | Same ID as the phone |
 | `targetSdk 34`. Play requires new apps and updates to target a recent API (35 since Aug 2025; the yearly bump to 36 was due Aug 2026) | all modules | Raise to the current requirement (§3) |
 | AGP 8.1.4 / Kotlin 1.9.10 can't compile against API 35/36 | root `build.gradle` | Toolchain upgrade (§3) |
-| Phone and watch both use `versionCode 24` | both | Every uploaded artifact needs a unique versionCode (§4) |
+| ~~Phone and watch both use `versionCode 24`~~ ✅ fixed | both | Every uploaded artifact needs a unique versionCode (§4) |
 | No release signing config | both | Upload keystore (§4) |
 | ~~`local.properties` tracked in git~~ ✅ fixed | repo | Untracked in `491d09b` |
 | `jcenter()` in `settings.gradle` | settings | Remove (shut down) |
@@ -70,11 +70,11 @@ Kotlin/R package and don't need to match the applicationId. Changing only
 **Versioning.** The version name currently lives in three places
 (`app/build.gradle`, `wear/build.gradle`, `AppVersion.kt`). Move it to one:
 
-- [ ] `gradle.properties`: `boombeeVersionName=3.0.0`, `boombeeVersionCode=30000`.
-- [ ] Phone `versionCode = boombeeVersionCode`; watch
+- [x] `gradle.properties`: `boombeeVersionName=3.0.0`, `boombeeVersionCode=30000`.
+- [x] Phone `versionCode = boombeeVersionCode`; watch
       `versionCode = 1_000_000 + boombeeVersionCode` (unique, and still
       ordered).
-- [ ] Generate `AppVersion.VERSION` from `BuildConfig`/`buildConfigField`
+- [x] Generate `AppVersion.VERSION` from `BuildConfig`/`buildConfigField`
       instead of hand-editing it.
 - 1.0 on the store = versionName `3.0.0` (continuing from 2.9.6) or reset
   to `1.0.0`. Either works; users only ever see the store build.
@@ -86,7 +86,7 @@ Kotlin/R package and don't need to match the applicationId. Changing only
       a password manager. Play App Signing holds the real app signing key;
       a lost upload key can be reset through Play support, but it takes
       days.
-- [ ] `keystore.properties` (gitignored) with path, alias and passwords;
+- [x] `keystore.properties` (gitignored) with path, alias and passwords;
       `signingConfigs.release` in both modules reads it.
 - [ ] `./gradlew :app:bundleRelease :wear:bundleRelease` produces two
       signed AABs.
