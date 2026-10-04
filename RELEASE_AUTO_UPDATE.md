@@ -40,24 +40,25 @@ console UI. Without automation every release is priority 0, which means
 flexible, which is the right default anyway.
 
 ## Steps
-- [ ] Move update logic out of `MainActivity` into a small
+- [x] Move update logic out of `MainActivity` into a small
       `UpdateController` (lifecycle-aware) in `:app`.
-- [ ] Use `AppUpdateOptions.newBuilder(type)` with the registered
+- [x] Use `AppUpdateOptions.newBuilder(type)` with the registered
       `ActivityResultLauncher<IntentSenderRequest>`.
-- [ ] Choose FLEXIBLE or IMMEDIATE from `updatePriority()` and
+- [x] Choose FLEXIBLE or IMMEDIATE from `updatePriority()` and
       `clientVersionStalenessDays()`.
-- [ ] `InstallStateUpdatedListener` → on `DOWNLOADED` publish a "ready"
+- [x] `InstallStateUpdatedListener` → on `DOWNLOADED` publish a "ready"
       state; `First` observes it and shows the Snackbar.
-- [ ] `onResume`: if `DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS` → resume
+- [x] `onResume`: if `DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS` → resume
       the immediate flow; if `DOWNLOADED` → show the Snackbar again.
-- [ ] Unregister the listener in `onDestroy`.
-- [ ] Remove the Toasts on cancel and failure; log `update_prompt` /
-      `update_accepted` analytics events instead.
-- [ ] Drop `app-update-ktx`.
+- [x] Unregister the listener in `onDestroy`.
+- [x] Remove the Toasts on cancel and failure. A declined flexible update
+      isn't offered again for that version (it still turns immediate after 7 days).
+- [ ] Log `update_prompt` / `update_accepted` analytics events (after Stage 2).
+- [x] Drop `app-update-ktx`.
 
 ## Testing (the only reliable way)
 The API only returns updates for **Play-installed** builds.
-- [ ] Unit logic: `FakeAppUpdateManager`.
+- [x] Unit logic: the flow decision (`chooseUpdateMode`) is unit-tested.
 - [ ] Real: **Internal App Sharing**. Upload build N and install it from
       the link, then upload N+1 (higher versionCode) and open the link
       without installing. The installed N now sees an update. Test both

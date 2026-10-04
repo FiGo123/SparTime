@@ -100,8 +100,9 @@ update, and a commit.
 - [ ] Core events: training start / complete, coach settings.
 
 ### Stage 3 — Auto-update (S) → `RELEASE_AUTO_UPDATE.md`
-- [ ] Replace the current always-IMMEDIATE check with flexible +
-      priority-based immediate.
+- [x] Replace the current always-IMMEDIATE check with flexible +
+      priority-based immediate. (`update/UpdateController.kt`; home-screen
+      "Update ready · Restart" Snackbar.)
 - [ ] Verified via Internal App Sharing (two builds, N → N+1).
 
 ### Stage 4 — Survey (M) → `RELEASE_SURVEY.md`

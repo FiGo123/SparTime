@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -20,6 +21,7 @@ import com.example.boombee.survey.SurveyTrigger
 import com.example.boombee.tutorial.TutorialFragment
 import com.example.boombee.tutorial.TutorialPrefs
 import com.example.boombee.viewmodel.MainViewModel
+import com.google.android.material.snackbar.Snackbar
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -50,6 +52,7 @@ class First : Fragment() {
         observeViewModel()
         handleDialogResponse()
         binding.versionLabel.text = "v${AppVersion.VERSION}"
+        observeUpdateReady()
 
         return binding.root
     }
@@ -71,6 +74,19 @@ class First : Fragment() {
         val context = requireContext()
         SurveyRepository.flush(context)
         if (SurveyTrigger.consumePending(context)) SurveySheet.show(childFragmentManager, fromSettings = false)
+    }
+
+    // A finished background (flexible) update is only offered here, never
+    // during a round, since installing it restarts the app.
+    private fun observeUpdateReady() {
+        val updates = (requireActivity() as MainActivity).updateController
+        updates.updateReady.observe(viewLifecycleOwner) { ready ->
+            if (!ready) return@observe
+            Snackbar.make(binding.root, "Update ready", Snackbar.LENGTH_INDEFINITE)
+                .setAction("Restart") { updates.completeUpdate() }
+                .setActionTextColor(ContextCompat.getColor(requireContext(), R.color.timer_active))
+                .show()
+        }
     }
 
     override fun onDestroyView() {
