@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.IBinder
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,8 +22,10 @@ import androidx.fragment.app.FragmentActivity
 import androidx.wear.ambient.AmbientModeSupport
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
+import com.example.boombee.coach.ClipPlayer
 import com.example.boombee.coach.Difficulty
 import com.example.boombee.coach.TrainingMode
+import com.example.boombee.coach.VoiceStyle
 import com.example.boombee.data.DBHandler
 import com.example.boombee.data.Dao
 import com.example.boombee.data.PreferencesProvider
@@ -104,6 +107,9 @@ fun BoomBeeWearApp(service: RoundTimerService, isAmbient: Boolean) {
     var trainingType by remember { mutableStateOf(dao.getDefault() ?: "BOXING") }
     var config by remember { mutableStateOf(defaultsFor(trainingType)) }
     var screen by remember { mutableStateOf(WearScreen.Setup) }
+    val clipPlayer = remember { ClipPlayer(context) }
+    var learnVoiceStyle by remember { mutableStateOf(VoiceStyle.WORDS) }
+    DisposableEffect(Unit) { onDispose { clipPlayer.shutdown() } }
 
     val timerState by service.state.collectAsState()
     val activeState = timerState
@@ -133,6 +139,7 @@ fun BoomBeeWearApp(service: RoundTimerService, isAmbient: Boolean) {
                 },
                 onSettings = { screen = WearScreen.Settings },
                 onHistory = { screen = WearScreen.History },
+                onLearn = { screen = WearScreen.Learn },
             )
         }
 
@@ -144,6 +151,27 @@ fun BoomBeeWearApp(service: RoundTimerService, isAmbient: Boolean) {
                     config = defaultsFor(trainingType)
                     screen = WearScreen.Setup
                 },
+            )
+        }
+
+        WearScreen.Learn -> {
+            LearnScreen(
+                clipPlayer = clipPlayer,
+                voiceStyle = learnVoiceStyle,
+                onVoiceStyleChange = { learnVoiceStyle = it },
+                onPlayGame = { screen = WearScreen.ComboGame },
+                onBack = {
+                    clipPlayer.stop()
+                    screen = WearScreen.Setup
+                },
+            )
+        }
+
+        WearScreen.ComboGame -> {
+            ComboGameScreen(
+                clipPlayer = clipPlayer,
+                voiceStyle = learnVoiceStyle,
+                onDone = { screen = WearScreen.Learn },
             )
         }
 

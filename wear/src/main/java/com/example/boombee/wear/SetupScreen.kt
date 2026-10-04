@@ -39,6 +39,7 @@ fun SetupScreen(
     onStart: (SessionConfig, TrainingMode, Difficulty?, VoiceStyle, Int) -> Unit,
     onSettings: () -> Unit,
     onHistory: () -> Unit,
+    onLearn: () -> Unit,
 ) {
     var rounds by remember { mutableStateOf(initialConfig.rounds) }
     var roundMin by remember { mutableStateOf(initialConfig.roundMinutes) }
@@ -119,6 +120,14 @@ fun SetupScreen(
                         )
                     },
                     colors = ChipDefaults.primaryChipColors(),
+                )
+            }
+            item {
+                Chip(
+                    label = { Text("Learn punches") },
+                    secondaryLabel = { Text("Numbers + combo game") },
+                    onClick = onLearn,
+                    colors = ChipDefaults.secondaryChipColors(),
                 )
             }
             item {
