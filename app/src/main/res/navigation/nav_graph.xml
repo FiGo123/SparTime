@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/first"
         android:name="com.example.boombee.First"
-        android:label="fragment_first"
+        android:label="home"
         tools:layout="@layout/fragment_first" >
         <action
             android:id="@+id/action_first_to_second"
@@ -26,7 +26,7 @@
     <fragment
         android:id="@+id/second"
         android:name="com.example.boombee.Second"
-        android:label="fragment_second"
+        android:label="round"
         tools:layout="@layout/fragment_second" >
         <action
             android:id="@+id/action_second_to_first"
@@ -41,7 +41,7 @@
     <fragment
         android:id="@+id/rest"
         android:name="com.example.boombee.Rest"
-        android:label="Rest"
+        android:label="rest"
         tools:layout="@layout/fragment_rest">
         <action
             android:id="@+id/action_rest_to_second"
@@ -53,7 +53,7 @@
     <fragment
         android:id="@+id/settings"
         android:name="com.example.boombee.Settings"
-        android:label="Settings"
+        android:label="settings"
         tools:layout="@layout/fragment_settings">
         <action
             android:id="@+id/action_settings_to_first"
@@ -65,7 +65,7 @@
     <fragment
         android:id="@+id/tutorial"
         android:name="com.example.boombee.tutorial.TutorialFragment"
-        android:label="Tutorial"
+        android:label="tutorial"
         tools:layout="@layout/fragment_tutorial">
         <argument
             android:name="source"
@@ -80,7 +80,7 @@
     <fragment
         android:id="@+id/historyTraining"
         android:name="com.example.boombee.HistoryTraining"
-        android:label="HistoryTraining" >
+        android:label="history" >
         <action
             android:id="@+id/action_historyTraining_to_first"
             app:destination="@id/first" />
@@ -88,7 +88,7 @@
     <fragment
         android:id="@+id/dialog"
         android:name="com.example.boombee.Dialog"
-        android:label="Dialog" >
+        android:label="stop_dialog" >
         <action
             android:id="@+id/action_dialog_to_first"
             app:destination="@id/first" />

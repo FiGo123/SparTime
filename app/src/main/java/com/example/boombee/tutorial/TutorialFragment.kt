@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.example.boombee.R
+import com.example.boombee.analytics.Analytics
 import com.example.boombee.coach.ClipPlayer
 import com.example.boombee.coach.ComboLibrary
 import com.example.boombee.coach.CommandPart
@@ -34,11 +35,13 @@ class TutorialFragment : Fragment() {
     private var adapter: TutorialAdapter? = null
     private val pages = TutorialPages.ALL
 
-    private val fromFirstRun get() = arguments?.getString(ARG_SOURCE) == SOURCE_FIRST_RUN
+    private val source get() = arguments?.getString(ARG_SOURCE) ?: SOURCE_MENU
+    private val fromFirstRun get() = source == SOURCE_FIRST_RUN
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentTutorialBinding.inflate(inflater, container, false)
         clipPlayer = ClipPlayer(requireContext())
+        if (savedInstanceState == null) Analytics.log(requireContext(), "tutorial_begin", "source" to source)
 
         val level3Pool = ComboLibrary(requireContext()).let { library ->
             (3..4).flatMap(library::combosOfLength).mapNotNull { combo ->
@@ -71,10 +74,18 @@ class TutorialFragment : Fragment() {
             }
         })
 
-        binding.skipBtn.setOnClickListener { finish() }
+        binding.skipBtn.setOnClickListener {
+            Analytics.log(requireContext(), "tutorial_skip", "page" to binding.pager.currentItem + 1, "source" to source)
+            finish()
+        }
         binding.backBtn.setOnClickListener { binding.pager.currentItem -= 1 }
         binding.nextBtn.setOnClickListener {
-            if (binding.pager.currentItem == pages.lastIndex) finish() else binding.pager.currentItem += 1
+            if (binding.pager.currentItem == pages.lastIndex) {
+                Analytics.log(requireContext(), "tutorial_complete", "source" to source)
+                finish()
+            } else {
+                binding.pager.currentItem += 1
+            }
         }
         updateNavButtons(0)
 

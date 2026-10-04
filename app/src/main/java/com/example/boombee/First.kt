@@ -21,7 +21,9 @@ import com.example.boombee.survey.SurveyTrigger
 import com.example.boombee.tutorial.TutorialFragment
 import com.example.boombee.tutorial.TutorialPrefs
 import com.example.boombee.viewmodel.MainViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.example.boombee.analytics.Analytics
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -53,6 +55,7 @@ class First : Fragment() {
         handleDialogResponse()
         binding.versionLabel.text = "v${AppVersion.VERSION}"
         observeUpdateReady()
+        askAnalyticsConsentOnce()
 
         return binding.root
     }
@@ -74,6 +77,21 @@ class First : Fragment() {
         val context = requireContext()
         SurveyRepository.flush(context)
         if (SurveyTrigger.consumePending(context)) SurveySheet.show(childFragmentManager, fromSettings = false)
+    }
+
+    // Asked once, on the first launch; changeable later in Settings.
+    private fun askAnalyticsConsentOnce() {
+        if (Analytics.consent(requireContext()) != null) return
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Help improve BoomBee?")
+            .setMessage(
+                "Share anonymous usage statistics and crash reports. " +
+                    "No ads, no personal info. You can change this any time in Settings."
+            )
+            .setCancelable(false)
+            .setPositiveButton("Share") { _, _ -> Analytics.setConsent(requireContext(), true) }
+            .setNegativeButton("No thanks") { _, _ -> Analytics.setConsent(requireContext(), false) }
+            .show()
     }
 
     // A finished background (flexible) update is only offered here, never
@@ -98,6 +116,7 @@ class First : Fragment() {
         binding.apply {
             firstFragmentStartBtn.setOnClickListener {
                 if (validateInputs()) {
+                    Analytics.log(requireContext(), "training_start", *Analytics.trainingParams(mainViewModel))
                     if (TutorialPrefs.isSeen(requireContext())) {
                         mainViewModel.resetCoachSession()
                         it.findNavController().navigate(R.id.action_first_to_second)

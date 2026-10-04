@@ -1,5 +1,6 @@
 package com.example.boombee
 
+import com.example.boombee.analytics.Analytics
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Bundle
@@ -371,6 +372,7 @@ class Second : Fragment() {
         isTimerPaused = false
         mainViewModel.setLeftTime((timeRemainingInMillis / 1000).toInt())
         stopCoachLoop()
+        Analytics.log(requireContext(), "training_abort", "round_reached" to currentRoundNumber)
         navController.navigate(R.id.action_second_to_dialog)
     }
 
@@ -426,6 +428,7 @@ class Second : Fragment() {
             punchBreakdown = stats?.serializeBreakdown(),
         )
         db.insertData(training)
+        Analytics.log(requireContext(), "training_complete", *Analytics.trainingParams(mainViewModel))
         SurveyTrigger.onTrainingCompleted(requireContext())
         findNavController().navigate(R.id.action_second_to_first)
     }

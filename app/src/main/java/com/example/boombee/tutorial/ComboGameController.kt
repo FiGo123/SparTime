@@ -8,6 +8,7 @@ import android.view.HapticFeedbackConstants
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.example.boombee.R
+import com.example.boombee.analytics.Analytics
 import com.example.boombee.coach.ClipPlayer
 import com.example.boombee.coach.CoachAudio
 import com.example.boombee.coach.CommandPart
@@ -27,6 +28,7 @@ class ComboGameController(
     private val context = binding.root.context
     private val handler = Handler(Looper.getMainLooper())
     private var game: ComboGame? = null
+    private var resultLogged = false
 
     private val idleTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.surface))
     private val correctTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.timer_active))
@@ -59,6 +61,7 @@ class ComboGameController(
 
     private fun newGame() {
         game = ComboGame.build(level3Pool)
+        resultLogged = false
         binding.playingGroup.visibility = View.VISIBLE
         binding.resultGroup.visibility = View.GONE
         render()
@@ -130,6 +133,10 @@ class ComboGameController(
         binding.playingGroup.visibility = View.GONE
         binding.resultGroup.visibility = View.VISIBLE
         binding.resultScore.text = context.getString(R.string.tutorial_game_score, game.score, game.total)
+        if (!resultLogged) {
+            Analytics.log(context, "combo_game_result", "correct" to game.score, "total" to game.total)
+            resultLogged = true
+        }
         binding.resultMessage.setText(
             if (game.score >= game.total - 1) R.string.tutorial_game_result_great else R.string.tutorial_game_result_ok
         )

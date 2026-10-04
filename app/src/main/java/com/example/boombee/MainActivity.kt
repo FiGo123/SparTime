@@ -6,6 +6,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.navigation.fragment.NavHostFragment
+import com.example.boombee.analytics.Analytics
 import com.example.boombee.databinding.ActivityMainBinding
 import com.example.boombee.update.UpdateController
 
@@ -24,6 +26,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         applyWindowInsets()
+
+        Analytics.applyConsent(this)
+        val navHost = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+        navHost.navController.addOnDestinationChangedListener { _, destination, _ ->
+            destination.label?.let { Analytics.logScreen(this, it.toString()) }
+        }
     }
 
     // All screens share the activity's background, so padding the nav host

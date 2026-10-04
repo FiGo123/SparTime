@@ -1,5 +1,6 @@
 package com.example.boombee.survey
 
+import com.example.boombee.analytics.Analytics
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,6 +34,9 @@ class SurveySheet : BottomSheetDialogFragment() {
         (view.parent as? View)?.setBackgroundColor(ContextCompat.getColor(view.context, R.color.surface))
 
         setSendEnabled(false)
+        if (savedInstanceState == null) {
+            Analytics.log(requireContext(), "survey_shown", "source" to if (fromSettings) "settings" else "auto")
+        }
         binding.surveyRating.setOnRatingBarChangeListener { _, rating, _ ->
             setSendEnabled(rating >= 1f)
         }
@@ -44,15 +48,21 @@ class SurveySheet : BottomSheetDialogFragment() {
                 binding.surveyComment.text?.toString().orEmpty()
             )
             SurveyTrigger.markSubmitted(context)
+            // The rating only; the comment never goes to Analytics.
+            Analytics.log(context, "survey_submit", "rating" to binding.surveyRating.rating.toInt())
             Toast.makeText(context, "Thanks! 🐝", Toast.LENGTH_SHORT).show()
             dismiss()
         }
-        binding.surveyNotNow.setOnClickListener { dismiss() }
+        binding.surveyNotNow.setOnClickListener {
+            Analytics.log(requireContext(), "survey_dismiss", "choice" to "not_now")
+            dismiss()
+        }
 
         // Opened on purpose from Settings, so there's nothing to opt out of.
         binding.surveyNever.visibility = if (fromSettings) View.GONE else View.VISIBLE
         binding.surveyNever.setOnClickListener {
             SurveyTrigger.markNeverAsk(requireContext())
+            Analytics.log(requireContext(), "survey_dismiss", "choice" to "never")
             dismiss()
         }
     }

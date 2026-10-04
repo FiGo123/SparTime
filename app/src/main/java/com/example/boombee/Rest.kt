@@ -1,5 +1,6 @@
 package com.example.boombee
 
+import com.example.boombee.analytics.Analytics
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Bundle
@@ -43,6 +44,7 @@ class Rest : Fragment() {
         binding.btnRestStop.setOnClickListener {
             if (::countDownTimer.isInitialized) countDownTimer.cancel()
             cancelPendingNavigateToSecond()
+            Analytics.log(requireContext(), "training_abort", "round_reached" to mainViewModel.currentRound.value)
             it.findNavController().navigate(R.id.action_rest_to_first)
         }
         // Back during rest behaves like STOP instead of popping back to the

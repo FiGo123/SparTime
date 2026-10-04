@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
+import com.example.boombee.analytics.Analytics
 import com.example.boombee.databinding.FragmentSettingsBinding
 import com.example.boombee.survey.SurveySheet
 import com.example.boombee.viewmodel.MainViewModel
@@ -73,10 +74,17 @@ class Settings : Fragment() {
         binding.btnSave.setOnClickListener {
             if (selectedTrainingType != null) {
                 mainViewModel.setDefaultTrainingType(selectedTrainingType!!)
+                Analytics.log(requireContext(), "settings_change", "setting" to "training_type", "value" to selectedTrainingType)
                 Toast.makeText(context, "Settings saved!", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(context, "Select a training type first.", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        // Analytics + crash reports opt-in (same choice as the first-launch prompt)
+        binding.checkboxUsageData.isChecked = Analytics.consent(requireContext()) == true
+        binding.checkboxUsageData.setOnCheckedChangeListener { _, isChecked ->
+            Analytics.setConsent(requireContext(), isChecked)
         }
 
         binding.tutorialRow.setOnClickListener {
