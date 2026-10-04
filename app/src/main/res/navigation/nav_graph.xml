@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_first_to_historyTraining"
             app:destination="@id/historyTraining" />
+        <action
+            android:id="@+id/action_first_to_tutorial"
+            app:destination="@id/tutorial" />
     </fragment>
     <fragment
         android:id="@+id/second"
@@ -55,6 +58,24 @@
         <action
             android:id="@+id/action_settings_to_first"
             app:destination="@id/first" />
+        <action
+            android:id="@+id/action_settings_to_tutorial"
+            app:destination="@id/tutorial" />
+    </fragment>
+    <fragment
+        android:id="@+id/tutorial"
+        android:name="com.example.boombee.tutorial.TutorialFragment"
+        android:label="Tutorial"
+        tools:layout="@layout/fragment_tutorial">
+        <argument
+            android:name="source"
+            app:argType="string"
+            android:defaultValue="menu" />
+        <action
+            android:id="@+id/action_tutorial_to_second"
+            app:destination="@id/second"
+            app:popUpTo="@id/tutorial"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/historyTraining"

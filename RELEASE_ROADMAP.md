@@ -114,12 +114,14 @@ update, and a commit.
 - [ ] Analytics events.
 
 ### Stage 5 — Tutorial + mini-game (L) → `RELEASE_TUTORIAL.md`
-- [ ] Pager with Next / Back / Skip, punch pages 1–6, defense, distance,
+- [x] Pager with Next / Back / Skip, punch pages 1–6, defense, distance,
       "how the coach calls combos".
-- [ ] "Tap the combo" mini-game using the recorded voice clips.
-- [ ] Shown on first training start; reachable from the home screen and
+- [x] "Tap the combo" mini-game using the recorded voice clips.
+- [x] Shown on first training start; reachable from the home screen and
       Settings.
-- [ ] Final artwork swapped in.
+- [ ] Final artwork swapped in (placeholder = `tutorial/FighterView`, an
+      orthodox fighter facing the user).
+- [ ] Analytics events (after Stage 2).
 
 ### Stage 6 — Store readiness (M) → `RELEASE_PLAY_STORE.md` §5–§6
 - [ ] Privacy policy published; Data safety, content rating, target

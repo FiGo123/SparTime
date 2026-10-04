@@ -51,10 +51,12 @@ user's voice-style setting.
 
 ## Mini-game: "Tap the combo"
 
-**Layout:** a front-facing fighter silhouette with 6 big tap targets
-placed where the punches land. The left-hand side has 1 (jab), 3 (hook)
-and 5 (uppercut); the right-hand side has 2, 4 and 6. That teaches the
-odd = left, even = right pattern.
+**Layout:** an orthodox fighter facing the user, with 6 big tap targets
+placed where the punches land. Because the fighter faces you, their lead
+(left) hand is on the **screen's right**: 1 (jab), 3 (hook), 5 (uppercut)
+are on the right, 2, 4, 6 on the left, next to the matching hand. That
+teaches the odd = left hand, even = right hand pattern. All artwork uses
+the same front view (lead foot forward = lower, on the screen's right).
 
 **Round:** the coach calls a combo, and the user taps the punches in
 order.
@@ -104,26 +106,26 @@ and light surfaces.
 
 ## Implementation
 
-- [ ] `TutorialFragment` hosting a `ViewPager2` + `TabLayout` dots, in
+- [x] `TutorialFragment` hosting a `ViewPager2` + `TabLayout` dots, in
       `nav_graph.xml` with actions from `first` and `settings`, and an
       argument `source` = `first_run` | `menu`.
-- [ ] Pages are data-driven: `TutorialPage(titleRes, bodyRes, imageRes, clipKeys)`
+- [x] Pages are data-driven: `TutorialPage(titleRes, bodyRes, imageRes, clipKeys)`
       rendered by one generic page layout. Only the mini-game and the
       summary have custom layouts.
-- [ ] `ComboGameFragment` (or a custom page view) with the 6 targets. Game
+- [x] `ComboGameFragment` (or a custom page view) with the 6 targets. Game
       logic lives in a plain `ComboGame` class (combo queue, expected
       index, score) so it can be unit-tested without UI.
-- [ ] One `ClipPlayer` owned by the tutorial and stopped when a page
+- [x] One `ClipPlayer` owned by the tutorial and stopped when a page
       changes or the tutorial closes. Never let audio overlap across pages.
-- [ ] `First`: Start checks `tutorial_seen`; add a "?" icon button next to
+- [x] `First`: Start checks `tutorial_seen`; add a "?" icon button next to
       the header title → tutorial (`source = menu`).
-- [ ] `Settings`: "Tutorial" row → tutorial.
+- [x] `Settings`: "Tutorial" row → tutorial.
 - [ ] Respect edge-to-edge insets (see `RELEASE_PLAY_STORE.md` §3) and
       test on a small phone.
 - [ ] Analytics: `tutorial_begin(source)`, `tutorial_skip(page)`,
       `tutorial_complete(source)`, `combo_game_result(correct, total)`.
-- [ ] Unit tests for `ComboGame` (correct tap, wrong tap → replay, score).
-- [ ] All strings in `strings.xml`, ready for later translation.
+- [x] Unit tests for `ComboGame` (correct tap, wrong tap → replay, score).
+- [x] All strings in `strings.xml`, ready for later translation.
 
 ## Watch
 

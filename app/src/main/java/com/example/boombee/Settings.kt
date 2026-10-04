@@ -79,6 +79,10 @@ class Settings : Fragment() {
             }
         }
 
+        binding.tutorialRow.setOnClickListener {
+            it.findNavController().navigate(R.id.action_settings_to_tutorial)
+        }
+
         binding.feedbackRow.setOnClickListener {
             SurveySheet.show(childFragmentManager, fromSettings = true)
         }

@@ -2,4 +2,53 @@
     <string name="app_name">BoomBee</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial_skip">Skip</string>
+    <string name="tutorial_back">Back</string>
+    <string name="tutorial_next">Next</string>
+    <string name="tutorial_finish">Finish</string>
+    <string name="tutorial_start_training">Start training</string>
+    <string name="tutorial_listen">🔊  Listen</string>
+    <string name="tutorial_open">Tutorial</string>
+
+    <string name="tutorial_welcome_title">Learn the punches</string>
+    <string name="tutorial_welcome_body">Your coach calls punches by number.\nTwo minutes to learn them, then a quick game.</string>
+    <string name="tutorial_stance_title">Stance &amp; guard</string>
+    <string name="tutorial_stance_body">Left foot forward, right foot back.\nHands up by your cheeks, elbows in.\n\nThe fighter in the pictures faces you,\nso their left hand is on your right.\nLeft-handed? Mirror everything.</string>
+    <string name="tutorial_jab_title">1 · Jab</string>
+    <string name="tutorial_jab_body">Lead (left) hand, straight out.\nFast — snap it back to your guard.</string>
+    <string name="tutorial_cross_title">2 · Cross</string>
+    <string name="tutorial_cross_body">Rear (right) hand, straight.\nTurn your hip and back foot into it.</string>
+    <string name="tutorial_lead_hook_title">3 · Lead hook</string>
+    <string name="tutorial_lead_hook_body">Left hook. Elbow up at shoulder height,\nswing in from the side.</string>
+    <string name="tutorial_rear_hook_title">4 · Rear hook</string>
+    <string name="tutorial_rear_hook_body">Right hook. Same shape,\nthrown off the back side.</string>
+    <string name="tutorial_lead_uppercut_title">5 · Lead uppercut</string>
+    <string name="tutorial_lead_uppercut_body">Left uppercut. Dip a little\nand drive the fist up from below.</string>
+    <string name="tutorial_rear_uppercut_title">6 · Rear uppercut</string>
+    <string name="tutorial_rear_uppercut_body">Right uppercut. Push off\nthe back foot and lift.</string>
+    <string name="tutorial_summary_title">Odd left, even right</string>
+    <string name="tutorial_summary_body">1, 3, 5 are your left hand.\n2, 4, 6 are your right hand.\n\nStraight, hook, uppercut — in pairs.</string>
+    <string name="tutorial_defense_title">Defense</string>
+    <string name="tutorial_defense_body">Slip: move your head to the side.\nDuck under: bend your knees and dip.\nHands up: back to your guard.</string>
+    <string name="tutorial_distance_title">Distance</string>
+    <string name="tutorial_distance_body">Close distance: step in.\nMake distance: step back out of range.\nMove more: keep your feet busy.</string>
+    <string name="tutorial_combos_title">How combos sound</string>
+    <string name="tutorial_combos_body">\"1-2\" means jab then cross, back to back.\n\nThe coach says numbers or punch names —\nchoose Numbers or Words on the home screen.</string>
+    <string name="tutorial_done_title">You\'re ready</string>
+    <string name="tutorial_done_body">Start with Coach mode on Beginner.\n\nReplay this tutorial any time with the ? button on the home screen or in Settings.</string>
+
+    <string name="tutorial_game_title">Tap the combo</string>
+    <string name="tutorial_game_body">Tap the punches in the order the coach calls them.</string>
+    <string name="tutorial_game_status">Combo %1$d/%2$d · Level %3$d</string>
+    <string name="tutorial_game_listen">🎧 Listen…</string>
+    <string name="tutorial_game_repeat">🔊  Repeat</string>
+    <string name="tutorial_game_correct">✓</string>
+    <string name="tutorial_game_wrong">✗ Again</string>
+    <string name="tutorial_game_score">%1$d/%2$d 🐝</string>
+    <string name="tutorial_game_result_great">Great — you know your numbers!</string>
+    <string name="tutorial_game_result_ok">Nice start. Play again, or move on.</string>
+    <string name="tutorial_game_play_again">Play again</string>
+    <string name="tutorial_game_continue">Continue</string>
 </resources>

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
@@ -16,6 +17,8 @@ import com.example.boombee.databinding.FragmentFirstBinding
 import com.example.boombee.survey.SurveyRepository
 import com.example.boombee.survey.SurveySheet
 import com.example.boombee.survey.SurveyTrigger
+import com.example.boombee.tutorial.TutorialFragment
+import com.example.boombee.tutorial.TutorialPrefs
 import com.example.boombee.viewmodel.MainViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -79,9 +82,21 @@ class First : Fragment() {
         binding.apply {
             firstFragmentStartBtn.setOnClickListener {
                 if (validateInputs()) {
-                    mainViewModel.resetCoachSession()
-                    it.findNavController().navigate(R.id.action_first_to_second)
+                    if (TutorialPrefs.isSeen(requireContext())) {
+                        mainViewModel.resetCoachSession()
+                        it.findNavController().navigate(R.id.action_first_to_second)
+                    } else {
+                        // First training ever: teach the punch numbers first;
+                        // the tutorial continues straight into this training.
+                        it.findNavController().navigate(
+                            R.id.action_first_to_tutorial,
+                            bundleOf(TutorialFragment.ARG_SOURCE to TutorialFragment.SOURCE_FIRST_RUN)
+                        )
+                    }
                 }
+            }
+            btnTutorial.setOnClickListener {
+                it.findNavController().navigate(R.id.action_first_to_tutorial)
             }
             btnSettings.setOnClickListener {
                 it.findNavController().navigate(R.id.action_first_to_settings)
