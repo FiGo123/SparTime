@@ -47,7 +47,7 @@ Created 2026-09-25. Update the checkboxes here as stages complete.
       no company or D-U-N-S number). So the closed test with 12+ testers
       for 14 days is required before production. One-time $25 fee plus
       identity verification.
-- [ ] **Survey backend**: Firebase Firestore (recommended) or email. See
+- [x] **Survey backend**: Firestore, location `eur3` (decided 2026-10-04). See
       `RELEASE_SURVEY.md` for the trade-off.
 - [ ] **Tutorial artwork source**: commissioned, AI-generated then cleaned
       up, or placeholder vectors first. See `RELEASE_TUTORIAL.md`.
@@ -94,10 +94,15 @@ update, and a commit.
       **The 14-day clock starts here.**
 
 ### Stage 2 — Analytics + Crashlytics (S) → `RELEASE_ANALYTICS.md`
-- [ ] Firebase project, both modules registered, `google-services.json`.
-- [ ] Analytics + Crashlytics wired; screen views via NavController.
-- [ ] Consent defaults + "Share anonymous usage data" toggle in Settings.
-- [ ] Core events: training start / complete, coach settings.
+- [x] Firebase project `boombee`, Android app `com.filipgolovic.boombee`
+      registered (covers phone + watch), `app/google-services.json` committed.
+- [x] Analytics + Crashlytics wired; screen views via NavController.
+- [x] Opt-in: first-launch prompt + "Share anonymous usage data" toggle in
+      Settings; off until yes. No AD_ID / ad-services permissions.
+- [x] Events: training start / complete / abort, tutorial, combo game,
+      survey, settings.
+- [ ] **(you)** Verify in Firebase DebugView on a real phone; enable
+      Crashlytics in the console.
 
 ### Stage 3 — Auto-update (S) → `RELEASE_AUTO_UPDATE.md`
 - [x] Replace the current always-IMMEDIATE check with flexible +
@@ -106,13 +111,12 @@ update, and a commit.
 - [ ] Verified via Internal App Sharing (two builds, N → N+1).
 
 ### Stage 4 — Survey (M) → `RELEASE_SURVEY.md`
-- [ ] Firestore + security rules (create-only, validated). Rules are in
-      `firestore.rules`; waiting on the Firebase project + `google-services.json`.
+- [x] Firestore (`eur3`) + create-only rules deployed (`firebase.json`).
 - [x] Survey sheet (`survey/SurveySheet.kt`): 5 stars + optional text.
       Answers queue locally until Firebase is connected.
 - [x] Trigger rules (first after 10 completed trainings) + "Rate &
       feedback" in Settings. Built ahead of Stages 2–3 on request.
-- [ ] Analytics events.
+- [x] Analytics events.
 
 ### Stage 5 — Tutorial + mini-game (L) → `RELEASE_TUTORIAL.md`
 - [x] Pager with Next / Back / Skip, punch pages 1–6, defense, distance,
@@ -122,7 +126,7 @@ update, and a commit.
       Settings.
 - [ ] Final artwork swapped in (placeholder = `tutorial/FighterView`, an
       orthodox fighter facing the user).
-- [ ] Analytics events (after Stage 2).
+- [x] Analytics events.
 
 ### Stage 6 — Store readiness (M) → `RELEASE_PLAY_STORE.md` §5–§6
 - [ ] Privacy policy published; Data safety, content rating, target
