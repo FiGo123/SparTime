@@ -51,11 +51,9 @@ Created 2026-09-25. Update the checkboxes here as stages complete.
       `RELEASE_SURVEY.md` for the trade-off.
 - [ ] **Tutorial artwork source**: commissioned, AI-generated then cleaned
       up, or placeholder vectors first. See `RELEASE_TUTORIAL.md`.
-- [ ] **Support email** shown on the Play listing and in the app. Use a
-      dedicated address such as `boombee.app@…`, not your personal inbox.
-- [ ] **Privacy policy hosting**: GitHub Pages, Firebase Hosting or Google
-      Sites (all free). A policy is required because analytics and the
-      survey collect data.
+- [x] **Support email**: `filipgolovicc@gmail.com` (decided 2026-10-09).
+- [x] **Privacy policy hosting**: Firebase Hosting →
+      https://boombee.web.app/privacy.html (source `hosting/`).
 
 ---
 
@@ -89,7 +87,9 @@ update, and a commit.
       `bundleRelease` works for both modules (unsigned until the keystore exists).
 - [ ] **(you)** Create the upload keystore + `keystore.properties`, then
       build signed AABs.
-- [ ] Play Console: account, create app, enable Wear OS form factor.
+- [x] **(you)** Play developer account created and verified (2026-10-09).
+- [ ] **(you)** Play Console: create app, enable Wear OS form factor
+      (answers in `PLAY_CONSOLE_ANSWERS.md`).
 - [ ] First **closed testing** release (phone + watch) + recruit testers.
       **The 14-day clock starts here.**
 
