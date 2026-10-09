@@ -1,0 +1,23 @@
+BoomBee is a boxing round timer with a voice coach in your ear. Set your rounds, hit Start, and train — on your phone or straight from your Wear OS watch.
+
+🥊 BOXING COACH MODE
+The coach calls punches and combos out loud while the round runs — "1-2", "jab, cross, left hook" — mixed with defense ("slip", "duck under") and footwork ("close distance", "move more"). Choose Beginner, Intermediate or Advanced, and hear punches as numbers or as names.
+
+⏱️ ROUND TIMER
+• Rounds, round length and rest — Boxing (12 × 3 min) and MMA (5 × 5 min) presets
+• Bell, round announcements and 10-second warnings
+• Optional warm-up before the first round
+• Timer-only mode when you just want the clock
+
+⌚ WEAR OS
+• Full timer and coach on the watch, no phone needed during training
+• Keeps counting with the screen off; the current round shows on your watch face
+• Learn the punch numbers and play the combo game right on your wrist
+
+🎓 NEW TO BOXING?
+A two-minute tutorial teaches stance, punches 1–6, defense and distance, then a quick "Tap the combo" game checks that you know your numbers before your first coached round.
+
+📈 HISTORY
+Every session is saved on your device with rounds, time and punch counts.
+
+No account. No ads. Your training history stays on your device.
