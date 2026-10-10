@@ -129,6 +129,13 @@ and light surfaces.
 
 ## Watch
 
-Not in 1.0. The watch keeps working on its own, and a watch-only user
-learns from the phone app or the Play listing screenshots. Possible later
-addition: a 3-card "punch numbers" cheat sheet on the watch Setup screen.
+Built for 1.0 (2026-10-10), optional and never shown automatically:
+
+- Setup screen → **Learn punches** chip → `LearnScreen.kt`: the 6 punch
+  chips ("1 · Jab · Left hand", tap to hear number + name), a "Game voice:
+  Words / Numbers" toggle, and **Combo game**.
+- `ComboGameScreen.kt`: the same 8-combo rules as the phone (`ComboGame` in
+  `:core`), 2/4/6 on the left and 1/3/5 on the right (fighter facing you),
+  prompt + 🔊 repeat in the middle, yellow/red flash and haptics, score
+  screen with Play again / Done. Back gesture returns to Learn.
+- No analytics on the watch (same as the rest of the watch app in 1.0).

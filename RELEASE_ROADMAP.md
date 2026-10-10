@@ -90,7 +90,8 @@ update, and a commit.
       3.0.0 build and verify (2026-10-09).
 - [x] **(you)** Play developer account created and verified (2026-10-09).
 - [ ] **(you)** Play Console: create app, enable Wear OS form factor
-      (answers in `PLAY_CONSOLE_ANSWERS.md`).
+      (answers in `PLAY_CONSOLE_ANSWERS.md`). Rebuild both AABs right
+      before uploading (the Desktop copies predate later watch fixes).
 - [ ] First **closed testing** release (phone + watch) + recruit testers.
       **The 14-day clock starts here.**
 
@@ -125,22 +126,33 @@ update, and a commit.
 - [x] "Tap the combo" mini-game using the recorded voice clips.
 - [x] Shown on first training start; reachable from the home screen and
       Settings.
+- [x] Watch: optional "Learn punches" (setup screen) → punch list with
+      tap-to-hear + the same combo game (`ComboGame` now in `:core`).
+      Checked on the Galaxy Watch 8 (2026-10-10).
 - [ ] Final artwork swapped in (placeholder = `tutorial/FighterView`, an
       orthodox fighter facing the user).
 - [x] Analytics events.
 
 ### Stage 6 — Store readiness (M) → `RELEASE_PLAY_STORE.md` §5–§6
-- [ ] Privacy policy published; Data safety, content rating, target
-      audience, ads, health apps and foreground-service declarations.
-- [ ] Listing text, icon, feature graphic, phone and watch screenshots.
+- [x] Privacy policy published: https://boombee.web.app/privacy.html.
+- [x] Drafted answers for Data safety, content rating, target audience
+      (18+), ads, health (Fitness) and the watch foreground-service
+      declaration → `PLAY_CONSOLE_ANSWERS.md`.
+- [ ] **(you)** Submit those App content forms in Play Console (no API for
+      them).
+- [x] Listing text + release notes in `app/src/main/play/`.
+- [ ] Icon 512×512, feature graphic 1024×500, phone and watch screenshots.
 - [ ] Full QA pass: phone (timer + coach), watch (timer + coach, ambient,
       ongoing activity), upgrade from a previous closed-test build.
 
 ### Stage 7 — Publishing automation + production (M) → `RELEASE_PLAY_STORE.md` §7
-- [ ] Service account + Google Play Developer API access.
+- [ ] **(you)** Service account + Google Play Developer API access
+      (`~/keys/boombee-play.json`; steps in `RELEASE_PLAY_STORE.md` §7).
+      Only possible after the app exists and has one manual upload.
 - [ ] Gradle Play Publisher configured (release notes, listing from repo,
       update priority).
-- [ ] Optional: Google Play MCP server added to Claude Code.
+- [ ] Optional: a Play MCP server. Google has no official one (checked
+      2026-10-10); the Publishing API via GPP covers uploads.
 - [ ] Production release with a staged rollout (e.g. 20% → 50% → 100%).
 
 After Stage 7 the release flow is a single request, for example: *"release

@@ -95,8 +95,8 @@ Kotlin/R package and don't need to match the applicationId. Changing only
 
 ## §5 Play Console setup (you + Claude)
 
-- [ ] **(you)** Developer account ($25, identity verification). Note the
-      account type (see the roadmap).
+- [x] **(you)** Developer account ($25, identity verification), personal
+      account, verified 2026-10-09.
 - [ ] **(you)** Create app: name "BoomBee", app (not game), free.
 - [ ] **(you)** Advanced settings → **Form factors → add Wear OS**. Watch
       builds then go to the Wear OS tracks, and Wear OS is reviewed
@@ -172,7 +172,22 @@ like any other Gradle task, so no extra MCP is needed for it to work.
       API**. This drives the auto-update behaviour in
       `RELEASE_AUTO_UPDATE.md`.
 
+### What the API can and can't do (checked 2026-10-10)
+
+| Can (GPP / Publishing API) | Can't — Play Console only |
+|---|---|
+| Upload AABs to any track, phone and Wear OS | Create the app |
+| Release notes, staged rollout %, `updatePriority` | The **first** upload of a new app |
+| Store listing text, graphics, screenshots | App content forms (content rating, target audience, data safety declarations, FGS) |
+| Promote between tracks | Accept legal terms / first publish, unpublish |
+| Read vitals, reply to reviews (other Play APIs) | |
+
+So the one-time setup is manual; every release after that can be a single
+command.
+
 ### Optional: Google Play MCP server
+
+Google doesn't publish an official one (checked 2026-10-10).
 
 An MCP server lets Claude call Play actions as tools (list tracks, read
 review and vitals data, promote releases) without Gradle. When we reach
