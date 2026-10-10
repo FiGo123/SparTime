@@ -1,5 +1,6 @@
 package com.example.boombee.history
 
+import com.example.boombee.uiUtils.keepAboveKeyboard
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -86,6 +87,11 @@ class EffortSheet : BottomSheetDialogFragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(STATE_SELECTED, selected ?: 0)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        keepAboveKeyboard(binding.root)
     }
 
     override fun onDestroyView() {

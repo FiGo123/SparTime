@@ -1,5 +1,6 @@
 package com.example.boombee.survey
 
+import com.example.boombee.uiUtils.keepAboveKeyboard
 import com.example.boombee.analytics.Analytics
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -71,6 +72,11 @@ class SurveySheet : BottomSheetDialogFragment() {
     private fun setSendEnabled(enabled: Boolean) {
         binding.surveySend.isEnabled = enabled
         binding.surveySend.alpha = if (enabled) 1f else 0.4f
+    }
+
+    override fun onStart() {
+        super.onStart()
+        keepAboveKeyboard(binding.root)
     }
 
     override fun onDestroyView() {
