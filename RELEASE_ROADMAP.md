@@ -85,8 +85,9 @@ update, and a commit.
       `AppVersion.VERSION` generated from it.
 - [x] Release signing config reading `keystore.properties` (gitignored);
       `bundleRelease` works for both modules (unsigned until the keystore exists).
-- [ ] **(you)** Create the upload keystore + `keystore.properties`, then
-      build signed AABs.
+- [x] Upload keystore `~/keys/boombee-upload.jks` (password only in the
+      gitignored `keystore.properties`; **back both up**). Signed AABs for
+      3.0.0 build and verify (2026-10-09).
 - [x] **(you)** Play developer account created and verified (2026-10-09).
 - [ ] **(you)** Play Console: create app, enable Wear OS form factor
       (answers in `PLAY_CONSOLE_ANSWERS.md`).
