@@ -12,6 +12,15 @@ class CoachStats {
     var freestyleCalls = 0
         private set
 
+    // Punches called in each round; warm-up calls (before the first
+    // startRound()) count toward the totals only.
+    private val perRound = mutableListOf<Int>()
+
+    /** Opens a new per-round bucket; [CoachSession.startRound] calls this. */
+    fun startRound() {
+        perRound.add(0)
+    }
+
     fun record(command: CoachCommand) {
         when (command.section) {
             CoachSection.ATTACK -> attackCalls++
@@ -22,6 +31,7 @@ class CoachStats {
         command.parts.forEach { part ->
             if (part is CommandPart.Punch) {
                 punchCounts[part.number - 1]++
+                if (perRound.isNotEmpty()) perRound[perRound.lastIndex]++
             }
         }
     }
@@ -32,4 +42,7 @@ class CoachStats {
 
     /** `"1:count,2:count,...,6:count"` — compact form for storage in [Training.punchBreakdown]. */
     fun serializeBreakdown(): String = (1..6).joinToString(",") { "$it:${punchCount(it)}" }
+
+    /** Punches per round as `"38,41,35"` for [Training.roundPunches]; null if no round started. */
+    fun serializeRoundPunches(): String? = perRound.takeIf { it.isNotEmpty() }?.joinToString(",")
 }

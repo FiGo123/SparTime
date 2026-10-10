@@ -13,7 +13,9 @@ import com.example.boombee.coach.Difficulty
 import com.example.boombee.coach.TrainingMode
 import com.example.boombee.coach.VoiceStyle
 import com.example.boombee.data.DBHandler
-import com.example.boombee.data.models.Training
+import com.example.boombee.data.TrainingRecords
+import com.example.boombee.history.EffortPrompt
+import com.example.boombee.history.EffortSheet
 import com.example.boombee.databinding.FragmentFirstBinding
 import com.example.boombee.survey.SurveyRepository
 import com.example.boombee.survey.SurveySheet
@@ -24,8 +26,6 @@ import com.example.boombee.viewmodel.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.example.boombee.analytics.Analytics
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 /**
  * A simple [Fragment] subclass.
@@ -76,7 +76,13 @@ class First : Fragment() {
         super.onResume()
         val context = requireContext()
         SurveyRepository.flush(context)
-        if (SurveyTrigger.consumePending(context)) SurveySheet.show(childFragmentManager, fromSettings = false)
+        // Rate the session just finished first; the survey waits for the next visit.
+        val effortId = EffortPrompt.consumePending(context)
+        if (effortId != null) {
+            EffortSheet.show(childFragmentManager, effortId)
+        } else if (SurveyTrigger.consumePending(context)) {
+            SurveySheet.show(childFragmentManager, fromSettings = false)
+        }
     }
 
     // Asked once, on the first launch; changeable later in Settings.
@@ -228,37 +234,31 @@ class First : Fragment() {
     }
     
     private fun saveInterruptedTraining() {
-        val db = DBHandler(requireContext())
-        val currentTime = getCurrentDateTime()
-
-        val currentRound = mainViewModel.currentRound.value ?: 0
+        val currentRound = mainViewModel.currentRound.value ?: 1
         val roundLength = mainViewModel.roundLengthInMin.value ?: 0
-        val difficulty = mainViewModel.getSelectedDifficulty()
-        val trainingType = mainViewModel.trainingType.value ?: "Custom"
-
-        val title = when (trainingType) {
-            "BOXING" -> "Boxing Training"
-            "MMA" -> "MMA Training"
-            else -> "Custom Training"
-        }
-        val mode = mainViewModel.trainingMode.value ?: TrainingMode.TIMER_ONLY
-        val stats = mainViewModel.coachSession?.stats
-
-        val training = Training(
-            title,
-            currentTime,
-            currentRound,
-            roundLength,
-            difficulty,
-            "Interrupted at round $currentRound",
-            trainingMode = mode.name,
-            coachDifficulty = mainViewModel.coachDifficulty.value?.name,
-            totalPunches = stats?.totalPunches() ?: 0,
-            totalCombos = stats?.attackCalls ?: 0,
-            totalTacticalCommands = (stats?.defenseCalls ?: 0) + (stats?.distanceCalls ?: 0),
-            punchBreakdown = stats?.serializeBreakdown(),
+        val secondsLeft = mainViewModel.leftTime.value ?: 0
+        // Full rounds before this one, plus the part of this round that ran.
+        val activeSeconds = (currentRound - 1).coerceAtLeast(0) * roundLength * 60 +
+            (roundLength * 60 - secondsLeft).coerceIn(0, roundLength * 60)
+        val training = TrainingRecords.build(
+            trainingType = mainViewModel.trainingType.value ?: "Custom",
+            mode = mainViewModel.trainingMode.value ?: TrainingMode.TIMER_ONLY,
+            coachDifficulty = mainViewModel.coachDifficulty.value,
+            voiceStyle = mainViewModel.voiceStyle.value,
+            platform = "phone",
+            startedAt = mainViewModel.sessionStartedAt.takeIf { it > 0 } ?: System.currentTimeMillis(),
+            activeSeconds = activeSeconds,
+            plannedRounds = mainViewModel.numOfRounds.value ?: currentRound,
+            roundsReached = currentRound,
+            roundMinutes = roundLength,
+            restSeconds = (mainViewModel.pauseLengthInMin.value ?: 0) * 60,
+            warmupSeconds = mainViewModel.warmupSeconds.value ?: 0,
+            completed = false,
+            stats = mainViewModel.coachSession?.stats,
         )
-        db.insertData(training)
+        val id = DBHandler(requireContext()).insertData(training)
+        // A session stopped in the first minute isn't worth rating.
+        if (activeSeconds >= 60) EffortPrompt.markPending(requireContext(), id)
     }
     
     private fun observeViewModel() {
@@ -319,10 +319,4 @@ class First : Fragment() {
         binding.roundTimeValue.text = time.toString()
     }
 
-
-    fun getCurrentDateTime(): String {
-        val currentDateTime = LocalDateTime.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        return currentDateTime.format(formatter)
-    }
 }

@@ -112,6 +112,7 @@ fun BoomBeeWearApp(service: RoundTimerService, isAmbient: Boolean) {
     DisposableEffect(Unit) { onDispose { clipPlayer.shutdown() } }
 
     val timerState by service.state.collectAsState()
+    val pendingEffortId by service.pendingEffortId.collectAsState()
     val activeState = timerState
 
     if (activeState != null) {
@@ -119,7 +120,19 @@ fun BoomBeeWearApp(service: RoundTimerService, isAmbient: Boolean) {
             state = activeState,
             isAmbient = isAmbient,
             onPauseToggle = { service.togglePause() },
-            onStop = { service.stop() },
+            onStop = { service.stopByUser() },
+        )
+        return
+    }
+
+    // Right after a session is saved: "How hard was that?"
+    pendingEffortId?.let { trainingId ->
+        EffortScreen(
+            onSave = { effort ->
+                dbHandler.updateEffort(trainingId, effort, null)
+                service.clearPendingEffort()
+            },
+            onSkip = { service.clearPendingEffort() },
         )
         return
     }

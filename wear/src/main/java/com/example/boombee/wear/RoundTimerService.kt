@@ -16,7 +16,7 @@ import com.example.boombee.coach.Difficulty
 import com.example.boombee.coach.TrainingMode
 import com.example.boombee.coach.VoiceStyle
 import com.example.boombee.data.DBHandler
-import com.example.boombee.data.models.Training
+import com.example.boombee.data.TrainingRecords
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -26,8 +26,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 /**
  * Owns the round/rest countdown as a foreground service instead of Activity
@@ -75,6 +73,20 @@ class RoundTimerService : Service() {
     private val _state = MutableStateFlow<RoundTimerState?>(null)
     val state: StateFlow<RoundTimerState?> = _state
 
+    // History record for the running session (see TrainingRecords).
+    private var sessionStartedAt = 0L
+    private var activeSeconds = 0
+    private var warmupSecondsUsed = 0
+    private var roundReached = 0
+
+    /** Session just saved and waiting for its effort rating; the UI clears it via [clearPendingEffort]. */
+    private val _pendingEffortId = MutableStateFlow<Long?>(null)
+    val pendingEffortId: StateFlow<Long?> = _pendingEffortId
+
+    fun clearPendingEffort() {
+        _pendingEffortId.value = null
+    }
+
     override fun onCreate() {
         super.onCreate()
         announcer = RoundAnnouncer(this)
@@ -99,6 +111,11 @@ class RoundTimerService : Service() {
         mode = trainingMode
         coachDifficulty = difficulty
         coachVoiceStyle = voiceStyle
+        sessionStartedAt = System.currentTimeMillis()
+        activeSeconds = 0
+        warmupSecondsUsed = if (trainingMode == TrainingMode.BOXING_COACH) warmupSeconds else 0
+        roundReached = 1
+        _pendingEffortId.value = null
         coachSession = if (trainingMode == TrainingMode.BOXING_COACH) {
             CoachSession(this, difficulty ?: Difficulty.BEGINNER)
         } else {
@@ -116,6 +133,12 @@ class RoundTimerService : Service() {
     fun togglePause() {
         _state.update { it?.copy(isPaused = !it.isPaused) }
         _state.value?.let { pushOngoingStatus(it) }
+    }
+
+    /** Stop pressed: keeps the session in history (as stopped) once a minute of rounds was done. */
+    fun stopByUser() {
+        if (_state.value != null && activeSeconds >= MIN_SAVED_ACTIVE_SECONDS) saveTraining(completed = false)
+        stop()
     }
 
     fun stop() {
@@ -154,6 +177,7 @@ class RoundTimerService : Service() {
             remainingSeconds = durationMinutes * 60,
             isPaused = false,
         )
+        if (phase == TimerPhase.ROUND) roundReached = roundNumber
         if (phase == TimerPhase.ROUND) {
             announcer.announcePhrase("Round $roundNumber", listOf("misc_round", "number_$roundNumber"))
         } else {
@@ -210,6 +234,7 @@ class RoundTimerService : Service() {
                         }
                     }
                     _state.update { it?.copy(remainingSeconds = it.remainingSeconds - 1) }
+                    if (phase == TimerPhase.ROUND) activeSeconds++
                 }
                 delay(1000)
             }
@@ -312,7 +337,7 @@ class RoundTimerService : Service() {
     private fun onPhaseFinished(phase: TimerPhase, roundNumber: Int) {
         if (phase == TimerPhase.ROUND) {
             if (roundNumber >= config.rounds) {
-                saveTraining()
+                saveTraining(completed = true)
                 stop()
             } else {
                 runPhase(TimerPhase.REST, roundNumber + 1)
@@ -322,30 +347,25 @@ class RoundTimerService : Service() {
         }
     }
 
-    private fun saveTraining() {
-        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-        val stats = coachSession?.stats
-        val description = if (mode == TrainingMode.BOXING_COACH) "Completed boxing coach session" else "Completed training"
-        val title = when (trainingType) {
-            "BOXING" -> "Boxing Training"
-            "MMA" -> "MMA Training"
-            else -> "Custom Training"
-        }
-        val training = Training(
-            title,
-            time,
-            config.rounds,
-            config.roundMinutes,
-            3,
-            description,
-            trainingMode = mode.name,
-            coachDifficulty = coachDifficulty?.name,
-            totalPunches = stats?.totalPunches() ?: 0,
-            totalCombos = stats?.attackCalls ?: 0,
-            totalTacticalCommands = (stats?.defenseCalls ?: 0) + (stats?.distanceCalls ?: 0),
-            punchBreakdown = stats?.serializeBreakdown(),
+    private fun saveTraining(completed: Boolean) {
+        val training = TrainingRecords.build(
+            trainingType = trainingType,
+            mode = mode,
+            coachDifficulty = coachDifficulty,
+            voiceStyle = coachVoiceStyle,
+            platform = "watch",
+            startedAt = sessionStartedAt,
+            activeSeconds = activeSeconds,
+            plannedRounds = config.rounds,
+            roundsReached = if (completed) config.rounds else roundReached,
+            roundMinutes = config.roundMinutes,
+            restSeconds = config.restMinutes * 60,
+            warmupSeconds = warmupSecondsUsed,
+            completed = completed,
+            stats = coachSession?.stats,
         )
-        dbHandler.insertData(training)
+        val id = dbHandler.insertData(training)
+        if (id > 0) _pendingEffortId.value = id
     }
 
     override fun onDestroy() {
@@ -427,6 +447,7 @@ class RoundTimerService : Service() {
         private const val CHANNEL_ID = "boombee_training"
         private const val NOTIFICATION_ID = 1
         private const val ANNOUNCE_LEAD_MS = 2500L
+        private const val MIN_SAVED_ACTIVE_SECONDS = 60
         private const val ROUND_START_COACH_GRACE_MS = 6000L
         // Extra silence after the bell (on top of playBell() already
         // waiting for its own tone) before the next phase's "Round X"/

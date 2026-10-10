@@ -1,5 +1,7 @@
 package com.example.boombee
 
+import com.example.boombee.data.TrainingRecords
+import com.example.boombee.history.EffortPrompt
 import com.example.boombee.analytics.Analytics
 import android.media.AudioManager
 import android.media.ToneGenerator
@@ -31,8 +33,6 @@ import com.example.boombee.data.models.Training
 import com.example.boombee.databinding.FragmentSecondBinding
 import com.example.boombee.survey.SurveyTrigger
 import com.example.boombee.viewmodel.MainViewModel
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class Second : Fragment() {
@@ -402,32 +402,25 @@ class Second : Fragment() {
     }
 
     private fun saveTraining() {
-        val db = DBHandler(requireContext())
-        val time = getCurrentDateTime()
-        val trainingType = mainViewModel.trainingType.value ?: "Custom"
         val mode = mainViewModel.trainingMode.value ?: TrainingMode.TIMER_ONLY
-        val stats = mainViewModel.coachSession?.stats
-        val title = when (trainingType) {
-            "BOXING" -> "Boxing Training"
-            "MMA" -> "MMA Training"
-            else -> "Custom Training"
-        }
-        val description = if (mode == TrainingMode.BOXING_COACH) "Completed boxing coach session" else "Completed training"
-        val training = Training(
-            title,
-            time,
-            roundNum,
-            roundLength,
-            3,
-            description,
-            trainingMode = mode.name,
-            coachDifficulty = mainViewModel.coachDifficulty.value?.name,
-            totalPunches = stats?.totalPunches() ?: 0,
-            totalCombos = stats?.attackCalls ?: 0,
-            totalTacticalCommands = (stats?.defenseCalls ?: 0) + (stats?.distanceCalls ?: 0),
-            punchBreakdown = stats?.serializeBreakdown(),
+        val training = TrainingRecords.build(
+            trainingType = mainViewModel.trainingType.value ?: "Custom",
+            mode = mode,
+            coachDifficulty = mainViewModel.coachDifficulty.value,
+            voiceStyle = mainViewModel.voiceStyle.value,
+            platform = "phone",
+            startedAt = mainViewModel.sessionStartedAt.takeIf { it > 0 } ?: System.currentTimeMillis(),
+            activeSeconds = roundNum * roundLength * 60,
+            plannedRounds = roundNum,
+            roundsReached = roundNum,
+            roundMinutes = roundLength,
+            restSeconds = (mainViewModel.pauseLengthInMin.value ?: 0) * 60,
+            warmupSeconds = mainViewModel.warmupSeconds.value ?: 0,
+            completed = true,
+            stats = mainViewModel.coachSession?.stats,
         )
-        db.insertData(training)
+        val id = DBHandler(requireContext()).insertData(training)
+        EffortPrompt.markPending(requireContext(), id)
         Analytics.log(requireContext(), "training_complete", *Analytics.trainingParams(mainViewModel))
         SurveyTrigger.onTrainingCompleted(requireContext())
         findNavController().navigate(R.id.action_second_to_first)
@@ -602,10 +595,6 @@ class Second : Fragment() {
         } catch (e: Exception) { /* no-op */ }
     }
 
-    private fun getCurrentDateTime(): String {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        return LocalDateTime.now().format(formatter)
-    }
 
     override fun onDestroy() {
         super.onDestroy()

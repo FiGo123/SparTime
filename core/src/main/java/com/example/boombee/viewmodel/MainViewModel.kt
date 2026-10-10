@@ -81,7 +81,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _coachDifficulty.value = difficulty
     }
 
+    /** Epoch millis of the current session's Start, for the history record. */
+    var sessionStartedAt: Long = 0L
+        private set
+
     fun resetCoachSession() {
+        sessionStartedAt = System.currentTimeMillis()
         Log.d(
             "boombeelogs",
             "resetCoachSession: mode=${_trainingMode.value} difficulty=${_coachDifficulty.value} warmupSeconds=${_warmupSeconds.value} voiceStyle=${_voiceStyle.value}"

@@ -84,6 +84,18 @@
         <action
             android:id="@+id/action_historyTraining_to_first"
             app:destination="@id/first" />
+        <action
+            android:id="@+id/action_historyTraining_to_sessionDetail"
+            app:destination="@id/sessionDetail" />
+    </fragment>
+    <fragment
+        android:id="@+id/sessionDetail"
+        android:name="com.example.boombee.history.SessionDetailFragment"
+        android:label="session_detail"
+        tools:layout="@layout/fragment_session_detail">
+        <argument
+            android:name="trainingId"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/dialog"

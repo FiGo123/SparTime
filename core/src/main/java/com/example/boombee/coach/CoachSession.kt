@@ -118,6 +118,7 @@ class CoachSession(
 
     /** Call once at the start of each round (not Rest) — resets ramp/range/freestyle state and rolls a fresh freestyle window. */
     fun startRound(roundNumber: Int, roundDurationSeconds: Int) {
+        stats.startRound()
         isFirstCommandOfRound = true
         currentRoundNumber = roundNumber
         elapsedInRoundMs = 0L

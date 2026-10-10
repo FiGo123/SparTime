@@ -15,12 +15,15 @@ import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.TimeTextDefaults
 import com.example.boombee.data.DBHandler
+import com.example.boombee.data.HistoryStats
+import com.example.boombee.wear.ui.theme.darkChipColors
+import java.time.format.DateTimeFormatter
 
 private val BeeYellow = Color(0xFFFFC107)
 
 @Composable
 fun HistoryScreen(dbHandler: DBHandler, onBack: () -> Unit) {
-    val trainings = remember { dbHandler.getAllTraining() }
+    val trainings = remember { HistoryStats.sorted(dbHandler.getAllTraining()) }
 
     Scaffold(timeText = { TimeText(timeTextStyle = TimeTextDefaults.timeTextStyle(color = BeeYellow)) }) {
         ScalingLazyColumn(
@@ -32,16 +35,19 @@ fun HistoryScreen(dbHandler: DBHandler, onBack: () -> Unit) {
                 item { Text("No sessions yet") }
             } else {
                 items(trainings) { training ->
-                    val base = "${training.date} · ${training.numberOfRounds}x${training.roundDuration}m"
-                    val detail = if (training.trainingMode == "BOXING_COACH") {
-                        "$base · ${training.coachDifficulty?.lowercase()?.replaceFirstChar { it.uppercase() }} · ${training.totalPunches} punches"
-                    } else {
-                        base
-                    }
+                    val start = HistoryStats.startTime(training).format(DateTimeFormatter.ofPattern("EEE d MMM HH:mm"))
+                    val rounds = if (training.completed) "${training.numberOfRounds} rds" else "${training.numberOfRounds}/${training.plannedRoundsOrDone()} rds"
+                    val detail = listOfNotNull(
+                        rounds,
+                        HistoryStats.formatDuration(training.activeSecondsOrEstimate()),
+                        if (training.isCoach && training.totalPunches > 0) "${training.totalPunches} punches" else null,
+                        training.effort?.let { "effort $it" },
+                    ).joinToString(" · ")
                     Chip(
-                        label = { Text(training.title) },
-                        secondaryLabel = { Text(detail) },
+                        label = { Text(start + if (training.completed) "" else " · stopped") },
+                        secondaryLabel = { Text(detail, maxLines = 2) },
                         onClick = {},
+                        colors = darkChipColors(),
                     )
                 }
             }

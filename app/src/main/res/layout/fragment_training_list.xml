@@ -16,7 +16,7 @@
         android:gravity="center_horizontal"
         android:text="Training History"
         android:textColor="@color/white"
-        android:textSize="32sp"
+        android:textSize="28sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -54,6 +54,7 @@
         android:layout_marginBottom="16dp"
         android:fontFamily="sans-serif-black"
         android:text="Back"
+        android:textColor="@color/white"
         android:textSize="18sp"
         app:backgroundTint="@color/surface"
         app:cornerRadius="30dp"

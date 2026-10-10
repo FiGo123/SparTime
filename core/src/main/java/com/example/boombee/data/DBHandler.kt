@@ -2,6 +2,7 @@ package com.example.boombee.data
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
@@ -25,7 +26,40 @@ val COL_TOTAL_COMBOS = "totalCombos"
 val COL_TOTAL_TACTICAL_COMMANDS = "totalTacticalCommands"
 val COL_PUNCH_BREAKDOWN = "punchBreakdown"
 
-private const val DATABASE_VERSION = 2
+// History v3 columns — added in DATABASE_VERSION 3 (see Training).
+val COL_STARTED_AT = "startedAt"
+val COL_ACTIVE_SECONDS = "activeSeconds"
+val COL_PLANNED_ROUNDS = "plannedRounds"
+val COL_COMPLETED = "completed"
+val COL_REST_SECONDS = "restSeconds"
+val COL_WARMUP_SECONDS = "warmupSeconds"
+val COL_VOICE_STYLE = "voiceStyle"
+val COL_PLATFORM = "platform"
+val COL_DEFENSE_CALLS = "defenseCalls"
+val COL_DISTANCE_CALLS = "distanceCalls"
+val COL_FREESTYLE_CALLS = "freestyleCalls"
+val COL_ROUND_PUNCHES = "roundPunches"
+val COL_EFFORT = "effort"
+val COL_NOTES = "notes"
+
+private val V3_COLUMNS = listOf(
+    COL_STARTED_AT to "INTEGER",
+    COL_ACTIVE_SECONDS to "INTEGER",
+    COL_PLANNED_ROUNDS to "INTEGER",
+    COL_COMPLETED to "INTEGER",
+    COL_REST_SECONDS to "INTEGER",
+    COL_WARMUP_SECONDS to "INTEGER",
+    COL_VOICE_STYLE to "VARCHAR(32)",
+    COL_PLATFORM to "VARCHAR(16)",
+    COL_DEFENSE_CALLS to "INTEGER",
+    COL_DISTANCE_CALLS to "INTEGER",
+    COL_FREESTYLE_CALLS to "INTEGER",
+    COL_ROUND_PUNCHES to "VARCHAR(512)",
+    COL_EFFORT to "INTEGER",
+    COL_NOTES to "TEXT",
+)
+
+private const val DATABASE_VERSION = 3
 
 class DBHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     override fun onCreate(p0: SQLiteDatabase?) {
@@ -42,7 +76,8 @@ class DBHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME,
                 COL_TOTAL_PUNCHES + " INTEGER, " +
                 COL_TOTAL_COMBOS + " INTEGER, " +
                 COL_TOTAL_TACTICAL_COMMANDS + " INTEGER, " +
-                COL_PUNCH_BREAKDOWN + " VARCHAR(128))"
+                COL_PUNCH_BREAKDOWN + " VARCHAR(128), " +
+                V3_COLUMNS.joinToString(", ") { (name, type) -> "$name $type" } + ")"
 
         p0?.execSQL(createTable)
     }
@@ -56,9 +91,13 @@ class DBHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME,
             db?.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COL_TOTAL_TACTICAL_COMMANDS INTEGER")
             db?.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $COL_PUNCH_BREAKDOWN VARCHAR(128)")
         }
+        if (oldVersion < 3) {
+            V3_COLUMNS.forEach { (name, type) -> db?.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $name $type") }
+        }
     }
 
-    fun insertData(training: Training) {
+    /** Inserts [training] and returns its new row id (-1 on failure). */
+    fun insertData(training: Training): Long {
         val db = this.writableDatabase
         val cv = ContentValues()
         cv.put(COL_TITLE, training.title)
@@ -73,8 +112,32 @@ class DBHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME,
         cv.put(COL_TOTAL_COMBOS, training.totalCombos)
         cv.put(COL_TOTAL_TACTICAL_COMMANDS, training.totalTacticalCommands)
         cv.put(COL_PUNCH_BREAKDOWN, training.punchBreakdown)
-        db.insert(TABLE_NAME, null, cv)
+        cv.put(COL_STARTED_AT, training.startedAt)
+        cv.put(COL_ACTIVE_SECONDS, training.activeSeconds)
+        cv.put(COL_PLANNED_ROUNDS, training.plannedRounds)
+        cv.put(COL_COMPLETED, if (training.completed) 1 else 0)
+        cv.put(COL_REST_SECONDS, training.restSeconds)
+        cv.put(COL_WARMUP_SECONDS, training.warmupSeconds)
+        cv.put(COL_VOICE_STYLE, training.voiceStyle)
+        cv.put(COL_PLATFORM, training.platform)
+        cv.put(COL_DEFENSE_CALLS, training.defenseCalls)
+        cv.put(COL_DISTANCE_CALLS, training.distanceCalls)
+        cv.put(COL_FREESTYLE_CALLS, training.freestyleCalls)
+        cv.put(COL_ROUND_PUNCHES, training.roundPunches)
+        training.effort?.let { cv.put(COL_EFFORT, it) }
+        cv.put(COL_NOTES, training.notes)
+        return db.insert(TABLE_NAME, null, cv)
     }
+
+    /** Saves the post-session effort rating (1–10, null clears it) and notes. */
+    fun updateEffort(id: Long, effort: Int?, notes: String?) {
+        val cv = ContentValues()
+        if (effort != null) cv.put(COL_EFFORT, effort) else cv.putNull(COL_EFFORT)
+        cv.put(COL_NOTES, notes?.trim()?.takeIf { it.isNotEmpty() })
+        writableDatabase.update(TABLE_NAME, cv, "$COL_ID = ?", arrayOf(id.toString()))
+    }
+
+    fun getTraining(id: Long): Training? = getAllTraining().firstOrNull { it.id.toLong() == id }
 
     fun deleteTraining(id: Int) {
         val db = this.writableDatabase
@@ -172,6 +235,7 @@ class DBHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME,
                         punchBreakdown,
                     )
                     training.id = id
+                    readV3Columns(cursor, training)
                     trainingList.add(training)
                 } while (cursor.moveToNext())
             }
@@ -182,5 +246,26 @@ class DBHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME,
         }
 
         return trainingList
+    }
+
+    private fun readV3Columns(cursor: Cursor, t: Training) {
+        fun int(col: String): Int? = cursor.getColumnIndex(col).takeIf { it != -1 && !cursor.isNull(it) }?.let(cursor::getInt)
+        fun long(col: String): Long? = cursor.getColumnIndex(col).takeIf { it != -1 && !cursor.isNull(it) }?.let(cursor::getLong)
+        fun str(col: String): String? = cursor.getColumnIndex(col).takeIf { it != -1 && !cursor.isNull(it) }?.let(cursor::getString)
+
+        t.startedAt = long(COL_STARTED_AT) ?: 0L
+        t.activeSeconds = int(COL_ACTIVE_SECONDS) ?: 0
+        t.plannedRounds = int(COL_PLANNED_ROUNDS) ?: 0
+        t.completed = (int(COL_COMPLETED) ?: if (t.description.startsWith("Interrupted")) 0 else 1) == 1
+        t.restSeconds = int(COL_REST_SECONDS) ?: 0
+        t.warmupSeconds = int(COL_WARMUP_SECONDS) ?: 0
+        t.voiceStyle = str(COL_VOICE_STYLE)
+        t.platform = str(COL_PLATFORM) ?: "phone"
+        t.defenseCalls = int(COL_DEFENSE_CALLS) ?: 0
+        t.distanceCalls = int(COL_DISTANCE_CALLS) ?: 0
+        t.freestyleCalls = int(COL_FREESTYLE_CALLS) ?: 0
+        t.roundPunches = str(COL_ROUND_PUNCHES)
+        t.effort = int(COL_EFFORT)
+        t.notes = str(COL_NOTES)
     }
 }
