@@ -1,6 +1,9 @@
 package com.example.boombee.wear.ui.theme
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.wear.compose.material.ChipColors
+import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Colors
 import androidx.wear.compose.material.MaterialTheme
 
@@ -19,3 +22,16 @@ fun BoomBeeWearTheme(content: @Composable () -> Unit) {
         content = content
     )
 }
+
+/**
+ * Dark chip for list items under the yellow primary chips. The theme's
+ * secondaryChipColors() renders dark-gray text on dark gray, so set the
+ * content colors explicitly.
+ */
+@Composable
+fun darkChipColors(): ChipColors = ChipDefaults.chipColors(
+    backgroundColor = Color(0xFF2A2A2A),
+    contentColor = Color.White,
+    secondaryContentColor = Color(0xFFFFC107),
+    iconColor = Color.White,
+)

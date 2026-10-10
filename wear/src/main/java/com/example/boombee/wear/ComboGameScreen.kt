@@ -43,6 +43,7 @@ import com.example.boombee.coach.ComboLibrary
 import com.example.boombee.coach.CommandPart
 import com.example.boombee.coach.VoiceStyle
 import com.example.boombee.tutorial.ComboGame
+import com.example.boombee.wear.ui.theme.darkChipColors
 import com.example.boombee.tutorial.ComboGame.TapResult
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -192,7 +193,7 @@ fun ComboGameScreen(clipPlayer: ClipPlayer, voiceStyle: VoiceStyle, onDone: () -
                 CompactChip(
                     label = { Text("🔊") },
                     onClick = { callCurrent(0L) },
-                    colors = ChipDefaults.secondaryChipColors(),
+                    colors = darkChipColors(),
                 )
             }
             PunchColumn(listOf(1, 3, 5), flashes, ::onTap)

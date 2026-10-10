@@ -20,6 +20,7 @@ import androidx.wear.compose.material.TimeTextDefaults
 import com.example.boombee.coach.ClipPlayer
 import com.example.boombee.coach.PunchNaming
 import com.example.boombee.coach.VoiceStyle
+import com.example.boombee.wear.ui.theme.darkChipColors
 
 private val BeeYellow = Color(0xFFFFC107)
 
@@ -65,7 +66,7 @@ fun LearnScreen(
                         label = { Text("$punch · ${PunchNaming.spoken(punch, VoiceStyle.WORDS)}") },
                         secondaryLabel = { Text(if (punch % 2 == 1) "Left hand · tap to hear" else "Right hand · tap to hear") },
                         onClick = { clipPlayer.play(listOf("number_$punch", "word_$punch"), gapMs = 450L) },
-                        colors = ChipDefaults.secondaryChipColors(),
+                        colors = darkChipColors(),
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }

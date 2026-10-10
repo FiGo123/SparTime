@@ -127,7 +127,6 @@ fun SetupScreen(
                     label = { Text("Learn punches") },
                     secondaryLabel = { Text("Numbers + combo game") },
                     onClick = onLearn,
-                    colors = ChipDefaults.secondaryChipColors(),
                 )
             }
             item {
