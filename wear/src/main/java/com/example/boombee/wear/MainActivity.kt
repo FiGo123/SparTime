@@ -29,6 +29,7 @@ import com.example.boombee.coach.VoiceStyle
 import com.example.boombee.data.DBHandler
 import com.example.boombee.data.Dao
 import com.example.boombee.data.PreferencesProvider
+import com.example.boombee.data.models.Training
 import com.example.boombee.wear.ui.theme.BoomBeeWearTheme
 
 /**
@@ -60,6 +61,7 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         super.onCreate(savedInstanceState)
 
         AmbientModeSupport.attach(this)
+        CrashReports.apply(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
@@ -109,6 +111,9 @@ fun BoomBeeWearApp(service: RoundTimerService, isAmbient: Boolean) {
     var screen by remember { mutableStateOf(WearScreen.Setup) }
     val clipPlayer = remember { ClipPlayer(context) }
     var learnVoiceStyle by remember { mutableStateOf(VoiceStyle.WORDS) }
+    var crashConsentAsked by remember { mutableStateOf(CrashReports.consent(context) != null) }
+    var openTraining by remember { mutableStateOf<Training?>(null) }
+    var editingEffort by remember { mutableStateOf(false) }
     DisposableEffect(Unit) { onDispose { clipPlayer.shutdown() } }
 
     val timerState by service.state.collectAsState()
@@ -134,6 +139,14 @@ fun BoomBeeWearApp(service: RoundTimerService, isAmbient: Boolean) {
             },
             onSkip = { service.clearPendingEffort() },
         )
+        return
+    }
+
+    if (!crashConsentAsked) {
+        CrashConsentScreen { granted ->
+            CrashReports.setConsent(context, granted)
+            crashConsentAsked = true
+        }
         return
     }
 
@@ -188,9 +201,40 @@ fun BoomBeeWearApp(service: RoundTimerService, isAmbient: Boolean) {
             )
         }
 
+        WearScreen.SessionDetail -> {
+            val training = openTraining
+            when {
+                training == null -> screen = WearScreen.History
+                editingEffort -> EffortScreen(
+                    initial = training.effort ?: 6,
+                    skipLabel = "Cancel",
+                    onSave = { effort ->
+                        dbHandler.updateEffort(training.id.toLong(), effort, training.notes)
+                        openTraining = dbHandler.getTraining(training.id.toLong())
+                        editingEffort = false
+                    },
+                    onSkip = { editingEffort = false },
+                )
+                else -> SessionDetailScreen(
+                    training = training,
+                    onEditEffort = { editingEffort = true },
+                    onDelete = {
+                        dbHandler.deleteTraining(training.id)
+                        openTraining = null
+                        screen = WearScreen.History
+                    },
+                    onBack = { screen = WearScreen.History },
+                )
+            }
+        }
+
         WearScreen.History -> {
             HistoryScreen(
                 dbHandler = dbHandler,
+                onOpen = {
+                    openTraining = it
+                    screen = WearScreen.SessionDetail
+                },
                 onBack = { screen = WearScreen.Setup },
             )
         }

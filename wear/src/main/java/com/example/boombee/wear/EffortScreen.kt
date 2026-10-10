@@ -35,20 +35,13 @@ import androidx.wear.compose.material.Text
 import com.example.boombee.data.HistoryStats
 import com.example.boombee.wear.ui.theme.darkChipColors
 
-private fun effortColor(effort: Int) = when (effort) {
-    in 1..4 -> Color(0xFF4CAF50)
-    in 5..6 -> Color(0xFFFFC107)
-    in 7..8 -> Color(0xFFFF6F00)
-    else -> Color(0xFFF44336)
-}
-
 /**
  * Post-session "How hard was that?" on the watch: effort 1–10 with − / +
  * or the rotating bezel. Notes are phone-only (no typing on the wrist).
  */
 @Composable
-fun EffortScreen(onSave: (Int) -> Unit, onSkip: () -> Unit) {
-    var effort by remember { mutableIntStateOf(6) }
+fun EffortScreen(onSave: (Int) -> Unit, onSkip: () -> Unit, initial: Int = 6, skipLabel: String = "Skip") {
+    var effort by remember { mutableIntStateOf(initial) }
     var rotaryAccumulated by remember { mutableFloatStateOf(0f) }
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
@@ -92,6 +85,6 @@ fun EffortScreen(onSave: (Int) -> Unit, onSkip: () -> Unit) {
         Spacer(Modifier.height(10.dp))
         Chip(label = { Text("Save") }, onClick = { onSave(effort) })
         Spacer(Modifier.height(4.dp))
-        CompactChip(label = { Text("Skip") }, onClick = onSkip, colors = darkChipColors())
+        CompactChip(label = { Text(skipLabel) }, onClick = onSkip, colors = darkChipColors())
     }
 }

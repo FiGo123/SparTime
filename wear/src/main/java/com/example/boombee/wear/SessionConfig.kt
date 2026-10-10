@@ -20,7 +20,7 @@ fun defaultsFor(trainingType: String?): SessionConfig = when (trainingType) {
  * [WearScreen], since the service (not this local state) is the source of
  * truth once a session starts (see Notes in WEAR_OS_IMPLEMENTATION.md).
  */
-enum class WearScreen { Setup, Settings, History, Learn, ComboGame }
+enum class WearScreen { Setup, Settings, History, SessionDetail, Learn, ComboGame }
 
 enum class TimerPhase { WARMUP, ROUND, REST }
 

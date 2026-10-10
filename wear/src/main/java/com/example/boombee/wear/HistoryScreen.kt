@@ -16,13 +16,14 @@ import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.TimeTextDefaults
 import com.example.boombee.data.DBHandler
 import com.example.boombee.data.HistoryStats
+import com.example.boombee.data.models.Training
 import com.example.boombee.wear.ui.theme.darkChipColors
 import java.time.format.DateTimeFormatter
 
 private val BeeYellow = Color(0xFFFFC107)
 
 @Composable
-fun HistoryScreen(dbHandler: DBHandler, onBack: () -> Unit) {
+fun HistoryScreen(dbHandler: DBHandler, onOpen: (Training) -> Unit, onBack: () -> Unit) {
     val trainings = remember { HistoryStats.sorted(dbHandler.getAllTraining()) }
 
     Scaffold(timeText = { TimeText(timeTextStyle = TimeTextDefaults.timeTextStyle(color = BeeYellow)) }) {
@@ -46,7 +47,7 @@ fun HistoryScreen(dbHandler: DBHandler, onBack: () -> Unit) {
                     Chip(
                         label = { Text(start + if (training.completed) "" else " · stopped") },
                         secondaryLabel = { Text(detail, maxLines = 2) },
-                        onClick = {},
+                        onClick = { onOpen(training) },
                         colors = darkChipColors(),
                     )
                 }

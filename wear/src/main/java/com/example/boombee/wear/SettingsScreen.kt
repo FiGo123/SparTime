@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.material.Chip
@@ -26,6 +27,8 @@ fun SettingsScreen(dao: Dao, onBack: () -> Unit) {
     var soundOn by remember { mutableStateOf(dao.getSoundStatus()) }
     var freestyleOn by remember { mutableStateOf(dao.getFreestyleEnabled()) }
     var tacticalCommandsOn by remember { mutableStateOf(dao.getTacticalCommandsEnabled()) }
+    val context = LocalContext.current
+    var crashReportsOn by remember { mutableStateOf(CrashReports.consent(context) == true) }
 
     Scaffold(timeText = { TimeText(timeTextStyle = TimeTextDefaults.timeTextStyle(color = BeeYellow)) }) {
         ScalingLazyColumn(
@@ -39,6 +42,15 @@ fun SettingsScreen(dao: Dao, onBack: () -> Unit) {
                     onClick = {
                         trainingType = if (trainingType == "MMA") "BOXING" else "MMA"
                         dao.saveDefault(trainingType)
+                    },
+                )
+            }
+            item {
+                Chip(
+                    label = { Text(if (crashReportsOn) "Crash reports: On" else "Crash reports: Off") },
+                    onClick = {
+                        crashReportsOn = !crashReportsOn
+                        CrashReports.setConsent(context, crashReportsOn)
                     },
                 )
             }

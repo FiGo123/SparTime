@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "790279395346",
+    "project_id": "boombee",
+    "storage_bucket": "boombee.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:790279395346:android:aee5eb9c050cb7d00520cb",
+        "android_client_info": {
+          "package_name": "com.filipgolovic.boombee"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgpXkUHHYtWdBkcCYA1WYgNDy2AZQPNaY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
