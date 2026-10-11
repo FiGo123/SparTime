@@ -11,6 +11,7 @@ status**. Each feature has its own detailed doc:
 | C | `RELEASE_AUTO_UPDATE.md` | Play In-App Updates (rework of the existing check) | S |
 | D | `RELEASE_SURVEY.md` | Occasional 1–5 star survey + optional "what should improve" text | M |
 | E | `RELEASE_TUTORIAL.md` | Punch tutorial (1–6, defense, distance) + "tap the combo" mini-game | L |
+| F | `HEART_RATE_ZONES.md` | **After 1.0 (planned 1.1)**: watch heart-rate zones, adaptive coach, safety disclaimer | L |
 
 Created 2026-09-25. Update the checkboxes here as stages complete.
 
@@ -182,6 +183,21 @@ Claude bumps the versions, builds both AABs, uploads them with release
 notes, and you confirm before anything reaches production.
 
 ---
+
+## After 1.0
+
+- **1.1 — Heart-rate zones (watch only)** → `HEART_RATE_ZONES.md`. Built
+  2026-10-11 and installed on the watch for testing. Not part of the 1.0
+  release. Its Play Console items (Data safety: heart rate; `health` FGS type)
+  belong to the 1.1 upload. The safety disclaimer and the new
+  `terms.html` ship with whichever build comes next.
+- **Nice to have, later: optional Pro plan** (in-app purchase or
+  subscription), only if users like the app. Everything free in 1.0 stays
+  free. Ideas: extra coach styles, custom combos/programs, long-term stats,
+  watch → phone sync, voice packs. Needs a Play payments profile (check
+  that Montenegro is a supported payout country), Google Play Billing, and
+  updated privacy policy / Data safety. The 1.0 "free, no ads" choice
+  allows this (only switching to a paid download is impossible).
 
 ## How we work through it
 
