@@ -347,6 +347,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:selectionRequired="true"
+                    app:checkedButton="@id/mode_timer_btn"
                     app:singleSelection="true">
 
                     <com.google.android.material.button.MaterialButton
@@ -355,7 +356,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:checked="true"
                         android:insetLeft="0dp"
                         android:insetRight="0dp"
                         android:minWidth="0dp"
@@ -401,6 +401,7 @@
                     android:layout_height="wrap_content"
                     android:visibility="gone"
                     app:selectionRequired="true"
+                    app:checkedButton="@id/difficulty_beginner_btn"
                     app:singleSelection="true">
 
                     <com.google.android.material.button.MaterialButton
@@ -409,7 +410,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:checked="true"
                         android:text="Beginner"
                         android:textColor="@color/white"
                         android:textSize="10sp"
@@ -470,6 +470,7 @@
                     android:layout_height="wrap_content"
                     android:visibility="gone"
                     app:selectionRequired="true"
+                    app:checkedButton="@id/voice_words_btn"
                     app:singleSelection="true">
 
                     <com.google.android.material.button.MaterialButton
@@ -488,7 +489,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:checked="true"
                         android:text="Words"
                         android:textColor="@color/white"
                         android:textSize="13sp" />
@@ -514,6 +514,7 @@
                     android:layout_height="wrap_content"
                     android:visibility="gone"
                     app:selectionRequired="true"
+                    app:checkedButton="@id/warmup_off_btn"
                     app:singleSelection="true">
 
                     <com.google.android.material.button.MaterialButton
@@ -522,7 +523,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:checked="true"
                         android:text="Off"
                         android:textColor="@color/white"
                         android:textSize="13sp" />
