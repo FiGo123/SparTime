@@ -13,20 +13,21 @@
         android:padding="24dp">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_tutorial"
+            android:id="@+id/btn_settings"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="44dp"
             android:layout_height="44dp"
-            android:contentDescription="@string/tutorial_open"
-            android:fontFamily="sans-serif-black"
+            android:contentDescription="Settings"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:minWidth="0dp"
             android:padding="0dp"
-            android:text="\?"
-            android:textColor="@color/timer_active"
-            android:textSize="20sp"
             app:cornerRadius="22dp"
+            app:icon="@drawable/baseline_settings_24"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="22dp"
+            app:iconTint="@color/timer_active"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:strokeColor="@color/gray_dark" />
@@ -75,17 +76,75 @@
 
         </LinearLayout>
 
+        <!-- This week at a glance; tap opens the History tab. -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/week_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/surface"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header_title">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="18dp"
+                android:paddingVertical="14dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-black"
+                        android:letterSpacing="0.08"
+                        android:text="THIS WEEK"
+                        android:textColor="@color/timer_active"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/week_summary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/white"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/week_streak"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/timer_setup_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="16dp"
             app:cardBackgroundColor="@color/surface"
             app:cardCornerRadius="16dp"
             app:cardElevation="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/header_title">
+            app:layout_constraintTop_toBottomOf="@+id/week_card">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -549,6 +608,19 @@
 
                 </com.google.android.material.button.MaterialButtonToggleGroup>
 
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/show_calls_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Show calls on screen"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    app:thumbTint="@color/timer_active"
+                    app:trackTint="@color/background_secondary" />
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -569,53 +641,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/coach_mode_card" />
 
-        <LinearLayout
-            android:id="@+id/settings_history_row"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/first_fragment_start_btn">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_settings"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="52dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:text="Settings"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                app:icon="@drawable/baseline_settings_24"
-                app:iconGravity="textStart"
-                app:iconPadding="6dp"
-                app:iconSize="18dp"
-                app:iconTint="@color/white"
-                app:strokeColor="@color/gray_dark" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_history"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="52dp"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:text="History"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                app:icon="@android:drawable/ic_menu_recent_history"
-                app:iconGravity="textStart"
-                app:iconPadding="6dp"
-                app:iconSize="18dp"
-                app:iconTint="@color/white"
-                app:strokeColor="@color/gray_dark" />
-
-        </LinearLayout>
-
         <TextView
             android:id="@+id/version_label"
             android:layout_width="wrap_content"
@@ -627,7 +652,7 @@
             android:textSize="11sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/settings_history_row"
+            app:layout_constraintTop_toBottomOf="@id/first_fragment_start_btn"
             tools:text="v2.0.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

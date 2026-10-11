@@ -60,6 +60,43 @@ object TutorialPages {
     )
 }
 
+/** A chapter of the Learn tab's "book": a slice of [TutorialPages.ALL] opened on its own. */
+data class TutorialChapter(val id: String, val title: String, val subtitle: String, val pages: IntRange, val isGame: Boolean = false)
+
+object TutorialChapters {
+    // Indexes into TutorialPages.ALL (0 welcome · 1 stance · 2–7 punches ·
+    // 8 summary · 9 defense · 10 distance · 11 combos · 12 game · 13 done).
+    val ALL = listOf(
+        TutorialChapter("stance", "Stance & guard", "Feet, hands, southpaw", 1..1),
+        TutorialChapter("punches", "Punches 1–6", "Jab to rear uppercut, odd = left", 2..8),
+        TutorialChapter("defense", "Defense", "Slip, duck under, hands up", 9..9),
+        TutorialChapter("distance", "Distance", "Close, make, move", 10..10),
+        TutorialChapter("combos", "How combos sound", "Numbers vs words", 11..11),
+    )
+    val GAME = TutorialChapter("combo_game", "Tap the combo", "Hear it, tap it — 8 combos", 12..12, isGame = true)
+
+    fun byId(id: String?): TutorialChapter? = (ALL + GAME).firstOrNull { it.id == id }
+}
+
+/** Learn-tab progress: chapters read and the combo game's best score. */
+object LearnProgress {
+    private fun key(id: String) = "learn_done_$id"
+    private const val KEY_GAME_BEST = "learn_game_best"
+
+    fun isDone(context: Context, chapterId: String) = PreferencesProvider(context).getBoolean(key(chapterId)) == true
+
+    fun markDone(context: Context, chapterId: String) = PreferencesProvider(context).putBoolean(key(chapterId), true)
+
+    fun markAllDone(context: Context) = TutorialChapters.ALL.forEach { markDone(context, it.id) }
+
+    fun gameBest(context: Context): Int = PreferencesProvider(context).getInt(KEY_GAME_BEST)
+
+    fun recordGame(context: Context, score: Int) {
+        if (score > gameBest(context)) PreferencesProvider(context).putInt(KEY_GAME_BEST, score)
+        markDone(context, TutorialChapters.GAME.id)
+    }
+}
+
 /** Whether the tutorial has been finished or skipped once; it opens automatically on the first Start until then. */
 object TutorialPrefs {
     private const val KEY_SEEN = "tutorial_seen"

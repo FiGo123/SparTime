@@ -154,6 +154,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getTacticalCommandsEnabled(): Boolean = repository.getTacticalCommandsEnabled()
 
+    fun getShowCallsOnScreen(): Boolean = repository.getShowCallsOnScreen()
+
+    fun setShowCallsOnScreen(enabled: Boolean) = repository.saveShowCallsOnScreen(enabled)
+
     fun setTacticalCommandsEnabled(enabled: Boolean) {
         repository.saveTacticalCommandsEnabled(enabled)
     }

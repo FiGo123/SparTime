@@ -13,6 +13,7 @@ import com.example.boombee.coach.Difficulty
 import com.example.boombee.coach.TrainingMode
 import com.example.boombee.coach.VoiceStyle
 import com.example.boombee.data.DBHandler
+import com.example.boombee.data.HistoryStats
 import com.example.boombee.data.TrainingRecords
 import com.example.boombee.history.EffortPrompt
 import com.example.boombee.history.EffortSheet
@@ -23,6 +24,7 @@ import com.example.boombee.survey.SurveyTrigger
 import com.example.boombee.tutorial.TutorialFragment
 import com.example.boombee.tutorial.TutorialPrefs
 import com.example.boombee.viewmodel.MainViewModel
+import java.time.LocalDate
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.example.boombee.analytics.Analytics
@@ -74,6 +76,7 @@ class First : Fragment() {
     
     override fun onResume() {
         super.onResume()
+        bindWeekCard()
         val context = requireContext()
         SurveyRepository.flush(context)
         // Rate the session just finished first; the survey waits for the next visit.
@@ -83,6 +86,19 @@ class First : Fragment() {
         } else if (SurveyTrigger.consumePending(context)) {
             SurveySheet.show(childFragmentManager, fromSettings = false)
         }
+    }
+
+    private fun bindWeekCard() {
+        val all = DBHandler(requireContext()).getAllTraining()
+        val today = LocalDate.now()
+        val week = HistoryStats.totals(HistoryStats.thisWeek(all, today))
+        val streak = HistoryStats.streakDays(all, today)
+        binding.weekSummary.text = if (week.sessions == 0) {
+            "No sessions yet — let's go"
+        } else {
+            "${week.sessions} sessions · ${week.rounds} rounds · ${HistoryStats.formatDuration(week.activeSeconds)}"
+        }
+        binding.weekStreak.text = if (streak > 0) "🔥 $streak" else ""
     }
 
     // Asked once, on the first launch; changeable later in Settings.
@@ -136,14 +152,11 @@ class First : Fragment() {
                     }
                 }
             }
-            btnTutorial.setOnClickListener {
-                it.findNavController().navigate(R.id.action_first_to_tutorial)
-            }
             btnSettings.setOnClickListener {
                 it.findNavController().navigate(R.id.action_first_to_settings)
             }
-            btnHistory.setOnClickListener {
-                it.findNavController().navigate(R.id.action_first_to_historyTraining)
+            weekCard.setOnClickListener {
+                (requireActivity() as MainActivity).selectTab(R.id.historyTraining)
             }
 
             modeToggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
@@ -157,6 +170,7 @@ class First : Fragment() {
                 voiceStyleToggleGroup.visibility = visibility
                 warmupLabel.visibility = visibility
                 warmupToggleGroup.visibility = visibility
+                showCallsSwitch.visibility = visibility
             }
 
             difficultyToggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
@@ -184,6 +198,9 @@ class First : Fragment() {
                 }
                 mainViewModel.setWarmupSeconds(seconds)
             }
+
+            showCallsSwitch.isChecked = mainViewModel.getShowCallsOnScreen()
+            showCallsSwitch.setOnCheckedChangeListener { _, isChecked -> mainViewModel.setShowCallsOnScreen(isChecked) }
 
             roundsMinusBtn.setOnClickListener { stepRounds(-1) }
             roundsPlusBtn.setOnClickListener { stepRounds(1) }

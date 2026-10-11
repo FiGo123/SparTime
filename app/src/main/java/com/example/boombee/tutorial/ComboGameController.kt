@@ -135,6 +135,7 @@ class ComboGameController(
         binding.resultScore.text = context.getString(R.string.tutorial_game_score, game.score, game.total)
         if (!resultLogged) {
             Analytics.log(context, "combo_game_result", "correct" to game.score, "total" to game.total)
+            LearnProgress.recordGame(context, game.score)
             resultLogged = true
         }
         binding.resultMessage.setText(

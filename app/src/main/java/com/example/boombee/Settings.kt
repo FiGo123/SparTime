@@ -65,6 +65,12 @@ class Settings : Fragment() {
             mainViewModel.setTacticalCommandsEnabled(isChecked)
         }
 
+        // Coach: big call text on the round screen
+        binding.checkboxShowCalls.isChecked = mainViewModel.getShowCallsOnScreen()
+        binding.checkboxShowCalls.setOnCheckedChangeListener { _, isChecked ->
+            mainViewModel.setShowCallsOnScreen(isChecked)
+        }
+
         // Coach: Freestyle toggle
         binding.checkboxFreestyle.isChecked = mainViewModel.getFreestyleEnabled()
         binding.checkboxFreestyle.setOnCheckedChangeListener { _, isChecked ->
@@ -88,7 +94,7 @@ class Settings : Fragment() {
         }
 
         binding.tutorialRow.setOnClickListener {
-            it.findNavController().navigate(R.id.action_settings_to_tutorial)
+            (requireActivity() as MainActivity).selectTab(R.id.learn)
         }
 
         binding.feedbackRow.setOnClickListener {
@@ -100,7 +106,7 @@ class Settings : Fragment() {
         }
 
         binding.btnBack.setOnClickListener {
-            it.findNavController().navigate(R.id.action_settings_to_first)
+            it.findNavController().popBackStack()
         }
 
         return binding.root

@@ -15,6 +15,7 @@ class Dao(private val preferencesProvider: PreferencesProvider) {
         private const val KEY_TIME_IF_INTERUPT = "time_if_interupt"
         private const val KEY_FREESTYLE_ENABLED = "coach_freestyle_enabled"
         private const val KEY_TACTICAL_COMMANDS_ENABLED = "coach_tactical_commands_enabled"
+        private const val KEY_SHOW_CALLS_ON_SCREEN = "coach_show_calls_on_screen"
         private const val KEY_AGE = "user_age"
         private const val KEY_HEART_RATE_ENABLED = "heart_rate_enabled"
         private const val KEY_HR_COACHING_ENABLED = "heart_rate_coaching_enabled"
@@ -78,6 +79,11 @@ class Dao(private val preferencesProvider: PreferencesProvider) {
     fun getTacticalCommandsEnabled(): Boolean {
         return preferencesProvider.getBoolean(KEY_TACTICAL_COMMANDS_ENABLED) ?: true
     }
+
+    /** Phone round screen shows each coach call in big text (on by default). */
+    fun getShowCallsOnScreen(): Boolean = preferencesProvider.getBoolean(KEY_SHOW_CALLS_ON_SCREEN) ?: true
+
+    fun saveShowCallsOnScreen(enabled: Boolean) = preferencesProvider.putBoolean(KEY_SHOW_CALLS_ON_SCREEN, enabled)
 
     /** Age for max heart rate (220 − age); null until the user sets it. */
     fun getAge(): Int? = preferencesProvider.getInt(KEY_AGE).takeIf { it > 0 }

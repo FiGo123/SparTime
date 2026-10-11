@@ -11,17 +11,20 @@ import android.os.Handler
 import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
+import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
 import androidx.activity.addCallback
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import com.example.boombee.coach.CallDisplay
 import com.example.boombee.coach.ClipPlayer
 import com.example.boombee.coach.CoachAudio
 import com.example.boombee.coach.CoachCommand
@@ -74,6 +77,7 @@ class Second : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSecondBinding.inflate(inflater, container, false)
+        setupCallDisplay()
         setupNavigation()
         observeViewModel()
         return binding.root
@@ -114,6 +118,7 @@ class Second : Fragment() {
             currentRound.observe(viewLifecycleOwner) { round ->
                 currentRoundNumber = round
                 binding.roundNum.text = "Round $round"
+                binding.callText.text = ""
                 binding.currentRoundIndicator.text = round.toString()
             }
             numOfRounds.observe(viewLifecycleOwner) { rounds ->
@@ -466,6 +471,29 @@ class Second : Fragment() {
         }
     }
 
+    private var showCalls = false
+
+    // Big call text with the timer shrunk to make room — FightFlow-style,
+    // only in Boxing Coach mode with "Show calls on screen" on.
+    private fun setupCallDisplay() {
+        showCalls = mainViewModel.trainingMode.value == TrainingMode.BOXING_COACH && mainViewModel.getShowCallsOnScreen()
+        binding.callText.visibility = if (showCalls) View.VISIBLE else View.GONE
+        if (!showCalls) return
+        binding.callText.text = ""
+        binding.timeCounter.layoutParams = binding.timeCounter.layoutParams.apply { height = (84 * resources.displayMetrics.density).toInt() }
+        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(binding.timeCounter, 32, 64, 2, TypedValue.COMPLEX_UNIT_SP)
+        binding.roundNum.textSize = 32f
+    }
+
+    private fun showCall(command: CoachCommand, voiceStyle: VoiceStyle) {
+        if (!showCalls || !isAdded) return
+        binding.callText.text = CallDisplay.text(command.parts, voiceStyle)
+        // Quick pop so a repeated call still reads as new from across the room.
+        binding.callText.scaleX = 0.85f
+        binding.callText.scaleY = 0.85f
+        binding.callText.animate().scaleX(1f).scaleY(1f).setDuration(150).start()
+    }
+
     /**
      * Speaks [command] using your own recorded voice if every part of it
      * has a clip (see [CoachAudio]/[ClipPlayer]), falling back to TTS
@@ -473,6 +501,7 @@ class Second : Fragment() {
      * just means some commands still use TTS until more clips exist.
      */
     private fun speak(command: CoachCommand, voiceStyle: VoiceStyle, utteranceId: String) {
+        showCall(command, voiceStyle)
         val keys = CoachAudio.keysFor(command.parts, voiceStyle)
         if (keys != null && clipPlayer.hasAllClips(keys)) {
             clipPlayer.playCommand(keys, isCombo = command.parts.size > 1)

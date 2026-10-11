@@ -46,7 +46,6 @@ class HistoryTraining : Fragment() {
         )
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = adapter
-        binding.historyBackBtn.setOnClickListener { findNavController().popBackStack() }
         return binding.root
     }
 

@@ -22,8 +22,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 /**
  * Punch tutorial + "Tap the combo" mini-game (RELEASE_TUTORIAL.md).
  * Opened from Start the first time ([SOURCE_FIRST_RUN] — finishing or
- * skipping goes straight into the training), or from the home "?" button
- * and Settings ([SOURCE_MENU] — finishing goes back).
+ * skipping goes straight into the training), or as a single chapter from
+ * the Learn tab ([ARG_CHAPTER] — finishing marks it read and goes back).
  */
 class TutorialFragment : Fragment() {
 
@@ -33,7 +33,8 @@ class TutorialFragment : Fragment() {
 
     private var clipPlayer: ClipPlayer? = null
     private var adapter: TutorialAdapter? = null
-    private val pages = TutorialPages.ALL
+    private val chapter: TutorialChapter? by lazy { TutorialChapters.byId(arguments?.getString(ARG_CHAPTER)) }
+    private val pages: List<TutorialPage> by lazy { chapter?.let { TutorialPages.ALL.slice(it.pages) } ?: TutorialPages.ALL }
 
     private val source get() = arguments?.getString(ARG_SOURCE) ?: SOURCE_MENU
     private val fromFirstRun get() = source == SOURCE_FIRST_RUN
@@ -57,7 +58,10 @@ class TutorialFragment : Fragment() {
                     clipPlayer = { clipPlayer },
                     voiceStyle = ::voiceStyle,
                     level3Pool = level3Pool,
-                    onContinue = { binding.pager.currentItem += 1 },
+                    onContinue = {
+                        if (binding.pager.currentItem == pages.lastIndex) finish(completed = true)
+                        else binding.pager.currentItem += 1
+                    },
                 )
             },
         )
@@ -76,17 +80,20 @@ class TutorialFragment : Fragment() {
 
         binding.skipBtn.setOnClickListener {
             Analytics.log(requireContext(), "tutorial_skip", "page" to binding.pager.currentItem + 1, "source" to source)
-            finish()
+            finish(completed = false)
         }
         binding.backBtn.setOnClickListener { binding.pager.currentItem -= 1 }
         binding.nextBtn.setOnClickListener {
             if (binding.pager.currentItem == pages.lastIndex) {
-                Analytics.log(requireContext(), "tutorial_complete", "source" to source)
-                finish()
+                Analytics.log(requireContext(), "tutorial_complete", "source" to source, "chapter" to chapter?.id)
+                finish(completed = true)
             } else {
                 binding.pager.currentItem += 1
             }
         }
+        // A one-page chapter needs no page dots, and "Skip" reads as "Close".
+        if (pages.size == 1) binding.dots.visibility = View.INVISIBLE
+        if (chapter != null) binding.skipBtn.text = "Close"
         updateNavButtons(0)
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
@@ -102,7 +109,7 @@ class TutorialFragment : Fragment() {
     private fun updateNavButtons(position: Int) {
         val isLast = position == pages.lastIndex
         binding.backBtn.visibility = if (position == 0) View.INVISIBLE else View.VISIBLE
-        binding.skipBtn.visibility = if (isLast) View.INVISIBLE else View.VISIBLE
+        binding.skipBtn.visibility = if (isLast && chapter == null) View.INVISIBLE else View.VISIBLE
         binding.nextBtn.setText(
             when {
                 !isLast -> R.string.tutorial_next
@@ -110,6 +117,8 @@ class TutorialFragment : Fragment() {
                 else -> R.string.tutorial_finish
             }
         )
+        // The game page has its own Continue button; Next would skip the game.
+        if (chapter?.isGame == true) binding.nextBtn.setText(R.string.tutorial_finish)
     }
 
     private fun voiceStyle(): VoiceStyle = mainViewModel.voiceStyle.value ?: VoiceStyle.WORDS
@@ -124,9 +133,16 @@ class TutorialFragment : Fragment() {
         }
     }
 
-    private fun finish() {
+    private fun finish(completed: Boolean) {
         TutorialPrefs.markSeen(requireContext())
         clipPlayer?.stop()
+        val chapter = chapter
+        if (completed) {
+            when {
+                chapter == null -> LearnProgress.markAllDone(requireContext())
+                !chapter.isGame -> LearnProgress.markDone(requireContext(), chapter.id)
+            }
+        }
         if (fromFirstRun) {
             mainViewModel.resetCoachSession()
             findNavController().navigate(R.id.action_tutorial_to_second)
@@ -146,6 +162,7 @@ class TutorialFragment : Fragment() {
 
     companion object {
         const val ARG_SOURCE = "source"
+        const val ARG_CHAPTER = "chapter"
         const val SOURCE_FIRST_RUN = "first_run"
         const val SOURCE_MENU = "menu"
         private const val SEQUENCE_GAP_MS = 450L
