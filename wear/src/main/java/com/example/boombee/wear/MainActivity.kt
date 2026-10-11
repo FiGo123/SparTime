@@ -8,7 +8,9 @@ import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -114,10 +116,21 @@ fun BoomBeeWearApp(service: RoundTimerService, isAmbient: Boolean) {
     var crashConsentAsked by remember { mutableStateOf(CrashReports.consent(context) != null) }
     var openTraining by remember { mutableStateOf<Training?>(null) }
     var editingEffort by remember { mutableStateOf(false) }
+    var safetyAccepted by remember { mutableStateOf(dao.getSafetyAccepted()) }
+    var heartRateSetupAsked by remember { mutableStateOf(dao.getHeartRateSetupAsked()) }
+    // Bumped after a permission answer so Settings re-reads it.
+    var permissionVersion by remember { mutableStateOf(0) }
+    val heartRatePermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        permissionVersion++
+    }
+    fun requestHeartRate() {
+        if (!HeartRateMonitor.hasPermission(context)) heartRatePermission.launch(HeartRateMonitor.PERMISSION)
+    }
     DisposableEffect(Unit) { onDispose { clipPlayer.shutdown() } }
 
     val timerState by service.state.collectAsState()
     val pendingEffortId by service.pendingEffortId.collectAsState()
+    val lastHeartRate by service.lastHeartRate.collectAsState()
     val activeState = timerState
 
     if (activeState != null) {
@@ -138,6 +151,18 @@ fun BoomBeeWearApp(service: RoundTimerService, isAmbient: Boolean) {
                 service.clearPendingEffort()
             },
             onSkip = { service.clearPendingEffort() },
+            heartRate = lastHeartRate,
+        )
+        return
+    }
+
+    if (!safetyAccepted) {
+        SafetyScreen(
+            onAccept = {
+                dao.saveSafetyAccepted()
+                safetyAccepted = true
+            },
+            onBack = null,
         )
         return
     }
@@ -147,6 +172,27 @@ fun BoomBeeWearApp(service: RoundTimerService, isAmbient: Boolean) {
             CrashReports.setConsent(context, granted)
             crashConsentAsked = true
         }
+        return
+    }
+
+    // Once: age for heart-rate zones, then the heart-rate permission.
+    if (!heartRateSetupAsked) {
+        AgeScreen(
+            initial = dao.getAge(),
+            onSave = { age ->
+                dao.saveAge(age)
+                dao.saveHeartRateEnabled(true)
+                dao.saveHeartRateSetupAsked()
+                heartRateSetupAsked = true
+                requestHeartRate()
+            },
+            onSkip = {
+                dao.saveHeartRateEnabled(false)
+                dao.saveHeartRateSetupAsked()
+                heartRateSetupAsked = true
+            },
+            skipLabel = "Not now",
+        )
         return
     }
 
@@ -172,12 +218,32 @@ fun BoomBeeWearApp(service: RoundTimerService, isAmbient: Boolean) {
         WearScreen.Settings -> {
             SettingsScreen(
                 dao = dao,
+                permissionVersion = permissionVersion,
+                onRequestHeartRate = { requestHeartRate() },
+                onAge = { screen = WearScreen.Age },
+                onSafety = { screen = WearScreen.Safety },
                 onBack = {
                     trainingType = dao.getDefault() ?: "BOXING"
                     config = defaultsFor(trainingType)
                     screen = WearScreen.Setup
                 },
             )
+        }
+
+        WearScreen.Age -> {
+            AgeScreen(
+                initial = dao.getAge(),
+                onSave = { age ->
+                    dao.saveAge(age)
+                    screen = WearScreen.Settings
+                },
+                onSkip = { screen = WearScreen.Settings },
+                skipLabel = "Cancel",
+            )
+        }
+
+        WearScreen.Safety -> {
+            SafetyScreen(onAccept = null, onBack = { screen = WearScreen.Settings })
         }
 
         WearScreen.Learn -> {

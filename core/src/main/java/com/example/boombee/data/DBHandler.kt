@@ -59,7 +59,30 @@ private val V3_COLUMNS = listOf(
     COL_NOTES to "TEXT",
 )
 
-private const val DATABASE_VERSION = 3
+// Heart rate columns — added in DATABASE_VERSION 4 (watch sessions only).
+val COL_HR_AVG = "hrAvg"
+val COL_HR_MAX = "hrMax"
+val COL_HR_MAX_HR = "hrMaxHr"
+val COL_HR_ZONE_SECONDS = "hrZoneSeconds"
+val COL_HR_ROUND_AVG = "hrRoundAvg"
+val COL_HR_ROUND_MAX = "hrRoundMax"
+val COL_HR_ROUND_TARGET = "hrRoundTarget"
+val COL_HR_RECOVERY = "hrRecovery"
+val COL_HR_SAMPLES = "hrSamples"
+
+private val V4_COLUMNS = listOf(
+    COL_HR_AVG to "INTEGER",
+    COL_HR_MAX to "INTEGER",
+    COL_HR_MAX_HR to "INTEGER",
+    COL_HR_ZONE_SECONDS to "VARCHAR(64)",
+    COL_HR_ROUND_AVG to "VARCHAR(256)",
+    COL_HR_ROUND_MAX to "VARCHAR(256)",
+    COL_HR_ROUND_TARGET to "VARCHAR(128)",
+    COL_HR_RECOVERY to "VARCHAR(256)",
+    COL_HR_SAMPLES to "TEXT",
+)
+
+private const val DATABASE_VERSION = 4
 
 class DBHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     override fun onCreate(p0: SQLiteDatabase?) {
@@ -77,7 +100,7 @@ class DBHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME,
                 COL_TOTAL_COMBOS + " INTEGER, " +
                 COL_TOTAL_TACTICAL_COMMANDS + " INTEGER, " +
                 COL_PUNCH_BREAKDOWN + " VARCHAR(128), " +
-                V3_COLUMNS.joinToString(", ") { (name, type) -> "$name $type" } + ")"
+                (V3_COLUMNS + V4_COLUMNS).joinToString(", ") { (name, type) -> "$name $type" } + ")"
 
         p0?.execSQL(createTable)
     }
@@ -93,6 +116,9 @@ class DBHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME,
         }
         if (oldVersion < 3) {
             V3_COLUMNS.forEach { (name, type) -> db?.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $name $type") }
+        }
+        if (oldVersion < 4) {
+            V4_COLUMNS.forEach { (name, type) -> db?.execSQL("ALTER TABLE $TABLE_NAME ADD COLUMN $name $type") }
         }
     }
 
@@ -126,6 +152,15 @@ class DBHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME,
         cv.put(COL_ROUND_PUNCHES, training.roundPunches)
         training.effort?.let { cv.put(COL_EFFORT, it) }
         cv.put(COL_NOTES, training.notes)
+        training.hrAvg?.let { cv.put(COL_HR_AVG, it) }
+        training.hrMax?.let { cv.put(COL_HR_MAX, it) }
+        training.hrMaxHr?.let { cv.put(COL_HR_MAX_HR, it) }
+        cv.put(COL_HR_ZONE_SECONDS, training.hrZoneSeconds)
+        cv.put(COL_HR_ROUND_AVG, training.hrRoundAvg)
+        cv.put(COL_HR_ROUND_MAX, training.hrRoundMax)
+        cv.put(COL_HR_ROUND_TARGET, training.hrRoundTarget)
+        cv.put(COL_HR_RECOVERY, training.hrRecovery)
+        cv.put(COL_HR_SAMPLES, training.hrSamples)
         return db.insert(TABLE_NAME, null, cv)
     }
 
@@ -267,5 +302,14 @@ class DBHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME,
         t.roundPunches = str(COL_ROUND_PUNCHES)
         t.effort = int(COL_EFFORT)
         t.notes = str(COL_NOTES)
+        t.hrAvg = int(COL_HR_AVG)
+        t.hrMax = int(COL_HR_MAX)
+        t.hrMaxHr = int(COL_HR_MAX_HR)
+        t.hrZoneSeconds = str(COL_HR_ZONE_SECONDS)
+        t.hrRoundAvg = str(COL_HR_ROUND_AVG)
+        t.hrRoundMax = str(COL_HR_ROUND_MAX)
+        t.hrRoundTarget = str(COL_HR_ROUND_TARGET)
+        t.hrRecovery = str(COL_HR_RECOVERY)
+        t.hrSamples = str(COL_HR_SAMPLES)
     }
 }

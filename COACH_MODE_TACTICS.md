@@ -582,6 +582,11 @@ multiplicatively with intensity's pace multiplier, so a flow firing
 during a `HIGH` window reads as more urgent still, and one during a `LOW`
 window is slowed down some but not as much as it would without the flow.
 
+**Heart rate (watch, 1.1)**: with a heart-rate reading, the roll is no
+longer purely random. `CoachSession.heartRateBias` weights it toward HIGH
+when you're under the round's target zone and toward LOW when you're over
+it, and forces LOW above 95% of max HR. See [HEART_RATE_ZONES.md](HEART_RATE_ZONES.md).
+
 **Code**: `CoachSession.Intensity` (the enum + its three fields),
 `intensity`/`nextIntensityRollMs` (state, reset in `startRound()`),
 `maybeRollIntensity()` (called once per `nextCommand()`, skipped during

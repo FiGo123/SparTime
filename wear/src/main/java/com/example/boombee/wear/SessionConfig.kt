@@ -20,7 +20,7 @@ fun defaultsFor(trainingType: String?): SessionConfig = when (trainingType) {
  * [WearScreen], since the service (not this local state) is the source of
  * truth once a session starts (see Notes in WEAR_OS_IMPLEMENTATION.md).
  */
-enum class WearScreen { Setup, Settings, History, SessionDetail, Learn, ComboGame }
+enum class WearScreen { Setup, Settings, History, SessionDetail, Learn, ComboGame, Age, Safety }
 
 enum class TimerPhase { WARMUP, ROUND, REST }
 
@@ -31,4 +31,12 @@ data class RoundTimerState(
     val totalRounds: Int,
     val remainingSeconds: Int,
     val isPaused: Boolean,
+    /** Latest heart rate, or null when off, not permitted, or no fresh reading. */
+    val heartRate: Int? = null,
+    /** Zone of [heartRate] (0 = below zone 1). */
+    val zone: Int = 0,
+    /** This round's target zone; 0 = none (rest, warm-up, timer-only, coaching off). */
+    val targetZone: Int = 0,
+    /** Held above 95% of max HR — the screen turns red and the coach eases off. */
+    val overLimit: Boolean = false,
 )

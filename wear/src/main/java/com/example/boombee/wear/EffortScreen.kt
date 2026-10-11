@@ -33,6 +33,7 @@ import androidx.wear.compose.material.CompactChip
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import com.example.boombee.data.HistoryStats
+import com.example.boombee.heartrate.HeartRateSummary
 import com.example.boombee.wear.ui.theme.darkChipColors
 
 /**
@@ -40,7 +41,13 @@ import com.example.boombee.wear.ui.theme.darkChipColors
  * or the rotating bezel. Notes are phone-only (no typing on the wrist).
  */
 @Composable
-fun EffortScreen(onSave: (Int) -> Unit, onSkip: () -> Unit, initial: Int = 6, skipLabel: String = "Skip") {
+fun EffortScreen(
+    onSave: (Int) -> Unit,
+    onSkip: () -> Unit,
+    initial: Int = 6,
+    skipLabel: String = "Skip",
+    heartRate: HeartRateSummary? = null,
+) {
     var effort by remember { mutableIntStateOf(initial) }
     var rotaryAccumulated by remember { mutableFloatStateOf(0f) }
     val focusRequester = remember { FocusRequester() }
@@ -64,6 +71,18 @@ fun EffortScreen(onSave: (Int) -> Unit, onSkip: () -> Unit, initial: Int = 6, sk
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+        heartRate?.let { hr ->
+            val peak = when (hr.peakReached()) {
+                true -> " · peak ✓"
+                false -> " · peak ↓"
+                null -> ""
+            }
+            Text(
+                "♥ avg ${hr.avgBpm} · max ${hr.maxBpm}$peak",
+                style = MaterialTheme.typography.caption3,
+                color = Color.LightGray,
+            )
+        }
         Text("How hard was that?", style = MaterialTheme.typography.caption1)
         Spacer(Modifier.height(6.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {

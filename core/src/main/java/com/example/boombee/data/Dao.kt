@@ -15,6 +15,11 @@ class Dao(private val preferencesProvider: PreferencesProvider) {
         private const val KEY_TIME_IF_INTERUPT = "time_if_interupt"
         private const val KEY_FREESTYLE_ENABLED = "coach_freestyle_enabled"
         private const val KEY_TACTICAL_COMMANDS_ENABLED = "coach_tactical_commands_enabled"
+        private const val KEY_AGE = "user_age"
+        private const val KEY_HEART_RATE_ENABLED = "heart_rate_enabled"
+        private const val KEY_HR_COACHING_ENABLED = "heart_rate_coaching_enabled"
+        private const val KEY_SAFETY_ACCEPTED = "safety_disclaimer_accepted"
+        private const val KEY_HEART_RATE_SETUP_ASKED = "heart_rate_setup_asked"
     }
 
     fun saveIsInProgress(isInProgress: Boolean) {
@@ -73,4 +78,28 @@ class Dao(private val preferencesProvider: PreferencesProvider) {
     fun getTacticalCommandsEnabled(): Boolean {
         return preferencesProvider.getBoolean(KEY_TACTICAL_COMMANDS_ENABLED) ?: true
     }
+
+    /** Age for max heart rate (220 − age); null until the user sets it. */
+    fun getAge(): Int? = preferencesProvider.getInt(KEY_AGE).takeIf { it > 0 }
+
+    fun saveAge(age: Int) = preferencesProvider.putInt(KEY_AGE, age)
+
+    /** Heart rate recording during sessions (watch). */
+    fun getHeartRateEnabled(): Boolean = preferencesProvider.getBoolean(KEY_HEART_RATE_ENABLED) ?: true
+
+    fun saveHeartRateEnabled(enabled: Boolean) = preferencesProvider.putBoolean(KEY_HEART_RATE_ENABLED, enabled)
+
+    /** Coach adapts to heart-rate zones (Coach mode on the watch). */
+    fun getHeartRateCoachingEnabled(): Boolean = preferencesProvider.getBoolean(KEY_HR_COACHING_ENABLED) ?: true
+
+    fun saveHeartRateCoachingEnabled(enabled: Boolean) = preferencesProvider.putBoolean(KEY_HR_COACHING_ENABLED, enabled)
+
+    fun getSafetyAccepted(): Boolean = preferencesProvider.getBoolean(KEY_SAFETY_ACCEPTED) ?: false
+
+    fun saveSafetyAccepted() = preferencesProvider.putBoolean(KEY_SAFETY_ACCEPTED, true)
+
+    /** The one-time "set your age for heart-rate zones" step was shown. */
+    fun getHeartRateSetupAsked(): Boolean = preferencesProvider.getBoolean(KEY_HEART_RATE_SETUP_ASKED) ?: false
+
+    fun saveHeartRateSetupAsked() = preferencesProvider.putBoolean(KEY_HEART_RATE_SETUP_ASKED, true)
 }

@@ -6,17 +6,32 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
+import android.content.pm.ServiceInfo
 import android.os.IBinder
 import android.os.PowerManager
+import android.os.SystemClock
+import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
 import androidx.wear.ongoing.OngoingActivity
 import androidx.wear.ongoing.Status
+import com.example.boombee.coach.CoachCommand
+import com.example.boombee.coach.CoachSection
 import com.example.boombee.coach.CoachSession
+import com.example.boombee.coach.CommandPart
 import com.example.boombee.coach.Difficulty
+import com.example.boombee.coach.Phrases
 import com.example.boombee.coach.TrainingMode
 import com.example.boombee.coach.VoiceStyle
 import com.example.boombee.data.DBHandler
+import com.example.boombee.data.Dao
+import com.example.boombee.data.PreferencesProvider
 import com.example.boombee.data.TrainingRecords
+import com.example.boombee.heartrate.HeartRateBias
+import com.example.boombee.heartrate.HeartRateCoach
+import com.example.boombee.heartrate.HeartRateRecorder
+import com.example.boombee.heartrate.HeartRateSummary
+import com.example.boombee.heartrate.HeartRateZones
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -62,6 +77,14 @@ class RoundTimerService : Service() {
 
     private lateinit var announcer: RoundAnnouncer
     private lateinit var dbHandler: DBHandler
+    private lateinit var dao: Dao
+    private lateinit var heartRateMonitor: HeartRateMonitor
+
+    // Heart rate for the running session (null = off, see startHeartRate()).
+    private var hrRecorder: HeartRateRecorder? = null
+    private var hrCoach: HeartRateCoach? = null
+    private var hrMaxHr = 0
+    private var hrAdaptive = false
 
     private var trainingType: String = "BOXING"
     private var config: SessionConfig = SessionConfig(rounds = 3, roundMinutes = 3, restMinutes = 1)
@@ -83,14 +106,21 @@ class RoundTimerService : Service() {
     private val _pendingEffortId = MutableStateFlow<Long?>(null)
     val pendingEffortId: StateFlow<Long?> = _pendingEffortId
 
+    /** Heart-rate summary of the session just saved, shown above the effort prompt. */
+    private val _lastHeartRate = MutableStateFlow<HeartRateSummary?>(null)
+    val lastHeartRate: StateFlow<HeartRateSummary?> = _lastHeartRate
+
     fun clearPendingEffort() {
         _pendingEffortId.value = null
+        _lastHeartRate.value = null
     }
 
     override fun onCreate() {
         super.onCreate()
         announcer = RoundAnnouncer(this)
         dbHandler = DBHandler(this)
+        dao = Dao(PreferencesProvider(this))
+        heartRateMonitor = HeartRateMonitor(this, scope)
         createNotificationChannel()
     }
 
@@ -116,6 +146,8 @@ class RoundTimerService : Service() {
         warmupSecondsUsed = if (trainingMode == TrainingMode.BOXING_COACH) warmupSeconds else 0
         roundReached = 1
         _pendingEffortId.value = null
+        _lastHeartRate.value = null
+        startHeartRate()
         coachSession = if (trainingMode == TrainingMode.BOXING_COACH) {
             CoachSession(this, difficulty ?: Difficulty.BEGINNER)
         } else {
@@ -144,6 +176,9 @@ class RoundTimerService : Service() {
     fun stop() {
         tickJob?.cancel()
         coachJob?.cancel()
+        heartRateMonitor.stop()
+        hrRecorder = null
+        hrCoach = null
         _state.value = null
         stopForeground(STOP_FOREGROUND_REMOVE)
         releaseWakeLock()
@@ -178,6 +213,15 @@ class RoundTimerService : Service() {
             isPaused = false,
         )
         if (phase == TimerPhase.ROUND) roundReached = roundNumber
+        if (phase == TimerPhase.ROUND) {
+            val target = targetZoneFor(roundNumber)
+            hrRecorder?.startRound(target)
+            hrCoach?.startRound(target, SystemClock.elapsedRealtime())
+            _state.update { it?.copy(targetZone = target) }
+        } else {
+            hrRecorder?.startRest()
+            hrCoach?.stopRound()
+        }
         if (phase == TimerPhase.ROUND) {
             announcer.announcePhrase("Round $roundNumber", listOf("misc_round", "number_$roundNumber"))
         } else {
@@ -235,6 +279,7 @@ class RoundTimerService : Service() {
                     }
                     _state.update { it?.copy(remainingSeconds = it.remainingSeconds - 1) }
                     if (phase == TimerPhase.ROUND) activeSeconds++
+                    tickHeartRate(phase)
                 }
                 delay(1000)
             }
@@ -276,6 +321,7 @@ class RoundTimerService : Service() {
                         break
                     }
                     _state.update { it?.copy(remainingSeconds = it.remainingSeconds - 1) }
+                    tickHeartRate(TimerPhase.WARMUP)
                 }
                 delay(1000)
             }
@@ -317,6 +363,19 @@ class RoundTimerService : Service() {
             val current = _state.value ?: break
             if (current.phase != phase || current.roundNumber != roundNumber) break
             if (!current.isPaused) {
+                val now = SystemClock.elapsedRealtime()
+                val coach = hrCoach
+                if (coach != null) {
+                    val bias = coach.bias(now)
+                    // Coaching off still keeps the safety ease-off.
+                    session.heartRateBias = if (hrAdaptive || bias == HeartRateBias.OVER_LIMIT) bias else HeartRateBias.NONE
+                    val cue = coach.nextCue(now)?.takeIf { hrAdaptive || bias == HeartRateBias.OVER_LIMIT }
+                    if (cue != null) {
+                        speakHeartRateCue(cue)
+                        delay(HR_CUE_DELAY_MS)
+                        continue
+                    }
+                }
                 val command = session.nextCommand(coachVoiceStyle)
                 // null = a deliberately silent beat (freestyle mode) —
                 // nothing to say, just wait out the delay and check again.
@@ -348,6 +407,7 @@ class RoundTimerService : Service() {
     }
 
     private fun saveTraining(completed: Boolean) {
+        val heartRateSummary = hrRecorder?.summary()
         val training = TrainingRecords.build(
             trainingType = trainingType,
             mode = mode,
@@ -363,14 +423,19 @@ class RoundTimerService : Service() {
             warmupSeconds = warmupSecondsUsed,
             completed = completed,
             stats = coachSession?.stats,
+            heartRate = heartRateSummary,
         )
         val id = dbHandler.insertData(training)
-        if (id > 0) _pendingEffortId.value = id
+        if (id > 0) {
+            _lastHeartRate.value = heartRateSummary
+            _pendingEffortId.value = id
+        }
     }
 
     override fun onDestroy() {
         tickJob?.cancel()
         coachJob?.cancel()
+        heartRateMonitor.stop()
         releaseWakeLock()
         announcer.shutdown()
         super.onDestroy()
@@ -436,10 +501,79 @@ class RoundTimerService : Service() {
 
         val notification = notificationBuilder.build()
         if (!foregroundStarted) {
-            startForeground(NOTIFICATION_ID, notification)
+            startForegroundTyped(notification)
             foregroundStarted = true
         } else {
             getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification)
+        }
+    }
+
+    /**
+     * Heart rate for this session, if turned on, permitted and the age is
+     * set (zones need max HR = 220 − age). Adaptive coaching needs Coach
+     * mode too; timer-only sessions just record.
+     */
+    private fun startHeartRate() {
+        hrRecorder = null
+        hrCoach = null
+        val age = dao.getAge()
+        if (!dao.getHeartRateEnabled() || age == null || !HeartRateMonitor.hasPermission(this)) return
+        hrMaxHr = HeartRateZones.maxHeartRate(age)
+        hrAdaptive = mode == TrainingMode.BOXING_COACH && dao.getHeartRateCoachingEnabled()
+        hrRecorder = HeartRateRecorder(hrMaxHr)
+        hrCoach = HeartRateCoach(hrMaxHr)
+        heartRateMonitor.start()
+    }
+
+    private fun targetZoneFor(roundNumber: Int): Int {
+        if (hrCoach == null || !hrAdaptive) return 0
+        val difficulty = coachDifficulty ?: return 0
+        return HeartRateZones.targetZone(difficulty, roundNumber, config.rounds)
+    }
+
+    /** One second of session time: record the reading and show it; safety cue in timer-only mode. */
+    private fun tickHeartRate(phase: TimerPhase) {
+        val coach = hrCoach ?: return
+        val bpm = heartRateMonitor.currentBpm()
+        val now = SystemClock.elapsedRealtime()
+        if (bpm != null) coach.onReading(bpm, now)
+        hrRecorder?.tick(bpm)
+        val overLimit = coach.bias(now) == HeartRateBias.OVER_LIMIT
+        _state.update {
+            it?.copy(
+                heartRate = bpm,
+                zone = bpm?.let { b -> HeartRateZones.zoneOf(b, hrMaxHr) } ?: 0,
+                overLimit = overLimit,
+            )
+        }
+        // Coach mode speaks its cues from runCoachLoop(); timer-only has no
+        // coach loop, so only the safety cue is spoken from here.
+        if (mode != TrainingMode.BOXING_COACH && phase == TimerPhase.ROUND && overLimit) {
+            coach.nextCue(now)?.let { speakHeartRateCue(it) }
+        }
+    }
+
+    private fun speakHeartRateCue(cue: String) {
+        Log.d("boombeelogs", "heart rate cue: $cue (bpm=${_state.value?.heartRate})")
+        if (cue == Phrases.HR_SLOW_DOWN) announcer.vibrateWarning()
+        // Spoken directly, not via CoachSession, so cues don't count as calls in the stats.
+        announcer.announceCommand(CoachCommand(CoachSection.DEFENSE, listOf(CommandPart.Phrase(cue))), coachVoiceStyle)
+    }
+
+    /**
+     * The health foreground-service type lets Health Services keep
+     * delivering heart rate with the screen off. It needs the heart-rate
+     * permission, so without it (or on any refusal) the service falls back
+     * to the special-use type alone.
+     */
+    private fun startForegroundTyped(notification: android.app.Notification) {
+        val special = ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+        val type = if (hrCoach != null) special or ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH else special
+        try {
+            ServiceCompat.startForeground(this, NOTIFICATION_ID, notification, type)
+        } catch (e: Exception) {
+            Log.w("boombeelogs", "startForeground with health type failed, falling back", e)
+            ServiceCompat.startForeground(this, NOTIFICATION_ID, notification, special)
         }
     }
 
@@ -453,5 +587,7 @@ class RoundTimerService : Service() {
         // waiting for its own tone) before the next phase's "Round X"/
         // "Rest" announcement — see the round-end branch in runPhase().
         private const val EXTRA_BELL_GAP_MS = 500L
+        // Pause after a heart-rate cue before the next coach call.
+        private const val HR_CUE_DELAY_MS = 2000L
     }
 }

@@ -90,6 +90,10 @@ dependencies {
     implementation 'androidx.wear:wear-tooling-preview:1.0.0'
     implementation 'com.google.android.gms:play-services-wearable:18.1.0'
 
+    // Heart rate during a session: ExerciseClient (exercise type BOXING) keeps
+    // the sensor streaming with the screen off; see HEART_RATE_ZONES.md.
+    implementation 'androidx.health:health-services-client:1.1.0'
+
     // Ambient Mode: keeps the timer screen itself visible (dimmed) instead
     // of handing off to the watch face when idle, so raising the wrist
     // un-dims straight back to the current round/time.

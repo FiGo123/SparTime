@@ -1,5 +1,7 @@
 package com.example.boombee.data.models
 
+import com.example.boombee.heartrate.HeartRateSummary
+
 class Training {
     var id: Int = -1
     var title: String = ""
@@ -42,6 +44,21 @@ class Training {
     /** Rate of perceived exertion 1–10, from the post-session prompt; null = not rated. */
     var effort: Int? = null
     var notes: String? = null
+
+    // Heart rate v4 fields (DATABASE_VERSION 4), watch sessions only; null =
+    // no heart rate recorded. Lists are comma-separated, see HeartRateSummary.
+    var hrAvg: Int? = null
+    var hrMax: Int? = null
+    /** The user's max HR (220 − age) at the time, so zones can be redrawn. */
+    var hrMaxHr: Int? = null
+    /** Seconds below zone 1 then in zones 1–5: "12,40,300,420,180,0". */
+    var hrZoneSeconds: String? = null
+    var hrRoundAvg: String? = null
+    var hrRoundMax: String? = null
+    var hrRoundTarget: String? = null
+    var hrRecovery: String? = null
+    /** One reading every 5 seconds over the session; 0 = no reading. */
+    var hrSamples: String? = null
 
     constructor(
         title: String,
@@ -92,4 +109,38 @@ class Training {
     /** Active seconds, estimated from rounds × round length for pre-v3 rows. */
     fun activeSecondsOrEstimate(): Int =
         if (activeSeconds > 0) activeSeconds else (numberOfRounds.coerceAtLeast(0) * roundDuration.coerceAtLeast(0) * 60)
+
+    val hasHeartRate: Boolean get() = hrAvg != null && (hrMaxHr ?: 0) > 0
+
+    /** Back to a [HeartRateSummary], or null when this session has no heart rate. */
+    fun heartRateSummary(): HeartRateSummary? {
+        if (!hasHeartRate) return null
+        fun ints(s: String?) = s?.split(",")?.mapNotNull { it.trim().toIntOrNull() }.orEmpty()
+        val zones = IntArray(6)
+        ints(hrZoneSeconds).take(6).forEachIndexed { i, v -> zones[i] = v }
+        return HeartRateSummary(
+            avgBpm = hrAvg ?: 0,
+            maxBpm = hrMax ?: 0,
+            maxHr = hrMaxHr ?: 0,
+            zoneSeconds = zones,
+            roundAvg = ints(hrRoundAvg),
+            roundMax = ints(hrRoundMax),
+            roundTarget = ints(hrRoundTarget),
+            recoveries = ints(hrRecovery),
+            samples = ints(hrSamples),
+        )
+    }
+
+    fun applyHeartRate(summary: HeartRateSummary?) {
+        if (summary == null) return
+        hrAvg = summary.avgBpm
+        hrMax = summary.maxBpm
+        hrMaxHr = summary.maxHr
+        hrZoneSeconds = summary.zoneSeconds.joinToString(",")
+        hrRoundAvg = summary.roundAvg.joinToString(",")
+        hrRoundMax = summary.roundMax.joinToString(",")
+        hrRoundTarget = summary.roundTarget.joinToString(",")
+        hrRecovery = summary.recoveries.joinToString(",")
+        hrSamples = summary.samples.joinToString(",")
+    }
 }

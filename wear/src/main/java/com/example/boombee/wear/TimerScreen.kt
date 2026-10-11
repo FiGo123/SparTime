@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.MaterialTheme
@@ -18,6 +19,7 @@ import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.TimeTextDefaults
+import com.example.boombee.heartrate.HeartRateZones
 
 private val BeeYellow = Color(0xFFFFC107)
 
@@ -74,6 +76,7 @@ fun TimerScreen(
                 style = MaterialTheme.typography.display1,
                 color = textColor,
             )
+            state.heartRate?.let { bpm -> HeartRateLine(bpm, state, isAmbient) }
             if (!isAmbient) {
                 Spacer(Modifier.height(8.dp))
                 Row {
@@ -88,4 +91,22 @@ fun TimerScreen(
             }
         }
     }
+}
+
+/** "♥ 152 · Z4 / Z4" in the zone's colour; red "Slow down" over the safety limit. */
+@Composable
+private fun HeartRateLine(bpm: Int, state: RoundTimerState, isAmbient: Boolean) {
+    val zoneText = HeartRateZones.label(state.zone)
+    val target = if (state.targetZone > 0) " / Z${state.targetZone}" else ""
+    val color = when {
+        isAmbient -> Color.Gray
+        state.overLimit -> Color(0xFFF44336)
+        else -> zoneColor(state.zone)
+    }
+    Text(
+        text = if (state.overLimit) "♥ $bpm · Slow down" else "♥ $bpm · $zoneText$target",
+        style = MaterialTheme.typography.caption1,
+        fontWeight = FontWeight.Bold,
+        color = color,
+    )
 }

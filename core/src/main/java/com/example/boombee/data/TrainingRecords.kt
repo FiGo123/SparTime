@@ -5,6 +5,7 @@ import com.example.boombee.coach.Difficulty
 import com.example.boombee.coach.TrainingMode
 import com.example.boombee.coach.VoiceStyle
 import com.example.boombee.data.models.Training
+import com.example.boombee.heartrate.HeartRateSummary
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -29,6 +30,7 @@ object TrainingRecords {
         warmupSeconds: Int,
         completed: Boolean,
         stats: CoachStats?,
+        heartRate: HeartRateSummary? = null,
     ): Training {
         val title = when (trainingType) {
             "BOXING" -> "Boxing Training"
@@ -68,6 +70,7 @@ object TrainingRecords {
             this.distanceCalls = stats?.distanceCalls ?: 0
             this.freestyleCalls = stats?.freestyleCalls ?: 0
             this.roundPunches = stats?.serializeRoundPunches()
+            applyHeartRate(heartRate)
         }
     }
 }

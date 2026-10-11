@@ -55,7 +55,7 @@ class First : Fragment() {
         handleDialogResponse()
         binding.versionLabel.text = "v${AppVersion.VERSION}"
         observeUpdateReady()
-        askAnalyticsConsentOnce()
+        SafetyDialog.showIfNeeded(requireContext()) { askAnalyticsConsentOnce() }
 
         return binding.root
     }
@@ -87,7 +87,7 @@ class First : Fragment() {
 
     // Asked once, on the first launch; changeable later in Settings.
     private fun askAnalyticsConsentOnce() {
-        if (Analytics.consent(requireContext()) != null) return
+        if (_binding == null || Analytics.consent(requireContext()) != null) return
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Help improve BoomBee?")
             .setMessage(

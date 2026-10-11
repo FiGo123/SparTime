@@ -37,6 +37,7 @@ import com.example.boombee.coach.PunchNaming
 import com.example.boombee.coach.VoiceStyle
 import com.example.boombee.data.HistoryStats
 import com.example.boombee.data.models.Training
+import com.example.boombee.heartrate.HeartRateZones
 import com.example.boombee.wear.ui.theme.darkChipColors
 import java.time.format.DateTimeFormatter
 
@@ -53,7 +54,7 @@ internal fun effortColor(effort: Int) = when (effort) {
     else -> Color(0xFFF44336)
 }
 
-/** One session on the watch: stats, effort, punch mix and punches per round, same data as the phone. */
+/** One session on the watch: stats, effort, heart rate (watch only), punch mix and punches per round. */
 @Composable
 fun SessionDetailScreen(
     training: Training,
@@ -113,6 +114,60 @@ fun SessionDetailScreen(
                     ),
                     modifier = Modifier.fillMaxWidth(),
                 )
+            }
+            t.heartRateSummary()?.let { hr ->
+                item { SectionTitle("Heart rate") }
+                item { StatLine("Avg · Max", "${hr.avgBpm} · ${hr.maxBpm} bpm") }
+                hr.peakReached()?.let { reached ->
+                    item {
+                        Text(
+                            if (reached) "Peak zone reached in the last round ✓" else "Peak zone not reached",
+                            style = MaterialTheme.typography.caption2,
+                            color = if (reached) zoneColor(3) else Color.LightGray,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+                item {
+                    HeartRateGraph(
+                        summary = hr,
+                        warmupSeconds = t.warmupSeconds,
+                        roundSeconds = t.roundDuration * 60,
+                        restSeconds = t.restSeconds,
+                        rounds = t.numberOfRounds,
+                    )
+                }
+                item { SectionTitle("Time in zones") }
+                val maxZone = hr.zoneSeconds.maxOrNull()?.coerceAtLeast(1) ?: 1
+                (5 downTo 1).forEach { zone ->
+                    item {
+                        BarLine(
+                            "Z$zone",
+                            hr.zoneSeconds[zone],
+                            maxZone,
+                            zoneColor(zone),
+                            valueText = shortDuration(hr.zoneSeconds[zone]),
+                        )
+                    }
+                }
+                if (hr.roundAvg.isNotEmpty()) {
+                    item { SectionTitle("Rounds vs target") }
+                    hr.roundAvg.forEachIndexed { i, avg ->
+                        val target = hr.roundTarget.getOrNull(i) ?: 0
+                        val zone = HeartRateZones.zoneOf(avg, hr.maxHr)
+                        val label = if (target > 0) "R${i + 1} · target Z$target" else "R${i + 1}"
+                        val mark = when {
+                            avg <= 0 -> ""
+                            target <= 0 -> ""
+                            zone >= target -> " ✓"
+                            else -> " ↓"
+                        }
+                        item { StatLine(label, if (avg > 0) "$avg · Z$zone$mark" else "—") }
+                    }
+                }
+                if (hr.recoveries.isNotEmpty()) {
+                    item { StatLine("Rest recovery", "−${hr.recoveries.sum() / hr.recoveries.size} bpm") }
+                }
             }
             if (!t.notes.isNullOrBlank()) {
                 item { Text(t.notes ?: "", style = MaterialTheme.typography.caption2, textAlign = TextAlign.Center) }
@@ -184,7 +239,7 @@ private fun StatLine(label: String, value: String) {
 }
 
 @Composable
-private fun BarLine(label: String, value: Int, max: Int, color: Color) {
+private fun BarLine(label: String, value: Int, max: Int, color: Color, valueText: String = "$value") {
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp).height(18.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -199,6 +254,6 @@ private fun BarLine(label: String, value: Int, max: Int, color: Color) {
             )
         }
         Spacer(Modifier.width(4.dp))
-        Text("$value", style = MaterialTheme.typography.caption3, color = Color.White, modifier = Modifier.width(24.dp), textAlign = TextAlign.End)
+        Text(valueText, style = MaterialTheme.typography.caption3, color = Color.White, modifier = Modifier.width(30.dp), textAlign = TextAlign.End)
     }
 }

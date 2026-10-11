@@ -95,6 +95,10 @@ class Settings : Fragment() {
             SurveySheet.show(childFragmentManager, fromSettings = true)
         }
 
+        binding.safetyRow.setOnClickListener {
+            SafetyDialog.show(requireContext())
+        }
+
         binding.btnBack.setOnClickListener {
             it.findNavController().navigate(R.id.action_settings_to_first)
         }

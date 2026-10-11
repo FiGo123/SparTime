@@ -44,6 +44,11 @@ object Phrases {
     // once tripped a broken text-normalizer rule in one device's TTS engine).
     const val PICK_UP_SPEED = "Pick up the speed"
     const val GO_POWER = "Power now"
+
+    // Heart-rate cues (watch only) — see HeartRateCoach.nextCue(). The push
+    // cue reuses PICK_UP_SPEED above.
+    const val HR_EASE_OFF = "Breathe, stay sharp"
+    const val HR_SLOW_DOWN = "Slow down, breathe"
 }
 
 /**

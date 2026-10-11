@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.example.boombee.data.Dao
 import com.example.boombee.data.PreferencesProvider
+import com.example.boombee.heartrate.HeartRateBias
 import kotlin.random.Random
 
 private const val TAG = "boombeelogs"
@@ -116,6 +117,16 @@ class CoachSession(
     private var intensity = Intensity.NORMAL
     private var nextIntensityRollMs = 0L
 
+    /**
+     * Where the boxer's heart rate is against this round's target zone,
+     * set by the watch before each call (see HeartRateCoach). Weights the
+     * work/ease roll and the Attack share — see [maybeRollIntensity].
+     * Stays [HeartRateBias.NONE] on the phone, which keeps the purely
+     * random behaviour.
+     */
+    var heartRateBias: HeartRateBias = HeartRateBias.NONE
+    private var rolledForBias = HeartRateBias.NONE
+
     /** Call once at the start of each round (not Rest) — resets ramp/range/freestyle state and rolls a fresh freestyle window. */
     fun startRound(roundNumber: Int, roundDurationSeconds: Int) {
         stats.startRound()
@@ -135,6 +146,7 @@ class CoachSession(
         consecutiveSamePunchCount = 0
         intensity = Intensity.NORMAL
         nextIntensityRollMs = 0L
+        rolledForBias = HeartRateBias.NONE
 
         if (roundNumber >= 2 && dao.getFreestyleEnabled() && random.nextDouble() < FREESTYLE_CHANCE) {
             val durationSeconds = FREESTYLE_DURATIONS_SECONDS.random(random)
@@ -162,11 +174,35 @@ class CoachSession(
      * 15-30s window every time the previous one expires.
      */
     private fun maybeRollIntensity() {
-        if (elapsedInRoundMs < nextIntensityRollMs) return
-        intensity = Intensity.values().filter { it != intensity }.random(random)
+        val bias = heartRateBias
+        // Over the safety limit: ease off right away, whatever the window.
+        if (bias == HeartRateBias.OVER_LIMIT) {
+            intensity = Intensity.LOW
+            rolledForBias = bias
+            nextIntensityRollMs = elapsedInRoundMs + HR_SAFETY_LOW_MS
+            return
+        }
+        // A changed heart-rate bias re-rolls at once instead of waiting out the window.
+        if (elapsedInRoundMs < nextIntensityRollMs && bias == rolledForBias) return
+        rolledForBias = bias
+        intensity = when (bias) {
+            HeartRateBias.BELOW -> weightedIntensity(high = 0.6, normal = 0.3)
+            HeartRateBias.ABOVE -> weightedIntensity(high = 0.1, normal = 0.3)
+            else -> Intensity.values().filter { it != intensity }.random(random)
+        }
         val durationSeconds = random.nextInt(15, 31)
         nextIntensityRollMs = elapsedInRoundMs + durationSeconds * 1000L
         Log.d(TAG, "maybeRollIntensity: intensity=$intensity for ${durationSeconds}s")
+    }
+
+    /** HIGH with chance [high], NORMAL with [normal], otherwise LOW. */
+    private fun weightedIntensity(high: Double, normal: Double): Intensity {
+        val roll = random.nextDouble()
+        return when {
+            roll < high -> Intensity.HIGH
+            roll < high + normal -> Intensity.NORMAL
+            else -> Intensity.LOW
+        }
     }
 
     /**
@@ -238,7 +274,14 @@ class CoachSession(
             }
             pendingFlow.isNotEmpty() -> buildFlowStep(pendingFlow.removeFirst(), voiceStyle)
             else -> {
-                val section = sectionPicker.next()
+                var section = sectionPicker.next()
+                // Heart rate under target: swap some Defense/Distance beats for punches.
+                if (heartRateBias == HeartRateBias.BELOW &&
+                    (section == CoachSection.DEFENSE || section == CoachSection.DISTANCE) &&
+                    random.nextDouble() < HR_BELOW_ATTACK_SWAP_CHANCE
+                ) {
+                    section = sectionPicker.forceNext(CoachSection.ATTACK)
+                }
                 val parts = when (section) {
                     CoachSection.ATTACK -> attackParts(voiceStyle, rampStage())
                     CoachSection.DEFENSE -> defenseParts()
@@ -580,6 +623,10 @@ class CoachSession(
     private data class WarmupStep(val section: CoachSection, val parts: List<CommandPart>)
 
     companion object {
+        // Heart-rate adaptation — see heartRateBias / HEART_RATE_ZONES.md.
+        private const val HR_SAFETY_LOW_MS = 15_000L
+        private const val HR_BELOW_ATTACK_SWAP_CHANCE = 0.35
+
         private const val WORD_MODE_MAX_LENGTH = 3
         private const val CROSS = 2
 
