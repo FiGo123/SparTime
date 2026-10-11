@@ -89,11 +89,24 @@ update, and a commit.
       gitignored `keystore.properties`; **back both up**). Signed AABs for
       3.0.0 build and verify (2026-10-09).
 - [x] **(you)** Play developer account created and verified (2026-10-09).
-- [ ] **(you)** Play Console: create app, enable Wear OS form factor
-      (answers in `PLAY_CONSOLE_ANSWERS.md`). Rebuild both AABs right
-      before uploading (the Desktop copies predate later watch fixes).
-- [ ] First **closed testing** release (phone + watch) + recruit testers.
-      **The 14-day clock starts here.**
+- [x] **(you)** Play Console app "BoomBee: Boxing Timer & Coach" created,
+      Wear OS form factor added (2026-10-11).
+- [x] Phone 3.0.0 (30000) uploaded (internal testing, then added to the
+      closed track **"Beta testers"**, 177+ countries, testers list
+      "BoomBee") and **sent for review 2026-10-11** together with the store
+      listing and all App content forms.
+- [ ] Wear OS closed track ("Beta testers", same list) + upload
+      `boombee-watch-3.0.0.aab` (versionCode 1030000). Deliberately held
+      back; add it a few days into the test so its stricter Wear review
+      runs in parallel. The 14-day rule is per app, so the watch doesn't
+      need its own 14 days.
+- [ ] After approval ("Available to selected testers"): send the opt-in
+      link. **The 14-day clock starts once 12+ testers are opted in.**
+      Aim for 15–20 testers; ask each to keep it installed, open it 3–4×
+      a week and send at least one piece of feedback (Google asks about
+      engagement when you apply for production).
+- [ ] **(you)** Verify the Data safety answers match
+      `PLAY_CONSOLE_ANSWERS.md` (filled in without a review pass).
 
 ### Stage 2 — Analytics + Crashlytics (S) → `RELEASE_ANALYTICS.md`
 - [x] Firebase project `boombee`, Android app `com.filipgolovic.boombee`
@@ -138,10 +151,18 @@ update, and a commit.
 - [x] Drafted answers for Data safety, content rating, target audience
       (18+), ads, health (Fitness) and the watch foreground-service
       declaration → `PLAY_CONSOLE_ANSWERS.md`.
-- [ ] **(you)** Submit those App content forms in Play Console (no API for
-      them).
+- [x] **(you)** App content forms submitted: content rating (Everyone /
+      PEGI 3 / 3+), target audience 18+, ads none, advertising ID no,
+      health = Activity and fitness, government/financial none, app access
+      unrestricted, category Health & Fitness with tags Workout, Martial
+      arts, Sports coaching, Clock/alarm/timer, Health & fitness.
+- [ ] Foreground-service declaration for the watch (comes up with the
+      Wear OS upload; text in `PLAY_CONSOLE_ANSWERS.md`).
 - [x] Listing text + release notes in `app/src/main/play/`.
-- [ ] Icon 512×512, feature graphic 1024×500, phone and watch screenshots.
+- [x] Icon 512×512, feature graphic 1024×500, 6 phone + 6 Wear OS
+      screenshots in `app/src/main/play/listings/en-US/graphics/` (copies
+      in `~/Desktop/BoomBee-release/store/`). Declared as AI-made/edited in
+      the store listing's AI asset declaration.
 - [ ] Full QA pass: phone (timer + coach), watch (timer + coach, ambient,
       ongoing activity), upgrade from a previous closed-test build.
 

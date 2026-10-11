@@ -97,12 +97,12 @@ Kotlin/R package and don't need to match the applicationId. Changing only
 
 - [x] **(you)** Developer account ($25, identity verification), personal
       account, verified 2026-10-09.
-- [ ] **(you)** Create app: name "BoomBee", app (not game), free.
-- [ ] **(you)** Advanced settings → **Form factors → add Wear OS**. Watch
+- [x] **(you)** Create app: name "BoomBee", app (not game), free.
+- [x] **(you)** Advanced settings → **Form factors → add Wear OS**. Watch
       builds then go to the Wear OS tracks, and Wear OS is reviewed
       separately against the Wear app quality guidelines. It's stricter,
       so allow extra days.
-- [ ] Upload the first phone AAB **manually** in the console. The API
+- [x] Upload the first phone AAB **manually** in the console. The API
       can't create the first release of a new app.
 - [ ] **Closed testing** track: create a tester list (Google Group or
       emails), add 12+ testers, and share the opt-in link. Testers must
