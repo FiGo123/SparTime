@@ -65,7 +65,13 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         AmbientModeSupport.attach(this)
         CrashReports.apply(this)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        // Ask for notifications (the ongoing round status) once, not on every launch.
+        val prefs = PreferencesProvider(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED &&
+            prefs.getBoolean(KEY_NOTIFICATIONS_ASKED) != true
+        ) {
+            prefs.putBoolean(KEY_NOTIFICATIONS_ASKED, true)
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
         }
         isBound = bindService(Intent(this, RoundTimerService::class.java), connection, Context.BIND_AUTO_CREATE)
@@ -101,6 +107,8 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
             }
         }
 }
+
+private const val KEY_NOTIFICATIONS_ASKED = "notifications_permission_asked"
 
 @Composable
 fun BoomBeeWearApp(service: RoundTimerService, isAmbient: Boolean) {

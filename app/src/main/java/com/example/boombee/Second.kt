@@ -1,6 +1,6 @@
 package com.example.boombee
 
-import com.example.boombee.data.TrainingRecords
+import com.example.boombee.history.PhoneSessionRecord
 import com.example.boombee.history.EffortPrompt
 import com.example.boombee.analytics.Analytics
 import android.media.AudioManager
@@ -290,6 +290,7 @@ class Second : Fragment() {
                 timeRemainingInMillis = millisUntilFinished
                 updateTimeDisplay()
                 maybeStartFinisher(millisUntilFinished)
+                maybeCheckpoint(millisUntilFinished)
 
                 // Half-time bell
                 if (!halfTimeBellPlayed && millisUntilFinished <= initialTimeInMillis / 2) {
@@ -346,6 +347,7 @@ class Second : Fragment() {
                 timeRemainingInMillis = millisUntilFinished
                 updateTimeDisplay()
                 maybeStartFinisher(millisUntilFinished)
+                maybeCheckpoint(millisUntilFinished)
                 if (!halfTimeBellPlayed && millisUntilFinished <= initialTimeInMillis / 2) {
                     halfTimeBellPlayed = true
                     playBellSound()
@@ -415,24 +417,10 @@ class Second : Fragment() {
     }
 
     private fun saveTraining() {
-        val mode = mainViewModel.trainingMode.value ?: TrainingMode.TIMER_ONLY
-        val training = TrainingRecords.build(
-            trainingType = mainViewModel.trainingType.value ?: "Custom",
-            mode = mode,
-            coachDifficulty = mainViewModel.coachDifficulty.value,
-            voiceStyle = mainViewModel.voiceStyle.value,
-            platform = "phone",
-            startedAt = mainViewModel.sessionStartedAt.takeIf { it > 0 } ?: System.currentTimeMillis(),
-            activeSeconds = roundNum * roundLength * 60,
-            plannedRounds = roundNum,
-            roundsReached = roundNum,
-            roundMinutes = roundLength,
-            restSeconds = (mainViewModel.pauseLengthInMin.value ?: 0) * 60,
-            warmupSeconds = mainViewModel.warmupSeconds.value ?: 0,
-            completed = true,
-            stats = mainViewModel.coachSession?.stats,
+        val id = PhoneSessionRecord.save(
+            requireContext(), mainViewModel,
+            completed = true, roundsReached = roundNum, activeSeconds = roundNum * roundLength * 60,
         )
-        val id = DBHandler(requireContext()).insertData(training)
         EffortPrompt.markPending(requireContext(), id)
         Analytics.log(requireContext(), "training_complete", *Analytics.trainingParams(mainViewModel))
         SurveyTrigger.onTrainingCompleted(requireContext())
@@ -592,6 +580,14 @@ class Second : Fragment() {
             else -> ANNOUNCE_LEAD_MS
         }
         coachHandler.postDelayed(runnable, initialDelay)
+    }
+
+    /** Keeps the History row current every 15 s of round time (see PhoneSessionRecord). */
+    private fun maybeCheckpoint(remainingMs: Long) {
+        val remainingSeconds = (remainingMs / 1000).toInt()
+        if (remainingSeconds % 15 != 0) return
+        val active = PhoneSessionRecord.activeSeconds(mainViewModel, currentRoundNumber, remainingSeconds)
+        PhoneSessionRecord.checkpoint(requireContext(), mainViewModel, currentRoundNumber, active)
     }
 
     // --- Recorded take finisher (see FinisherPlanner / coach_takes_general.txt) ---

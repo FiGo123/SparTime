@@ -186,6 +186,13 @@ notes, and you confirm before anything reaches production.
 
 ## After 1.0
 
+- **Built after the 1.0 test build (in code, not yet uploaded):** recorded
+  attack takes as round finishers on phone and watch (`attack_1`,
+  `attack_2`; see COACH_MODE_TACTICS.md "Recorded takes"), the same-hand
+  slip/duck rule, sessions saved to History as they run (a killed session
+  is kept as "stopped"; "No" on the stop dialog still discards it), and
+  the watch asking for notifications only once. Next upload: **3.1.2**.
+
 - **1.1 — Heart-rate zones (watch only)** → `HEART_RATE_ZONES.md`. Built
   2026-10-11 and installed on the watch for testing. Not part of the 1.0
   release. Its Play Console items (Data safety: heart rate; `health` FGS type)
@@ -198,6 +205,32 @@ notes, and you confirm before anything reaches production.
   that Montenegro is a supported payout country), Google Play Billing, and
   updated privacy policy / Data safety. The 1.0 "free, no ads" choice
   allows this (only switching to a paid download is impossible).
+
+## Future development (proposals, 2026-10-14)
+
+Boxing content (combos, programs, exercises, recordings) comes from Filip;
+Claude builds the screens and the engine. Not started.
+
+- **A. Combo builder.** The user picks combos from the library or types
+  their own ("1-2-3") and sets per block a time or number of rounds
+  ("1-2-3 for 2 rounds, then 1-1-2-slip-2 for 1 round"). The coach then
+  calls only those combos in that block. Solution: a Builder screen saving
+  sessions as presets, reusing the coach engine limited to the chosen
+  combos.
+- **B. Training cards (predefined programs).** Big, easy-to-pick cards on
+  the Training tab: e.g. *Distance* (jab-heavy, footwork), *Closing
+  distance* (entries, hooks and power punches, then move out), *Defense &
+  counter*, *Pressure*, *Conditioning*. Each card shows name, short
+  description, length and difficulty and starts with one tap. Solution:
+  each program is a text file like the combo files: per round a focus
+  (which combos/calls get more weight), the takes to use and the round
+  plan.
+- **C. Strength + boxing circuit.** Rounds that alternate boxing and
+  exercise stations ("10 squats, 10 lunges, 15 push-ups, 20 jumps"), or
+  mixed inside a round (30 s boxing → 30 s burpees), circuit style.
+  Solution: a new station type in the round plan (boxing / exercise, with
+  reps or time; user taps Done or it's time-based), new voice clips for
+  exercise names and counts, and exercises logged in History.
 
 ## How we work through it
 

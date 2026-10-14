@@ -30,6 +30,7 @@ class Dialog : Fragment() {
 
         binding.noButton.setOnClickListener {
             mainViewModel.setDialogAnswer(false)
+            mainViewModel.discardLiveSession = true
             it.findNavController().navigate(R.id.action_dialog_to_first)
         }
 

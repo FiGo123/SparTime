@@ -85,8 +85,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var sessionStartedAt: Long = 0L
         private set
 
+    /** History row of the running session, once its first checkpoint is written (see PhoneSessionRecord). */
+    var liveTrainingId: Long? = null
+
+    /** Set by the stop dialog's "No": First then deletes the checkpointed row. */
+    var discardLiveSession = false
+
     fun resetCoachSession() {
         sessionStartedAt = System.currentTimeMillis()
+        liveTrainingId = null
+        discardLiveSession = false
         Log.d(
             "boombeelogs",
             "resetCoachSession: mode=${_trainingMode.value} difficulty=${_coachDifficulty.value} warmupSeconds=${_warmupSeconds.value} voiceStyle=${_voiceStyle.value}"

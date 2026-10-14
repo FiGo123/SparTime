@@ -123,8 +123,19 @@ class DBHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME,
     }
 
     /** Inserts [training] and returns its new row id (-1 on failure). */
-    fun insertData(training: Training): Long {
-        val db = this.writableDatabase
+    fun insertData(training: Training): Long =
+        writableDatabase.insert(TABLE_NAME, null, contentValues(training))
+
+    /**
+     * Overwrites a saved session's recorded data (used to keep a live
+     * session's row up to date while it runs), keeping its effort and notes.
+     */
+    fun updateTraining(id: Long, training: Training) {
+        val cv = contentValues(training).apply { remove(COL_EFFORT); remove(COL_NOTES) }
+        writableDatabase.update(TABLE_NAME, cv, "$COL_ID = ?", arrayOf(id.toString()))
+    }
+
+    private fun contentValues(training: Training): ContentValues {
         val cv = ContentValues()
         cv.put(COL_TITLE, training.title)
         cv.put(COL_DATE, training.date)
@@ -161,7 +172,7 @@ class DBHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME,
         cv.put(COL_HR_ROUND_TARGET, training.hrRoundTarget)
         cv.put(COL_HR_RECOVERY, training.hrRecovery)
         cv.put(COL_HR_SAMPLES, training.hrSamples)
-        return db.insert(TABLE_NAME, null, cv)
+        return cv
     }
 
     /** Saves the post-session effort rating (1–10, null clears it) and notes. */

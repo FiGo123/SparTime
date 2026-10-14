@@ -145,6 +145,7 @@ class RoundTimerService : Service() {
         coachDifficulty = difficulty
         coachVoiceStyle = voiceStyle
         sessionStartedAt = System.currentTimeMillis()
+        liveTrainingId = null
         activeSeconds = 0
         warmupSecondsUsed = if (trainingMode == TrainingMode.BOXING_COACH) warmupSeconds else 0
         roundReached = 1
@@ -292,6 +293,7 @@ class RoundTimerService : Service() {
                     if (phase == TimerPhase.ROUND) {
                         activeSeconds++
                         maybeStartFinisher(roundNumber)
+                        if (activeSeconds % CHECKPOINT_EVERY_SECONDS == 0) checkpoint()
                     }
                     tickHeartRate(phase)
                 }
@@ -461,6 +463,7 @@ class RoundTimerService : Service() {
 
     private fun onPhaseFinished(phase: TimerPhase, roundNumber: Int) {
         if (phase == TimerPhase.ROUND) {
+            if (roundNumber < config.rounds) checkpoint()
             if (roundNumber >= config.rounds) {
                 saveTraining(completed = true)
                 stop()
@@ -472,28 +475,50 @@ class RoundTimerService : Service() {
         }
     }
 
+    /** History row of the running session once it's worth keeping; updated as it goes so a killed session isn't lost. */
+    @Volatile private var liveTrainingId: Long? = null
+
+    private fun buildRecord(completed: Boolean) = TrainingRecords.build(
+        trainingType = trainingType,
+        mode = mode,
+        coachDifficulty = coachDifficulty,
+        voiceStyle = coachVoiceStyle,
+        platform = "watch",
+        startedAt = sessionStartedAt,
+        activeSeconds = activeSeconds,
+        plannedRounds = config.rounds,
+        roundsReached = if (completed) config.rounds else roundReached,
+        roundMinutes = config.roundMinutes,
+        restSeconds = config.restMinutes * 60,
+        warmupSeconds = warmupSecondsUsed,
+        completed = completed,
+        stats = coachSession?.stats,
+        heartRate = hrRecorder?.summary(),
+    )
+
+    /**
+     * Writes the session so far to History as "stopped" (after the first
+     * minute, then every [CHECKPOINT_EVERY_SECONDS] of round time and at
+     * each round's end). If Android kills the app mid-session — e.g. a
+     * permission changed — the session still shows up in History.
+     */
+    private fun checkpoint() {
+        if (activeSeconds < MIN_SAVED_ACTIVE_SECONDS) return
+        runCatching {
+            val record = buildRecord(completed = false)
+            val id = liveTrainingId
+            if (id == null) liveTrainingId = dbHandler.insertData(record).takeIf { it > 0 }
+            else dbHandler.updateTraining(id, record)
+        }.onFailure { Log.d("boombeelogs", "checkpoint failed: ${it.message}") }
+    }
+
     private fun saveTraining(completed: Boolean) {
-        val heartRateSummary = hrRecorder?.summary()
-        val training = TrainingRecords.build(
-            trainingType = trainingType,
-            mode = mode,
-            coachDifficulty = coachDifficulty,
-            voiceStyle = coachVoiceStyle,
-            platform = "watch",
-            startedAt = sessionStartedAt,
-            activeSeconds = activeSeconds,
-            plannedRounds = config.rounds,
-            roundsReached = if (completed) config.rounds else roundReached,
-            roundMinutes = config.roundMinutes,
-            restSeconds = config.restMinutes * 60,
-            warmupSeconds = warmupSecondsUsed,
-            completed = completed,
-            stats = coachSession?.stats,
-            heartRate = heartRateSummary,
-        )
-        val id = dbHandler.insertData(training)
+        val training = buildRecord(completed)
+        val existing = liveTrainingId
+        val id = if (existing != null) existing.also { dbHandler.updateTraining(it, training) } else dbHandler.insertData(training)
+        liveTrainingId = null
         if (id > 0) {
-            _lastHeartRate.value = heartRateSummary
+            _lastHeartRate.value = hrRecorder?.summary()
             _pendingEffortId.value = id
         }
     }
@@ -650,6 +675,7 @@ class RoundTimerService : Service() {
         /** No new coach call this close to a finisher take, so the take never cuts one off. */
         private const val QUIET_BEFORE_TAKE_MS = 3000L
         private const val MIN_SAVED_ACTIVE_SECONDS = 60
+        private const val CHECKPOINT_EVERY_SECONDS = 15
         private const val ROUND_START_COACH_GRACE_MS = 6000L
         // Extra silence after the bell (on top of playBell() already
         // waiting for its own tone) before the next phase's "Round X"/

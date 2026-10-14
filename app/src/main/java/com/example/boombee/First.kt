@@ -14,7 +14,7 @@ import com.example.boombee.coach.TrainingMode
 import com.example.boombee.coach.VoiceStyle
 import com.example.boombee.data.DBHandler
 import com.example.boombee.data.HistoryStats
-import com.example.boombee.data.TrainingRecords
+import com.example.boombee.history.PhoneSessionRecord
 import com.example.boombee.history.EffortPrompt
 import com.example.boombee.history.EffortSheet
 import com.example.boombee.databinding.FragmentFirstBinding
@@ -247,33 +247,19 @@ class First : Fragment() {
         if (dialogAnswer == true) {
             mainViewModel.setDialogAnswer(false)
             saveInterruptedTraining()
+        } else if (mainViewModel.discardLiveSession) {
+            mainViewModel.discardLiveSession = false
+            PhoneSessionRecord.discard(requireContext(), mainViewModel)
         }
     }
     
     private fun saveInterruptedTraining() {
         val currentRound = mainViewModel.currentRound.value ?: 1
-        val roundLength = mainViewModel.roundLengthInMin.value ?: 0
-        val secondsLeft = mainViewModel.leftTime.value ?: 0
-        // Full rounds before this one, plus the part of this round that ran.
-        val activeSeconds = (currentRound - 1).coerceAtLeast(0) * roundLength * 60 +
-            (roundLength * 60 - secondsLeft).coerceIn(0, roundLength * 60)
-        val training = TrainingRecords.build(
-            trainingType = mainViewModel.trainingType.value ?: "Custom",
-            mode = mainViewModel.trainingMode.value ?: TrainingMode.TIMER_ONLY,
-            coachDifficulty = mainViewModel.coachDifficulty.value,
-            voiceStyle = mainViewModel.voiceStyle.value,
-            platform = "phone",
-            startedAt = mainViewModel.sessionStartedAt.takeIf { it > 0 } ?: System.currentTimeMillis(),
-            activeSeconds = activeSeconds,
-            plannedRounds = mainViewModel.numOfRounds.value ?: currentRound,
-            roundsReached = currentRound,
-            roundMinutes = roundLength,
-            restSeconds = (mainViewModel.pauseLengthInMin.value ?: 0) * 60,
-            warmupSeconds = mainViewModel.warmupSeconds.value ?: 0,
-            completed = false,
-            stats = mainViewModel.coachSession?.stats,
+        val activeSeconds = PhoneSessionRecord.activeSeconds(mainViewModel, currentRound, mainViewModel.leftTime.value ?: 0)
+        val id = PhoneSessionRecord.save(
+            requireContext(), mainViewModel,
+            completed = false, roundsReached = currentRound, activeSeconds = activeSeconds,
         )
-        val id = DBHandler(requireContext()).insertData(training)
         // A session stopped in the first minute isn't worth rating.
         if (activeSeconds >= 60) EffortPrompt.markPending(requireContext(), id)
     }

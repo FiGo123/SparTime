@@ -1001,6 +1001,48 @@ respectively).
 
 ---
 
+## Slip / duck: the next punch uses the same hand
+
+After a slip or a duck, the next punch comes from the **same hand as the
+punch before it**: you slip to the side of the hand you just threw and
+counter with it. `2-slip-2`, `2-slip-4`, `2-slip-6`, `1-duck-3` are fine;
+`2-slip-3`, `2-slip-5`, `1-duck-2` are not.
+
+- `ComboRules.sameHandAroundDefense` checks it. `ComboLibrary` and
+  `FlowLibrary` **skip** a breaking line when they load (logged as
+  "punch after slip/duck must use the same hand"), so a typo can't reach a
+  session.
+- `ComboRulesTest` fails the build if any combo, flow or take line in the
+  asset files breaks it.
+- The coach never inserts slips/ducks on its own; they only come from the
+  files. The one breaking flow (`1-1-2-slip-3`) became `1-1-2-slip-4`.
+
+## Recorded takes: a round's finisher in your own voice
+
+A **take** is one natural recording of a whole attack sequence (e.g.
+`attack_1`: jab… jab, cross, slip, cross… make distance and breathe),
+listed in `coach_takes_general.txt` with its audio clip and the time each
+call starts in the recording. It plays as the **cherry on top** of a round:
+
+- Only **Intermediate and Advanced**, in about **50%** of rounds
+  (`FinisherPlanner.CHANCE`), never the same take twice in a row.
+- At least **1 minute** of normal coaching first (`MIN_BUILDUP_MS`).
+- It starts at exactly the moment that makes it **end 1.5 s before the
+  bell**, or before the round's freestyle window if one is armed; a take
+  too long for the round is skipped.
+- The coach goes quiet 3 s before it and stays quiet during it; the
+  half-time bell and 10-second beep never play over it (the watch still
+  vibrates); Pause pauses it; afterwards freestyle (or the bell) follows
+  almost immediately.
+- Each call shows on screen as the audio reaches it (`TakePlayer` polls
+  the playback position) and counts in History like a normal call.
+
+**Adding a take:** record it in one natural take at training pace with a
+clear gap between calls, save `attack-N.wav`, give Claude the call list
+in order. Claude trims the leading silence, levels it to the other clips
+(peak −1.5 dB), measures each call's start time and adds the line. Current
+takes: `attack_1` (18.6 s, 12 calls), `attack_2` (17.7 s, 12 calls).
+
 ## Open / not yet built
 
 - Southpaw stance setting (would flip left/right in `PunchNaming`).
