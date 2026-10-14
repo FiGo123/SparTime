@@ -36,7 +36,7 @@ private const val TAG = "boombeelogs"
  */
 class CoachSession(
     context: Context,
-    difficulty: Difficulty,
+    private val difficulty: Difficulty,
     private val random: Random = Random.Default,
 ) {
     private val profile = profileFor(difficulty)
@@ -47,8 +47,14 @@ class CoachSession(
     private val defenseGenerator = DefenseGenerator(random)
     private val distanceGenerator = DistanceGenerator(random)
     private val dao = Dao(PreferencesProvider(context))
+    private val takeLibrary = TakeLibrary(context)
 
     val stats = CoachStats()
+
+    /** This round's recorded-take finisher, or null (see [FinisherPlanner]); the platform timer starts it. */
+    var finisher: FinisherPlan? = null
+        private set
+    private var lastTakeId: String? = null
 
     private var isFirstCommandOfRound = true
     private var currentRoundNumber = 1
@@ -157,7 +163,29 @@ class CoachSession(
                 freestyleStartElapsedMs = roundDurationMs - freestyleMs
             }
         }
-        Log.d(TAG, "startRound: round=$roundNumber durationSec=$roundDurationSeconds freestyleArmed=$freestyleArmed")
+        val freestyleMs = if (freestyleArmed) roundDurationSeconds * 1000L - freestyleStartElapsedMs else 0L
+        finisher = FinisherPlanner.plan(
+            takes = takeLibrary.takes,
+            difficulty = difficulty,
+            roundDurationMs = roundDurationSeconds * 1000L,
+            freestyleMs = freestyleMs,
+            lastTakeId = lastTakeId,
+            roll = random.nextDouble(),
+        ) { it.random(random) }
+        finisher?.let { lastTakeId = it.take.id }
+        Log.d(TAG, "startRound: round=$roundNumber durationSec=$roundDurationSeconds freestyleArmed=$freestyleArmed finisher=${finisher?.take?.id}")
+    }
+
+    /** Counts a call from a playing take in the session stats (the take's audio already spoke it). */
+    fun recordTakeCue(cue: TakeCue): CoachCommand {
+        val section = cue.parts.singleOrNull()?.let { it as? CommandPart.Phrase }?.let { sectionForPhrase(it.text) } ?: CoachSection.ATTACK
+        return CoachCommand(section, cue.parts).also { stats.record(it) }
+    }
+
+    /** After the take: the round goes straight into its freestyle window if it has one. */
+    fun onTakeFinished() {
+        finisher = null
+        if (freestyleArmed) elapsedInRoundMs = maxOf(elapsedInRoundMs, freestyleStartElapsedMs)
     }
 
     private fun rampStage(): RampStage = when {

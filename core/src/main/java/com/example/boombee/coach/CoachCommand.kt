@@ -30,6 +30,8 @@ object Phrases {
     // section calls, these bridge two same-hand punches mid-combo.
     const val SLIP = "Slip"
     const val DUCK_UNDER = "Duck under"
+    /** Spoken only inside recorded takes (see TakeLibrary); shown on screen there. */
+    const val BREATHE = "Breathe"
 
     const val FREESTYLE_START = "Now go freestyle, max power and speed"
 

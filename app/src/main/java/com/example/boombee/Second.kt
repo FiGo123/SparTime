@@ -29,6 +29,7 @@ import com.example.boombee.coach.ClipPlayer
 import com.example.boombee.coach.CoachAudio
 import com.example.boombee.coach.CoachCommand
 import com.example.boombee.coach.CoachSession
+import com.example.boombee.coach.TakePlayer
 import com.example.boombee.coach.TrainingMode
 import com.example.boombee.coach.VoiceStyle
 import com.example.boombee.data.DBHandler
@@ -66,6 +67,7 @@ class Second : Fragment() {
     private var textToSpeech: TextToSpeech? = null
     private var toneGenerator: ToneGenerator? = null
     private val clipPlayer: ClipPlayer by lazy { ClipPlayer(requireContext()) }
+    private val takePlayer: TakePlayer by lazy { TakePlayer(requireContext()) }
 
     private val coachHandler = Handler(Looper.getMainLooper())
     private var coachRunnable: Runnable? = null
@@ -287,6 +289,7 @@ class Second : Fragment() {
             override fun onTick(millisUntilFinished: Long) {
                 timeRemainingInMillis = millisUntilFinished
                 updateTimeDisplay()
+                maybeStartFinisher(millisUntilFinished)
 
                 // Half-time bell
                 if (!halfTimeBellPlayed && millisUntilFinished <= initialTimeInMillis / 2) {
@@ -326,13 +329,15 @@ class Second : Fragment() {
             mainViewModel.setLeftTime((timeRemainingInMillis / 1000).toInt())
             updateButtonState()
             stopCoachLoop()
+            takePlayer.pause()
         }
     }
 
     private fun resumeTimer() {
         isTimerPaused = false
         updateButtonState()
-        startCoachLoopIfNeeded()
+        // A paused finisher take carries on where it stopped; otherwise the coach resumes.
+        if (takePlayer.isActive) takePlayer.resume() else startCoachLoopIfNeeded()
         val resumeColor = if (timeRemainingInMillis <= 10_000) R.color.timer_danger else R.color.timer_active
         binding.timeCounter.setTextColor(ContextCompat.getColor(requireContext(), resumeColor))
 
@@ -340,6 +345,7 @@ class Second : Fragment() {
             override fun onTick(millisUntilFinished: Long) {
                 timeRemainingInMillis = millisUntilFinished
                 updateTimeDisplay()
+                maybeStartFinisher(millisUntilFinished)
                 if (!halfTimeBellPlayed && millisUntilFinished <= initialTimeInMillis / 2) {
                     halfTimeBellPlayed = true
                     playBellSound()
@@ -377,12 +383,14 @@ class Second : Fragment() {
         isTimerPaused = false
         mainViewModel.setLeftTime((timeRemainingInMillis / 1000).toInt())
         stopCoachLoop()
+        takePlayer.stop()
         Analytics.log(requireContext(), "training_abort", "round_reached" to currentRoundNumber)
         navController.navigate(R.id.action_second_to_dialog)
     }
 
     private fun handleRoundFinish(navController: NavController) {
         stopCoachLoop()
+        takePlayer.stop()
         if (currentRoundNumber >= roundNum) {
             announceWorkoutDone()
             saveTraining()
@@ -541,7 +549,7 @@ class Second : Fragment() {
     // since pacing depends on combo length/difficulty, not the 1s round tick.
 
     /** @param isRoundStart true only for a genuine new round (not a resume-from-pause) — forces that round's first call to Attack. */
-    private fun startCoachLoopIfNeeded(isRoundStart: Boolean = false) {
+    private fun startCoachLoopIfNeeded(isRoundStart: Boolean = false, afterTake: Boolean = false) {
         if (mainViewModel.trainingMode.value != TrainingMode.BOXING_COACH) return
         val session = mainViewModel.coachSession ?: return
         Log.d(
@@ -552,6 +560,12 @@ class Second : Fragment() {
         stopCoachLoop()
         val runnable = object : Runnable {
             override fun run() {
+                // Leave a short quiet beat before a finisher take instead of
+                // starting a call it would have to cut off.
+                if (finisherIsImminent()) {
+                    coachHandler.postDelayed(this, 500)
+                    return
+                }
                 if (mainViewModel.getSoundStatus()) {
                     val voiceStyle = mainViewModel.voiceStyle.value ?: VoiceStyle.WORDS
                     val command = session.nextCommand(voiceStyle)
@@ -572,8 +586,43 @@ class Second : Fragment() {
         // the opening before the coach starts calling, like a real round.
         // Resuming from pause has no such announcement to wait for at all,
         // so it only needs the plain lead-in.
-        val initialDelay = if (isRoundStart) ROUND_START_COACH_GRACE_MS else ANNOUNCE_LEAD_MS
+        val initialDelay = when {
+            isRoundStart -> ROUND_START_COACH_GRACE_MS
+            afterTake -> AFTER_TAKE_LEAD_MS
+            else -> ANNOUNCE_LEAD_MS
+        }
         coachHandler.postDelayed(runnable, initialDelay)
+    }
+
+    // --- Recorded take finisher (see FinisherPlanner / coach_takes_general.txt) ---
+
+    private fun finisherIsImminent(): Boolean {
+        val plan = mainViewModel.coachSession?.finisher ?: return false
+        return !takePlayer.isActive && timeRemainingInMillis - plan.startWhenRemainingMs < QUIET_BEFORE_TAKE_MS
+    }
+
+    /** Starts this round's take when the remaining time reaches its planned start, so it ends with the round (or at freestyle). */
+    private fun maybeStartFinisher(remainingMs: Long) {
+        val session = mainViewModel.coachSession ?: return
+        val plan = session.finisher ?: return
+        if (takePlayer.isActive || remainingMs > plan.startWhenRemainingMs || !mainViewModel.getSoundStatus()) return
+        if (remainingMs < plan.take.durationMs) {
+            // Too late to fit it whole (e.g. resumed past the start): skip it this round.
+            session.onTakeFinished()
+            return
+        }
+        stopCoachLoop()
+        stopSpeaking()
+        val voiceStyle = mainViewModel.voiceStyle.value ?: VoiceStyle.WORDS
+        Log.d("boombeelogs", "finisher: starting ${plan.take.id} at remainingMs=$remainingMs")
+        takePlayer.start(
+            plan.take,
+            onCue = { cue -> showCall(session.recordTakeCue(cue), voiceStyle) },
+            onDone = {
+                session.onTakeFinished()
+                if (isAdded && isTimerRunning && !isTimerPaused) startCoachLoopIfNeeded(afterTake = true)
+            },
+        )
     }
 
     private fun stopCoachLoop() {
@@ -603,7 +652,7 @@ class Second : Fragment() {
     }
 
     private fun playBellSound() {
-        if (!mainViewModel.getSoundStatus()) return
+        if (!mainViewModel.getSoundStatus() || takePlayer.isActive) return
         try {
             stopSpeaking()
             if (toneGenerator == null) {
@@ -614,7 +663,7 @@ class Second : Fragment() {
     }
 
     private fun playWarningBeep() {
-        if (!mainViewModel.getSoundStatus()) return
+        if (!mainViewModel.getSoundStatus() || takePlayer.isActive) return
         try {
             stopSpeaking()
             if (toneGenerator == null) {
@@ -633,6 +682,7 @@ class Second : Fragment() {
         cancelPendingRestNavigate()
         stopWarmupCoachLoop()
         stopCoachLoop()
+        takePlayer.stop()
         textToSpeech?.shutdown()
         toneGenerator?.release()
         clipPlayer.shutdown()
@@ -643,6 +693,10 @@ class Second : Fragment() {
         fun newInstance(param1: String, param2: String) = Second()
 
         private const val ANNOUNCE_LEAD_MS = 2500L
+        /** No new coach call this close to a finisher take, so the take never cuts one off. */
+        private const val QUIET_BEFORE_TAKE_MS = 3000L
+        /** The take already ends with a breath; freestyle (or the last seconds) follows almost straight away. */
+        private const val AFTER_TAKE_LEAD_MS = 300L
         private const val ROUND_START_COACH_GRACE_MS = 6000L
         // playBellSound()'s ToneGenerator duration (800ms) plus a little
         // extra breathing room — Rest.kt has its own separate TTS instance
