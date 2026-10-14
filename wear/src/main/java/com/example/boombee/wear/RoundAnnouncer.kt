@@ -102,6 +102,9 @@ class RoundAnnouncer(context: Context) {
      * for a tone starting mid-speech (or mid-clip), which is audible as
      * garbled overlap. Called right before every tone below.
      */
+    /** Cuts any call or announcement in progress (e.g. before a recorded take). */
+    fun stop() = stopSpeaking()
+
     private fun stopSpeaking() {
         tts?.stop()
         clipPlayer.stop()

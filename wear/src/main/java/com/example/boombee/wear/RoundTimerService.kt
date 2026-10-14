@@ -18,6 +18,7 @@ import androidx.wear.ongoing.Status
 import com.example.boombee.coach.CoachCommand
 import com.example.boombee.coach.CoachSection
 import com.example.boombee.coach.CoachSession
+import com.example.boombee.coach.TakePlayer
 import com.example.boombee.coach.CommandPart
 import com.example.boombee.coach.Difficulty
 import com.example.boombee.coach.Phrases
@@ -76,6 +77,7 @@ class RoundTimerService : Service() {
     private var wakeLock: PowerManager.WakeLock? = null
 
     private lateinit var announcer: RoundAnnouncer
+    private lateinit var takePlayer: TakePlayer
     private lateinit var dbHandler: DBHandler
     private lateinit var dao: Dao
     private lateinit var heartRateMonitor: HeartRateMonitor
@@ -121,6 +123,7 @@ class RoundTimerService : Service() {
         dbHandler = DBHandler(this)
         dao = Dao(PreferencesProvider(this))
         heartRateMonitor = HeartRateMonitor(this, scope)
+        takePlayer = TakePlayer(this)
         createNotificationChannel()
     }
 
@@ -165,6 +168,10 @@ class RoundTimerService : Service() {
     fun togglePause() {
         _state.update { it?.copy(isPaused = !it.isPaused) }
         _state.value?.let { pushOngoingStatus(it) }
+        // A playing finisher take pauses and resumes with the clock.
+        if (takeRunning) {
+            if (_state.value?.isPaused == true) takePlayer.pause() else takePlayer.resume()
+        }
     }
 
     /** Stop pressed: keeps the session in history (as stopped) once a minute of rounds was done. */
@@ -176,6 +183,7 @@ class RoundTimerService : Service() {
     fun stop() {
         tickJob?.cancel()
         coachJob?.cancel()
+        stopTake()
         heartRateMonitor.stop()
         hrRecorder = null
         hrCoach = null
@@ -213,6 +221,8 @@ class RoundTimerService : Service() {
             isPaused = false,
         )
         if (phase == TimerPhase.ROUND) roundReached = roundNumber
+        stopTake()
+        takeStartedThisRound = false
         if (phase == TimerPhase.ROUND) {
             val target = targetZoneFor(roundNumber)
             hrRecorder?.startRound(target)
@@ -273,12 +283,16 @@ class RoundTimerService : Service() {
                         }
                         current.remainingSeconds == 10 && !warned -> {
                             warned = true
-                            announcer.playWarning()
+                            // Never beep over a playing take; the vibration still marks it.
+                            if (!takeRunning) announcer.playWarning()
                             announcer.vibrateWarning()
                         }
                     }
                     _state.update { it?.copy(remainingSeconds = it.remainingSeconds - 1) }
-                    if (phase == TimerPhase.ROUND) activeSeconds++
+                    if (phase == TimerPhase.ROUND) {
+                        activeSeconds++
+                        maybeStartFinisher(roundNumber)
+                    }
                     tickHeartRate(phase)
                 }
                 delay(1000)
@@ -363,6 +377,12 @@ class RoundTimerService : Service() {
             val current = _state.value ?: break
             if (current.phase != phase || current.roundNumber != roundNumber) break
             if (!current.isPaused) {
+                // Quiet while this round's finisher take plays, and for a
+                // short beat before it so it never cuts off a call.
+                if (takeRunning || finisherIsImminent(current.remainingSeconds)) {
+                    delay(200)
+                    continue
+                }
                 val now = SystemClock.elapsedRealtime()
                 val coach = hrCoach
                 if (coach != null) {
@@ -391,6 +411,52 @@ class RoundTimerService : Service() {
                 delay(200)
             }
         }
+    }
+
+    // --- Recorded take finisher (see FinisherPlanner / coach_takes_general.txt) ---
+
+    @Volatile private var takeRunning = false
+    @Volatile private var takeStartedThisRound = false
+    private val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
+
+    private fun finisherIsImminent(remainingSeconds: Int): Boolean {
+        val plan = coachSession?.finisher ?: return false
+        return !takeStartedThisRound && remainingSeconds * 1000L - plan.startWhenRemainingMs < QUIET_BEFORE_TAKE_MS
+    }
+
+    /** Called every round second; starts the take when the remaining time reaches its planned start. */
+    private fun maybeStartFinisher(roundNumber: Int) {
+        val session = coachSession ?: return
+        val plan = session.finisher ?: return
+        val remainingMs = (_state.value?.remainingSeconds ?: return) * 1000L
+        if (takeStartedThisRound || remainingMs > plan.startWhenRemainingMs || !dao.getSoundStatus()) return
+        takeStartedThisRound = true
+        if (remainingMs < plan.take.durationMs) {
+            session.onTakeFinished()
+            return
+        }
+        takeRunning = true
+        mainHandler.post {
+            if (_state.value?.roundNumber != roundNumber || _state.value?.phase != TimerPhase.ROUND) {
+                takeRunning = false
+                return@post
+            }
+            announcer.stop()
+            Log.d("boombeelogs", "finisher(watch): starting ${plan.take.id} at remainingMs=$remainingMs")
+            takePlayer.start(
+                plan.take,
+                onCue = { cue -> session.recordTakeCue(cue) },
+                onDone = {
+                    takeRunning = false
+                    session.onTakeFinished()
+                },
+            )
+        }
+    }
+
+    private fun stopTake() {
+        takeRunning = false
+        mainHandler.post { takePlayer.stop() }
     }
 
     private fun onPhaseFinished(phase: TimerPhase, roundNumber: Int) {
@@ -581,6 +647,8 @@ class RoundTimerService : Service() {
         private const val CHANNEL_ID = "boombee_training"
         private const val NOTIFICATION_ID = 1
         private const val ANNOUNCE_LEAD_MS = 2500L
+        /** No new coach call this close to a finisher take, so the take never cuts one off. */
+        private const val QUIET_BEFORE_TAKE_MS = 3000L
         private const val MIN_SAVED_ACTIVE_SECONDS = 60
         private const val ROUND_START_COACH_GRACE_MS = 6000L
         // Extra silence after the bell (on top of playBell() already
