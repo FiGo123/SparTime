@@ -12,10 +12,11 @@
 # the recording, so the on-screen text and History punch counts follow the
 # audio. Call vocabulary is the same as the combo/flow files: 1-6 with
 # slip/duck mid-combo (1-2-slip-2), or a phrase: make_distance,
-# close_distance, move_more, hands_up, breathe.
+# close_distance, move_more, move_out, hands_up, breathe.
 #
 # To add a take: record it, trim the silence at the start, drop the WAV
 # into assets/audio and add a line here with the cue times (Claude can
 # measure them from the file).
 
 attack_1 | take_attack_1 | 0.00=1 ; 1.30=1-1 ; 3.79=3-2 ; 4.88=1-4-3 ; 6.60=3-2 ; 9.43=1-1 ; 10.83=1-2 ; 11.67=1-4 ; 13.97=1 ; 15.02=1-2-slip-2 ; 16.87=make_distance ; 17.55=breathe
+attack_2 | take_attack_2 | 0.35=close_distance ; 1.39=1-4-3 ; 2.86=3-1 ; 4.06=make_distance ; 6.39=1 ; 7.58=1-1 ; 9.85=1 ; 11.25=close_distance ; 12.31=1-6-3 ; 14.07=move_out ; 15.41=move_more ; 16.15=breathe

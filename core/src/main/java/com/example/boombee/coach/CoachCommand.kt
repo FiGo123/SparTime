@@ -32,6 +32,7 @@ object Phrases {
     const val DUCK_UNDER = "Duck under"
     /** Spoken only inside recorded takes (see TakeLibrary); shown on screen there. */
     const val BREATHE = "Breathe"
+    const val MOVE_OUT = "Move out"
 
     const val FREESTYLE_START = "Now go freestyle, max power and speed"
 

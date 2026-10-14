@@ -51,4 +51,12 @@ class FinisherPlannerTest {
         assertEquals(listOf(0L, 1300L, 15020L, 17550L), cues.map { it.atMs })
         assertEquals(listOf(CommandPart.Phrase(Phrases.BREATHE)), cues.last().parts)
     }
+
+    @Test
+    fun everyLineInTheTakesFileParses() {
+        val lines = java.io.File("src/main/assets/coach_takes_general.txt").readLines()
+            .filter { it.isNotBlank() && !it.trimStart().startsWith("#") }
+        assert(lines.isNotEmpty())
+        lines.forEach { line -> assertNotNull("Bad take line: $line", TakeLibrary.parseLine(line)) }
+    }
 }

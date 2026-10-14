@@ -73,6 +73,7 @@ class TakeLibrary(context: Context, schools: List<String> = listOf("general")) {
             "move_more" to Phrases.MOVE_MORE,
             "hands_up" to Phrases.HANDS_UP,
             "breathe" to Phrases.BREATHE,
+            "move_out" to Phrases.MOVE_OUT,
         )
     }
 }
