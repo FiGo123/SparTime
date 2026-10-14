@@ -73,9 +73,13 @@ class FlowLibrary(context: Context, schools: List<String> = listOf("general")) {
                 else -> it.toIntOrNull()?.let { n -> CommandPart.Punch(n) }
             }
         }
-        return if (parts.isEmpty() || parts.any { it == null }) null else {
-            @Suppress("UNCHECKED_CAST")
-            FlowStep.LiteralCombo(parts as List<CommandPart>)
+        if (parts.isEmpty() || parts.any { it == null }) return null
+        @Suppress("UNCHECKED_CAST")
+        val combo = parts as List<CommandPart>
+        if (!ComboRules.sameHandAroundDefense(combo)) {
+            android.util.Log.w("boombeelogs", "FlowLibrary: skipping flow with '$token' (punch after slip/duck must use the same hand)")
+            return null
         }
+        return FlowStep.LiteralCombo(combo)
     }
 }

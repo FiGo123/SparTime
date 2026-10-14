@@ -74,6 +74,10 @@ class ComboLibrary(context: Context, schools: List<String> = listOf("general")) 
             }
         }
         if (parts.isEmpty()) return null
+        if (!ComboRules.sameHandAroundDefense(parts)) {
+            android.util.Log.w("boombeelogs", "ComboLibrary: skipping '$line' (punch after slip/duck must use the same hand)")
+            return null
+        }
         return LibraryCombo(parts, punchCount, isPower)
     }
 }

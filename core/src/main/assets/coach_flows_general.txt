@@ -16,7 +16,9 @@
 #       -> a normal ramp/library-driven Attack pick, same as if no flow
 #          were active
 #   1-6, hyphen-separated, slip/duck allowed mid-combo (e.g. 1-2-3,
-#   1-2-slip-2-3, 1-3-duck-5-2)
+#   1-2-slip-2-3, 1-3-duck-5-2). After a slip/duck the next punch must be
+#   the SAME hand as the punch before it (2-slip-4 yes, 2-slip-3 no) —
+#   a line that breaks this is skipped when the app loads (ComboRules).
 #       -> a fixed combo, spoken exactly as written every time — same
 #          vocabulary as coach_combos_general.txt. Don't write 2-1
 #          ("cross, jab") — CoachSession bans it outright, so a literal
@@ -38,7 +40,7 @@ close_distance > power > move_more > power > make_distance
 close_distance > power > power > make_distance > hands_up
 close_distance > 1-2-slip-2-3 > make_distance > hands_up
 close_distance > 1-3-duck-5-2 > make_distance
-close_distance > power > 1-1-2-slip-3 > make_distance > hands_up
+close_distance > power > 1-1-2-slip-4 > make_distance > hands_up
 close_distance > attack > power > make_distance > move_more
 close_distance > 1-2-3 > power > make_distance > hands_up
 close_distance > power > 1-2-duck-2-4 > make_distance

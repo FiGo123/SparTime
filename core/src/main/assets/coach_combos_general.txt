@@ -2,7 +2,9 @@
 #
 # One combo per line: hyphen-separated tokens.
 #   - 1-6        = punch numbers (standard gym numbering)
-#   - slip, duck = defensive moves, spoken inline as part of the combo
+#   - slip, duck = defensive moves, spoken inline as part of the combo.
+#     The punch after a slip/duck must use the SAME hand as the punch before
+#     it (2-slip-2/4/6, 1-duck-1/3/5); a line breaking this is skipped.
 #   - " | notes" (optional) — free text, not parsed, just for humans reading this file
 #
 # Blank lines and lines starting with # are ignored.
